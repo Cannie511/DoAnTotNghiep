@@ -6,8 +6,6 @@
 const { getUsersService, addUsersService } = require("../Services/User.Service");
 const { hashPassword } = require("../Utils/HashPassword");
 const { handleError } = require("../Utils/HttpError");
-const timestamp = Date.now();
-const currentDate = new Date(timestamp);
 const getUserController = async (req, res) => {
   try {
     const data = await getUsersService();
@@ -20,7 +18,6 @@ const getUserController = async (req, res) => {
 const addUserController = async (req, res) => {
   const { email, password, display_name, language, premium, linked_account } =
     req.body;
-  console.log(email, password, display_name, language, premium, linked_account);
   const hashPass = hashPassword(password);
   try {
     const data = await addUsersService(
