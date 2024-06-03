@@ -16,13 +16,17 @@ const loginController = async (req, res) => {
         }
         return res.status(data.status).json(data);
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({message:'Server Error'});
+        const err = handleError(error);
+        return res.status(err.status).json({ message: err.message });
     }
 };
 
 const registerController = async (req, res) => {
   const { email, password, display_name, language, premium, linked_account } = req.body;
+  if(!email)
+    return res
+      .status(422)
+      .json({message:"email is required"});
   const hashPass = hashPassword(password);
   try {
     const data = await addUsersService(
@@ -33,7 +37,6 @@ const registerController = async (req, res) => {
       premium,
       linked_account
     );
-    
     if (data && data.status === 200){
         const access_token = createKey({email})
         return res.status(data.status).json({...data, access_token: access_token.token});

@@ -1,4 +1,5 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { handleError } = require('../Utils/HttpError');
 require('dotenv').config();
 const secret_key = process.env.ACCESS_TOKEN_SECRET_KEY;
 const exp = process.env.EXPIRED_TIME;
@@ -26,29 +27,27 @@ const createKey = (payload)=>{
     }
 }
 
-const checkKey = (token) =>{
+const checkKey = async (token) =>{
     try {
         if(!token)
-        return {
-            status: 403,
-            message: "token not found"
+          return {
+              status: 403,
+              message: "token not found"
+          }
+        else{
+          const data = jwt.verify(token, secret_key, true)
+            if (data) {
+              return {
+                status: 200,
+                message: "verify successfully",
+              };
+            }
         }
-        jwt.verify(token, secret_key, (err, data)=>{
-            if (err)
-            return {
-                status: 401,
-                message: err,
-            };
-        });
-         return {
-           status: 200,
-           message: "verify successfully",
-         };
     } catch (error) {
-        console.log(error);
+        handleError(error)
         return {
-          status: 500,
-          message: error,
+          status: 401,
+          message: "Unauthorized",
         };
     }
 }
