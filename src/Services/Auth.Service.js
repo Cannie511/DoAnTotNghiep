@@ -1,10 +1,6 @@
 const { createKey } = require("./jwt");
-
-const db_account = [
-  { id:1, username: "Canh51102@gmail.com", password: "abc123" },
-  { id:2, username: "user1@gmail.com", password: "abc123" },
-  { id:3, username: "user2@gmail.com", password: "abc123" },
-];
+const Model = require('../models');
+const { checkPassword } = require("../Utils/HashPassword");
 const LoginService = async (username, password)=>{
     try {
         if (!username || !password) {
@@ -13,11 +9,14 @@ const LoginService = async (username, password)=>{
             message: "username or password is required",
           };
         }
-        const account_user = db_account.find(
-          (item) => item.username === username
-        );
+        const account_user = await Model.User.findOne({
+          where:{
+            email:username
+          }
+          ,raw:true
+        })
         if (account_user) {
-            if(password === account_user.password){
+            if(checkPassword(password, account_user.password)){
                 const access_token = await createKey({username});
                 return {
                   status: 200,

@@ -5,7 +5,7 @@ const salt = bcrypt.genSaltSync(saltRounds);
 const hashPassword = (password) => {
     try {
         if (!password) {
-          throw new Error("Password is required");
+          return new Error("Password is required");
         } else {
           const passwordHashed = bcrypt.hashSync(password, salt);
           return passwordHashed;
@@ -24,7 +24,7 @@ const checkPassword = (password, hashPassword) => {
       return check;
     }
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(error.message);   
   }
 };
 module.exports = { hashPassword, checkPassword };
