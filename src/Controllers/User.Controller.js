@@ -1,12 +1,28 @@
-const { getUsersService, addUsersService } = require("../Services/User.Service");
+const {
+  getUsersByIdService,
+  addUsersService,
+  deleteUserService,
+  updateUserService,
+} = require("../Services/User.Service");
 const { hashPassword } = require("../Utils/HashPassword");
-const { handleError } = require("../Utils/HttpError");
+const { handleError } = require("../Utils/Http");
 const pagination = require("../Utils/Pagination");
+
+const getUserByIdController = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const data = await getUsersByIdService(user_id);
+    console.log(data);
+    return res.status(data.status).json(data);
+  } catch (error) {
+    return err = handleError(error)
+  }
+};
 
 const getUserController = async (req, res) => {
   try {
-    const {page} = req.query;
-    if(page){
+    const { page } = req.query;
+    if (page) {
       const attr = [
         "id",
         "email",
@@ -14,9 +30,9 @@ const getUserController = async (req, res) => {
         "language",
         "premium",
         "linked_account",
-        "createdAt"
+        "createdAt",
       ];
-      const data = await pagination("User",attr, page); 
+      const data = await pagination("User", attr, page);
       if (data) return res.status(data.status).json(data);
     }
     const data = await getUsersService();
@@ -34,11 +50,11 @@ const addUserController = async (req, res) => {
   try {
     const data = await addUsersService(
       email,
-      hashPass, 
+      hashPass,
       display_name,
       language,
       premium,
-      linked_account,
+      linked_account
     );
     if (data) return res.status(data.status).json(data);
   } catch (error) {
@@ -47,14 +63,13 @@ const addUserController = async (req, res) => {
   }
 };
 
-const editUserController = async (req, res) => {
-  const { email, password, display_name, language, premium, linked_account } =
-    req.body;
-  const hashPass = hashPassword(password);
+const updateUserController = async (req, res) => {
   try {
-    const data = await addUsersService(
+    const { user_id } = req.params;
+    const { email, display_name, language, premium, linked_account } = req.body;
+    const data = await updateUserService(
+      user_id,
       email,
-      hashPass,
       display_name,
       language,
       premium,
@@ -68,18 +83,9 @@ const editUserController = async (req, res) => {
 };
 
 const deleteUserController = async (req, res) => {
-  const { email, password, display_name, language, premium, linked_account } =
-    req.body;
-  const hashPass = hashPassword(password);
+  const { user_id } = req.params;
   try {
-    const data = await addUsersService(
-      email,
-      hashPass,
-      display_name,
-      language,
-      premium,
-      linked_account
-    );
+    const data = await deleteUserService(user_id);
     if (data) return res.status(data.status).json(data);
   } catch (error) {
     const err = handleError(error);
@@ -88,8 +94,9 @@ const deleteUserController = async (req, res) => {
 };
 
 module.exports = {
+  getUserByIdController,
   getUserController,
   addUserController,
-  editUserController,
+  updateUserController,
   deleteUserController,
 };

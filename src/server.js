@@ -6,12 +6,15 @@ const AuthRoute = require('./Routes/Auth.api');
 const UserRoute = require('./Routes/User.api');
 const db_connect = require('./Database/db.connect');
 const { hashPassword, checkPassword } = require('./Utils/HashPassword');
+const cors_config = require('./Middlewares/CORS')
 require("dotenv").config();
 
+app.use(cors_config);
 app.use(db_connect);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+//PORT SERVER
 const port = process.env.PORT || 5000;
 
 //route test
@@ -27,8 +30,8 @@ app.get('/', Authentication, async(req, res)=>{
 
 app.use('/auth', AuthRoute);
 app.use("/api", Authentication, UserRoute);
-app.use((req, res, next) => {
-  res.status(404).send("404 Not Found")
+app.use((req, res) => {
+  res.status(404).json({status: 404, message:"404 NOT FOUND"})
 });
 app.listen(port, ()=>{
     console.log(`[Đồ án tốt nghiệp] is running on port ${port}, domain: http://localhost:${port}`)
