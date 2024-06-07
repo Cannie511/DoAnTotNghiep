@@ -1,4 +1,5 @@
 const Model = require("../models");
+const { checkPassword, hashPassword } = require("../Utils/HashPassword");
 const { handleError, handleResult } = require("../Utils/Http");
 
 const getUsersByIdService = async (user_id) => {
@@ -25,7 +26,7 @@ const getUsersByIdService = async (user_id) => {
     }
     return handleResult(400, "User not found");
   } catch (error) {
-    return (err = handleError(error));
+    return err = handleError(error);
   }
 };
 
@@ -67,11 +68,7 @@ const addUsersService = async (
       raw: true,
     });
     if (isExists)
-      return {
-        status: 405,
-        message: "User is already exist! Try another email",
-        data: [],
-      };
+      return handleResult(405, "User is already exist! Try another email");
     const users = await Model.User.create({
       email,
       password,
@@ -81,16 +78,8 @@ const addUsersService = async (
       linked_account,
     });
     if (!users)
-      return {
-        status: 400,
-        message: "add user failed",
-        data: [],
-      };
-    return {
-      status: 200,
-      message: "add user successfully",
-      data: users,
-    };
+      return handleResult(400, "add user failed");
+    return handleResult(200, "add user successfully", {data: users});
   } catch (error) {
     return handleError(error);
   }
@@ -106,7 +95,7 @@ const updateUserService = async (
 ) => {
   try {
     if (!user_id)
-      return res.status(422).json({ message: "User_id is required" });
+      return handleResult(422, "User_id is required");
     const isExists = await Model.User.findOne({
       where: {
         id: user_id,
@@ -130,19 +119,49 @@ const updateUserService = async (
         }
       );
       if (+data === 1)
-        return {
-          status: 200,
-          message: "update user successfully",
-        };
+        return handleResult(200, "Update user successfully");
+      return handleResult(405, "Update user failed");
     }
-    return {
-      status: 422,
-      message: "User_id is not exist",
-    };
+    return handleResult(422, "User is not exist");
   } catch (error) {
     return handleError(error);
   }
 };
+
+const updatePasswordService = async (user_id, old_password, new_password)=>{
+  try {
+    const isExist = await Model.User.findOne({
+      attributes: ["id", "password"],
+      where: {
+        id: user_id,
+      },
+      raw: true,
+    });
+    if (isExist) {
+       if (checkPassword(old_password, isExist.password)) {
+
+        const data = await Model.User.update(
+          {
+            password: hashPassword(new_password),
+          },
+          {
+            where: {
+              id: user_id,
+            },
+            raw: true,
+          }
+        );
+        if (+data === 1)
+          return handleResult(200, "Update user password successfully");
+        return handleResult(405, "Update user password failed");
+      }
+      return handleResult(422, "Old password is not correct");
+    }
+    return handleResult(422, "User is not exist");
+  } catch (error) {
+    return handleError(error)
+  }
+}
 
 const deleteUserService = async (user_id) => {
   try {
@@ -173,5 +192,6 @@ module.exports = {
   getUsersService,
   addUsersService,
   updateUserService,
+  updatePasswordService,
   deleteUserService,
 };

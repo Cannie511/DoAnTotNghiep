@@ -3,6 +3,7 @@ const {
   addUsersService,
   deleteUserService,
   updateUserService,
+  updatePasswordService,
 } = require("../Services/User.Service");
 const { hashPassword } = require("../Utils/HashPassword");
 const { handleError } = require("../Utils/Http");
@@ -82,6 +83,22 @@ const updateUserController = async (req, res) => {
   }
 };
 
+const updatePasswordController = async (req, res)=>{
+  try {
+    const { user_id } = req.params;
+    const { old_password, new_password } = req.body;
+    const data = await updatePasswordService(
+      user_id,
+      old_password,
+      new_password
+    );
+    if(data) return res.status(data.status).json(data);
+  } catch (error) {
+    const err = handleError(error);
+    return res.status(err.status).json({ message: err.message });
+  }
+}
+
 const deleteUserController = async (req, res) => {
   const { user_id } = req.params;
   try {
@@ -98,5 +115,6 @@ module.exports = {
   getUserController,
   addUserController,
   updateUserController,
+  updatePasswordController,
   deleteUserController,
 };
