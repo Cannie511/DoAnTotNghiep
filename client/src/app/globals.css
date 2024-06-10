@@ -3,7 +3,7 @@
   @tailwind utilities;
 
   *{
-    transition: all .2s ease-in-out;
+
   }
   @layer base {
      
@@ -72,7 +72,8 @@
     }
   }
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 5px;
+    height: 5px;
 }
 ::-webkit-scrollbar-track {
     @apply

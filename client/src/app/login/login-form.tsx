@@ -1,28 +1,80 @@
 'use client'
 import React, { FormEvent, useEffect, useState } from 'react'
-import { Button, Card, Label, TextInput } from "flowbite-react";
+import { Button, Card, Label, Spinner, TextInput } from "flowbite-react";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { HiOutlineLogin } from "react-icons/hi";
 import '@/styles/login.css'
 import NavLogin from '@/components/ui/login-navigation';
+import { AuthEmail, AuthLogin } from '@/apis/auth.api';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+
 export default function LoginForm() {
+  const router = useRouter();
   const [step, setStep] = useState<number>(1);
-  const [username, setUsername] = useState<string>();
-  const [password, setPassword] = useState<string>();
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [validateUsername, setValidateUsername] = useState<boolean>(false);
   const [validatePassword, setValidatePassword] = useState<boolean>(false);
-  const handleStep = ()=>{
-    if(!username){
-        setValidateUsername(true); 
+  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [isLoading, setLoading] = useState<boolean | undefined>(false);
+  
+  const handleStep = async () =>{
+    try {
+        if(isLoading) return;
+        setLoading(true);
+        if(!username){
+            setValidateUsername(true);
+            setErrorMessage('Tên đăng nhập không được để trống');
+        }
+        else {
+            await AuthEmail(username)
+            .then((data)=>{
+                setStep(2);
+            })
+            .catch((err)=>{
+                setValidateUsername(true);
+                setErrorMessage("Tài khoản này chưa tồn tại")
+            })
+        }
+    } catch (error) {
+        setValidateUsername(true);
+        console.log(error);
+    }finally{
+        setLoading(false)
     }
-    else setStep(2);
   }
-  const onSubmit = (e:FormEvent<HTMLFormElement>) =>{
+  const onSubmit = async(e:FormEvent<HTMLFormElement>) =>{
     e.preventDefault();
-    if(!password){
-        setValidatePassword(true); 
+    setLoading(true);
+    try {
+        if(!password){
+            setValidatePassword(true); 
+        }
+        if(username && password){
+            await AuthLogin({username, password})
+            .then(async (data)=>{
+                 await axios.post('/api/auth',{access_token: data.data.access_token})
+                 .then((data)=>{
+                    router.push('/')
+                 })
+                .catch((err)=>{
+                    console.log(err);
+                    setValidatePassword(true);
+                    setErrorMessage("Không có token")
+                })
+
+            })
+            .catch((err)=>{
+                setValidatePassword(true);
+                setErrorMessage("Sai mật khẩu!")
+            })
+        } 
+    } catch (error) {
+        console.log(error);
+    }finally{
+        setLoading(false)
     }
-    console.log(username, password)
   }
   useEffect(()=>{
     setValidateUsername(false); 
@@ -43,11 +95,11 @@ export default function LoginForm() {
                                 <Label htmlFor="email1" color={validateUsername ? 'failure':'gray'} value="Email đăng nhập: " />
                             </div>
                             <TextInput className='dark:text-black' color={validateUsername ? 'failure':'gray'} type="email" value={username} 
-                                onChange={(e)=>setUsername(e.target.value)} placeholder="name@flowbite.com"
-                                helperText={validateUsername ? 'Tên đăng nhập không được để trống':''}
+                                onChange={(e)=>setUsername(e.target.value)} placeholder="example@freetco.com"
+                                helperText={validateUsername ? errorMessage:''}
                             />
                         </div>
-                        <Button type="button" onClick={handleStep}>Tiếp theo</Button>
+                        <Button disabled={isLoading} type="button" onClick={handleStep}>{isLoading ? <Spinner color={'info'} aria-label="Medium sized spinner example" size="md" /> : 'Tiếp theo'}</Button>
                         <div className="line-container">
                             or
                         </div>
@@ -71,11 +123,11 @@ export default function LoginForm() {
                                 <Label htmlFor="password1" color={validatePassword ? 'failure':'gray'} value="Mật khẩu" />
                             </div>
                             <TextInput value={password} color={validatePassword ? 'failure':'gray'} onChange={(e)=>setPassword(e.target.value)} type="password"
-                                helperText={validatePassword ? 'Mật khẩu ít nhất 6 ký tự':''}
+                                helperText={validatePassword ? errorMessage:''}
                             />
                         </div>
                         <button type="button" className='btn-primary' onClick={()=>setStep(1)}>Sử dụng tài khoản khác</button>
-                        <Button type="submit">Đăng nhập <HiOutlineLogin className='text-xl ml-2' /></Button>
+                        <Button disabled={isLoading} type="submit">{isLoading ? <Spinner color={'info'} aria-label="Medium sized spinner example" size="md" /> : <>Đăng nhập <HiOutlineLogin className='text-xl ml-2' /></>}</Button>
                         </form>
                     </>
                     }

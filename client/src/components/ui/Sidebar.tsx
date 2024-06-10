@@ -10,7 +10,7 @@ export default function SideBar() {
     <Sidebar className="h-screen fixed transition-all sm:translate-x-0 -translate-x-full" aria-label="Sidebar with content separator example">
       <Sidebar.Items className="mt-16">
         <Sidebar.ItemGroup>
-          <Sidebar.Item href="#" icon={HiChartPie}>
+          <Sidebar.Item href="/me" icon={HiChartPie}>
             Dashboard
           </Sidebar.Item>
           <Sidebar.Item href="#" icon={HiViewBoards}>

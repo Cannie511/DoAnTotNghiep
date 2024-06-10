@@ -1,6 +1,24 @@
 const { createKey } = require("./jwt");
 const Model = require('../models');
 const { checkPassword } = require("../Utils/HashPassword");
+const { handleResult, handleError } = require("../Utils/Http");
+
+const checkEmailService = async(email)=>{
+  try {
+    if(!email) handleResult(422,'Email is required');
+    const account_user = await Model.User.findOne({
+      where: {
+        email: email,
+      },
+      raw: true,
+    });
+    if(account_user) return handleResult(200, 'get Email successfully')
+    return handleResult(422, "Email not found");
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
 const LoginService = async (username, password)=>{
     try {
         if (!username || !password) {
@@ -41,4 +59,4 @@ const LoginService = async (username, password)=>{
     
 }
 
-module.exports = {LoginService}
+module.exports = { LoginService, checkEmailService };
