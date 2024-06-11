@@ -1,6 +1,6 @@
 'use client'
-import React, { FormEvent, useEffect, useState } from 'react'
-import { Button, Card, Label, Spinner, TextInput } from "flowbite-react";
+import React, { FormEvent, useContext, useEffect, useState } from 'react'
+import { Button, Card, Label, Spinner, TextInput, Tooltip } from "flowbite-react";
 import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { HiOutlineLogin } from "react-icons/hi";
 import '@/styles/login.css'
@@ -8,7 +8,9 @@ import NavLogin from '@/components/ui/login-navigation';
 import { AuthEmail, AuthLogin } from '@/apis/auth.api';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-
+import { useToast } from '@/components/ui/use-toast';
+import { LiaExchangeAltSolid } from "react-icons/lia";
+import { AppContext } from '@/Context/Context';
 export default function LoginForm() {
   const router = useRouter();
   const [step, setStep] = useState<number>(1);
@@ -18,7 +20,8 @@ export default function LoginForm() {
   const [validatePassword, setValidatePassword] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [isLoading, setLoading] = useState<boolean | undefined>(false);
-  
+  const {toast} = useToast();
+  const {setName} = useContext(AppContext)
   const handleStep = async () =>{
     try {
         if(isLoading) return;
@@ -54,9 +57,16 @@ export default function LoginForm() {
         if(username && password){
             await AuthLogin({username, password})
             .then(async (data)=>{
+                setName(data?.data?.data?.display_name)
+                sessionStorage.setItem('user_data',JSON.stringify(data.data.data));
                  await axios.post('/api/auth',{access_token: data.data.access_token})
-                 .then((data)=>{
-                    router.push('/')
+                 .then(async (data)=>{
+                    await router.push('/');
+                    toast({
+                        title: "Chào mừng",
+                        description:"Chào mừng quay trở lại",
+                        
+                    })
                  })
                 .catch((err)=>{
                     console.log(err);
@@ -116,7 +126,7 @@ export default function LoginForm() {
                         <form className="flex flex-col gap-4 -translate-x-0 transition-all" onSubmit={(e)=>onSubmit(e)}>
                         <div>
                             <div className='flex w-full'>
-                                <div className='font-semibold cursor-not-allowed'>{username} </div>
+                                <div className='font-semibold cursor-not-allowed flex'>{username}<Tooltip content="Đổi tài khoản"><Button size={'sm'} className='ml-2 -top-1 rounded-full ' onClick={()=>setStep(1)}><LiaExchangeAltSolid className=''/></Button></Tooltip></div>
                             </div>
                             
                             <div className="my-3 block">
@@ -126,7 +136,6 @@ export default function LoginForm() {
                                 helperText={validatePassword ? errorMessage:''}
                             />
                         </div>
-                        <button type="button" className='btn-primary' onClick={()=>setStep(1)}>Sử dụng tài khoản khác</button>
                         <Button disabled={isLoading} type="submit">{isLoading ? <Spinner color={'info'} aria-label="Medium sized spinner example" size="md" /> : <>Đăng nhập <HiOutlineLogin className='text-xl ml-2' /></>}</Button>
                         </form>
                     </>

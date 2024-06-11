@@ -2,6 +2,7 @@ export interface AuthRes{
     status: number;
     message: string;
     access_token: string;
+    data:any
 }
 export interface UserRes{
     id: number;

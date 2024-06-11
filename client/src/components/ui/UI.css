@@ -1,0 +1,7 @@
+a.navbar-items.active{
+ @apply text-blue-700 dark:text-blue-500 font-extrabold
+}
+li a.navbar-items.active {
+    border-radius: 0px !important;
+    border-bottom: 2px solid  rgb(63,131, 248);
+}

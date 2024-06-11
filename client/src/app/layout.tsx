@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import ClientNav from "@/components/ClientNav";
 import { Toaster } from "@/components/ui/toaster";
+import AppProvider from "@/Context/Context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,12 +29,12 @@ export default function RootLayout({
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
-          >
+          ><AppProvider>
               <ClientNav>
                 {children}
               </ClientNav>
            <Toaster/>
-           
+          </AppProvider>
         </ThemeProvider>
       </body>
     </html>
