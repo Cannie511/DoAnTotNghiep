@@ -7,6 +7,7 @@ const UserRoute = require('./Routes/User.api');
 const db_connect = require('./Database/db.connect');
 const { hashPassword, checkPassword } = require('./Utils/HashPassword');
 const cors_config = require('./Middlewares/CORS')
+const io = require('socket.io')
 require("dotenv").config();
 
 app.use(cors_config);
