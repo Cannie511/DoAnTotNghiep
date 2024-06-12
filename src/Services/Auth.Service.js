@@ -1,4 +1,4 @@
-const { createKey } = require("./jwt");
+const { createKey, createRefreshKey } = require("./jwt");
 const Model = require('../models');
 const { checkPassword } = require("../Utils/HashPassword");
 const { handleResult, handleError } = require("../Utils/Http");
@@ -36,10 +36,12 @@ const LoginService = async (username, password)=>{
       if (account_user) {
           if(checkPassword(password, account_user.password)){
               const access_token = await createKey({id:account_user.id, username, email:account_user.email, display_name: account_user.display_name});
+              const refresh_token = await createRefreshKey({id:account_user.id, username, email:account_user.email, display_name: account_user.display_name});
               return {
                 status: 200,
                 message: "Login successfully",
                 access_token: access_token.token,
+                refresh_token: refresh_token.token,
                 data: {
                   id: account_user?.id,
                   email: account_user?.email,
