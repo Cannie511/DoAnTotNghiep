@@ -1,17 +1,18 @@
 'use client'
-import React, { useState } from 'react'
+
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './dropdown-menu'
 import { Button } from './button'
-
 import Image, { StaticImageData } from 'next/image'
 import { useTheme } from 'next-themes'
+import { useRouter } from 'next/navigation'
 
 interface Props {
     srcImg: StaticImageData
 }
 
 export default function AvatarDropdown({srcImg}:Props) {
-  
+  const router = useRouter();
+  const {theme, setTheme} = useTheme();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -20,11 +21,11 @@ export default function AvatarDropdown({srcImg}:Props) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem >
+        <DropdownMenuItem onClick={()=>router.push('/me')}>
           Tài khoản của tôi 
         </DropdownMenuItem>
-        <DropdownMenuItem >
-          Dark
+        <DropdownMenuItem className='block md:hidden' onClick={theme === 'light' ? ()=>setTheme('dark'):()=>setTheme('light')}>
+          Giao diện: {theme === 'light' ? 'Sáng':'Tối'}
         </DropdownMenuItem>
         <hr />
         <DropdownMenuItem >

@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const { handleError } = require("../Utils/Http");
 require("dotenv").config();
 const secret_key = process.env.ACCESS_TOKEN_SECRET_KEY;
+const refresh_key = process.env.REFRESH_TOKEN_SECRET_KEY;
 const exp = process.env.EXPIRED_TIME;
 const createKey = (payload) => {
   try {
@@ -12,6 +13,30 @@ const createKey = (payload) => {
         token: "",
       };
     const token = jwt.sign(payload, secret_key, { expiresIn: exp });
+    return {
+      status: 200,
+      message: "create token successfully",
+      token,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+      message: "Server Error",
+      token: "",
+    };
+  }
+};
+
+const createRefreshKey = (payload) => {
+  try {
+    if (!payload)
+      return {
+        status: 403,
+        message: "payload not found",
+        token: "",
+      };
+    const token = jwt.sign(payload, refresh_key);
     return {
       status: 200,
       message: "create token successfully",
@@ -51,4 +76,4 @@ const checkKey = async (token) => {
     };
   }
 };
-module.exports = { createKey, checkKey };
+module.exports = { createKey, checkKey, createRefreshKey };

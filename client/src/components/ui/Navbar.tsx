@@ -7,8 +7,9 @@ import './UI.css';
 import { useContext } from "react";
 import { AppContext } from "@/Context/Context";
 export default function Navbar() {
-
+    
     const { display_name, setName } = useContext(AppContext);
+    
   return (
     <>
     <nav className="fixed top-0 z-50 w-screen bg-white border-gray-200 dark:bg-gray-900">

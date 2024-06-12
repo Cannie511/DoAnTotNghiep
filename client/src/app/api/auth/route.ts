@@ -1,7 +1,7 @@
 export async function POST(request: Request) {
     const res = await request.json();
     const access_token = res.access_token as string;
-    console.log(res)
+    //console.log(res)
     if(!access_token)
         return Response.json({
             message:'không nhập được token'
