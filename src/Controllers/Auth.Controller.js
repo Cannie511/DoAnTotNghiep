@@ -1,4 +1,4 @@
-const { LoginService, checkEmailService } = require("../Services/Auth.Service");
+const { LoginService, checkEmailService, checkSessionService, GoogleLoginService } = require("../Services/Auth.Service");
 const { addUsersService } = require("../Services/User.Service");
 const { createKey } = require("../Services/jwt");
 const { hashPassword } = require("../Utils/HashPassword");
@@ -14,10 +14,6 @@ const loginController = async (req, res) => {
         secure: process.env.NODE_ENV === "production", 
         sameSite: "lax",
       });
-      // res.setHeader(
-      //   "Set-Cookie",
-      //   `access_token=${data.access_token};Path=/;HttpOnly;Secure;`
-      // );
     }
     return res.status(data.status).json(data);
   } catch (error) {
@@ -29,8 +25,31 @@ const loginController = async (req, res) => {
 const checkEmailController = async(req, res)=>{
   try {
     const {email} = req.body;
+    console.log('email:', email);
     const data = await checkEmailService(email);
-    if(data) res.status(data.status).json(data)
+    if(data) return res.status(data.status).json(data)
+  } catch (error) {
+    const err = handleError(error);
+    return res.status(err.status).json({ message: err.message });
+  }
+}
+
+const GoogleLoginController = async (req, res) => {
+  try {
+    const { google_token } = req.body;
+    const data = await GoogleLoginService(google_token);
+    if (data) return res.status(data.status).json(data);
+  } catch (error) {
+    const err = handleError(error);
+    return res.status(err.status).json({ message: err.message });
+  }
+};
+
+const checkSessionController = async(req, res)=>{
+  try {
+    const { access_token } = req.body || req.cookies;
+    const data = await checkSessionService(access_token);
+    if(data) res.status(data.status).json(data);
   } catch (error) {
     const err = handleError(error);
     return res.status(err.status).json({ message: err.message });
@@ -52,7 +71,7 @@ const registerController = async (req, res) => {
       linked_account
     );
     if (data && data.status === 200) {
-      const access_token = createKey({ email });
+      const access_token = createKey({ email, display_name,language, premium });
       return res
         .status(data.status)
         .json({ ...data, access_token: access_token.token });
@@ -63,4 +82,10 @@ const registerController = async (req, res) => {
     return res.status(err.status).json({ message: err.message });
   }
 };
-module.exports = { loginController, registerController, checkEmailController };
+module.exports = {
+  loginController,
+  registerController,
+  checkEmailController,
+  checkSessionController,
+  GoogleLoginController,
+};

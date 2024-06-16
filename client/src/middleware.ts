@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import http, { getApiFromNextServer } from './Utils/https';
 
  
-const privateRoute = ['/me', '/local_','/user'];
-const authRoute = ['/login']
+const privateRoute = ['/me', '/local_','/user', '/chat'];
+export const authRoute = ['/register','/login',]
 
 export function middleware(request: NextRequest) {
+  
     const {pathname} = request.nextUrl;
-    // console.log(pathname);
     const access_token = request.cookies.get('access_token')?.value;
+   
     if(pathname === '/' && !access_token){
       return NextResponse.redirect(new URL('/login', request.url));
     }
@@ -26,6 +28,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/','/login','/me','/local_', '/user'
+    '/','/login','/register','/me','/local_', '/user', '/chat'
   ],
 }

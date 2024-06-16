@@ -20,8 +20,25 @@ export interface LoginRequestType{
     password: string;
 }
 
+export interface RegisterRequestType{
+    email: string;
+    password: string;
+    display_name: string;
+    language: number;
+    premium: number;
+    linked_account:string;
+}
+
 export interface BasicResponse{
     status: number;
     message: string;
     data: any;
+}
+
+export interface UserData {
+    id:number|null;
+    email: string;
+    display_name: string|null;
+    language: number;
+    premium: number;
 }

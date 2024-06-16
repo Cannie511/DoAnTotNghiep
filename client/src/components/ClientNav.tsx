@@ -7,6 +7,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
+import { authRoute } from '@/middleware';
 export default function ClientNav({
   children,
 }: Readonly<{
@@ -14,7 +15,7 @@ export default function ClientNav({
 }>) {
   const queryClient = new QueryClient()
     const pathname = usePathname();
-    const isLoginRoute = pathname === '/login';
+    const isLoginRoute = authRoute.some(path=>pathname.startsWith(path));
   return (
     <>
         {!isLoginRoute ? <>

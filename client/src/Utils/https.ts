@@ -12,7 +12,10 @@ class Http{
             withCredentials:true,
         })
     }
+    
 }
-
+export const getApiFromNextServer= async(route:string, body={})=>{
+        return await axios.post(route,{body});
+}
 const http = new Http().instance;
 export default http

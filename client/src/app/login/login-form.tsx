@@ -1,18 +1,22 @@
 'use client'
 import React, { FormEvent, useContext, useEffect, useState } from 'react'
 import { Button, Card, Label, Spinner, TextInput, Tooltip } from "flowbite-react";
-import { FaGoogle, FaFacebook } from "react-icons/fa";
 import { HiOutlineLogin } from "react-icons/hi";
 import '@/styles/login.css'
 import NavLogin from '@/components/ui/login-navigation';
-import { AuthEmail, AuthLogin } from '@/apis/auth.api';
+import { AuthEmail, AuthLogin } from '@/Services/auth.api';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { LiaExchangeAltSolid } from "react-icons/lia";
 import { AppContext } from '@/Context/Context';
+import Link from 'next/link';
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode";
+import { useTheme } from 'next-themes';
 export default function LoginForm() {
   const router = useRouter();
+  const {theme} = useTheme();
   const [step, setStep] = useState<number>(1);
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -86,6 +90,11 @@ export default function LoginForm() {
         setLoading(false)
     }
   }
+  const GoogleAuth = useGoogleLogin({
+        onSuccess: tokenResponse => console.log(tokenResponse),
+        flow: 'auth-code',
+    });
+    
   useEffect(()=>{
     setValidateUsername(false); 
   },[username])
@@ -110,15 +119,28 @@ export default function LoginForm() {
                             />
                         </div>
                         <Button disabled={isLoading} type="button" onClick={handleStep}>{isLoading ? <Spinner color={'info'} aria-label="Medium sized spinner example" size="md" /> : 'Tiếp theo'}</Button>
+                        <span>Chưa có tài khoản ? <Link className='text-indigo-700 font-semibold transition-all hover:underline hover:underline-offset-8' href={'/register'}>Đăng ký ngay</Link></span>
                         <div className="line-container">
                             or
                         </div>
-                        <div>
-                            <div className="w-full flex justify-center items-center gap-x-7 mb-3">
-                                <button className="btn-white flex items-center gap-x-3 flex-1 shadow-md text-xl" ><FaGoogle/>Google</button>
-                                <button className="btn-white flex items-center gap-x-3 flex-1 shadow-md text-xl"><FaFacebook className='text-white dark:text-black'/> Facebook</button>
-                            </div>
-                        </div>
+                        <GoogleLogin
+                                width="300px"
+                                theme='outline'
+                                size='large'
+                                shape = 'pill'
+                                logo_alignment='left'
+                                auto_select={false}
+                                useOneTap={false}
+                                onSuccess={credentialResponse => {
+                                    console.log(credentialResponse);
+                                    // const token:string|undefined = credentialResponse?.credential;
+                                    // const info = jwtDecode(String(token));
+                                    // console.log(info);
+                                }}
+                                onError={() => {
+                                    console.log('Login Failed');
+                                }}
+                            />
                     </>
                     }{
                     step === 2 &&

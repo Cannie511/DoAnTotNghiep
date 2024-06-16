@@ -1,5 +1,4 @@
 
-import { Button } from 'flowbite-react';
 import { Metadata } from 'next';
 import React from 'react'
 
@@ -14,7 +13,7 @@ export default function Home() {
     <>
     <div>
       <h1 className="text-4xl">HOME</h1>
-      <div>hahaha</div>
+      
       </div>
     </>
   )

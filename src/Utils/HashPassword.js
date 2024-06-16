@@ -11,20 +11,21 @@ const hashPassword = (password) => {
           return passwordHashed;
         }
     } catch (error) {
-        throw new Error("Sever Error");
+        return new Error("Sever Error");
     }
 };
 
 const checkPassword = (password, hashPassword) => {
   try {
     if (!password || !hashPassword) {
-      throw new Error("Password and hashPassword is required");
+      return new Error("Password and hashPassword is required");
     } else {
       const check = bcrypt.compareSync(password, hashPassword);
       return check;
     }
   } catch (error) {
-    throw new Error(error.message);   
+    return new Error(error.message);   
   }
 };
+
 module.exports = { hashPassword, checkPassword };

@@ -1,17 +1,18 @@
 'use client'
-import { getUsers } from '@/apis/auth.api';
+import { AppContext } from '@/Context/Context';
+import { getUsers } from '@/Services/auth.api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Pagination, Table } from 'flowbite-react';
-import React from 'react'
+import React, { useContext } from 'react'
 
 export default function UserList() {
+  const {setForceLogout} = useContext(AppContext)
   const {data, isLoading, error} = useQuery({
         queryKey:['List user'],
         queryFn: ()=>getUsers(),
     })
-    console.log(data);
-    
+    if(error) setForceLogout(true);
   return (
     <div className="w-full">
       <Table>

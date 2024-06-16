@@ -79,7 +79,14 @@ const addUsersService = async (
     });
     if (!users)
       return handleResult(400, "add user failed");
-    return handleResult(200, "add user successfully", {data: users});
+    return handleResult(200, "add user successfully", {
+      data: {
+        email,
+        display_name,
+        language,
+        premium
+      },
+    });
   } catch (error) {
     return handleError(error);
   }

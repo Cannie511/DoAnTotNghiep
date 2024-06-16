@@ -113,3 +113,10 @@
     @apply bg-background text-foreground;
   }
 }
+hr{
+  @apply border-black dark:border-white 
+}
+
+:root{
+  --primary-color: rgb(63,131, 248)
+}

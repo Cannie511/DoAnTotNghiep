@@ -1,0 +1,6 @@
+.sidebar-items.active{
+    @apply text-indigo-700 font-bold dark:font-bold dark:text-indigo-500 rounded-none border-l-2 border-indigo-700 dark:border-indigo-500
+}
+.sidebar-items svg{
+    @apply text-2xl me-2
+}

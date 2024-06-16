@@ -1,47 +1,31 @@
-'use client'
 import { Sidebar } from "flowbite-react";
-import { useEffect } from "react";
-import { BiBuoy } from "react-icons/bi";
-import { HiArrowSmRight, HiChartPie, HiInbox, HiShoppingBag, HiTable, HiUser, HiViewBoards } from "react-icons/hi";
-
+import NavLink from "./NavLink";
+import '@/styles/Sidebar.css';
+import { MdManageAccounts, MdVideoCameraFront } from "react-icons/md";
+import { IoChatbubbleEllipses } from "react-icons/io5";
+import { FaCalendarAlt } from "react-icons/fa";
+import { FaRegNewspaper } from "react-icons/fa6";
 export default function SideBar() {
   return (
     <>
     <Sidebar className="h-screen fixed transition-all sm:translate-x-0 -translate-x-full" aria-label="Sidebar with content separator example">
       <Sidebar.Items className="mt-16">
         <Sidebar.ItemGroup>
-          <Sidebar.Item href="/me" icon={HiChartPie}>
-            Dashboard
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiViewBoards}>
-            Kanban
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiInbox}>
-            Inbox
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiUser}>
-            Users
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiShoppingBag}>
-            Products
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiArrowSmRight}>
-            Sign In
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiTable}>
-            Sign Up
-          </Sidebar.Item>
-        </Sidebar.ItemGroup>
-        <Sidebar.ItemGroup>
-          <Sidebar.Item href="#" icon={HiChartPie}>
-            Upgrade to Pro
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={HiViewBoards}>
-            Documentation
-          </Sidebar.Item>
-          <Sidebar.Item href="#" icon={BiBuoy}>
-            Help
-          </Sidebar.Item>
+          <NavLink href="/profile" className="sidebar-items text-start flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+            <MdManageAccounts/> Tài khoản
+          </NavLink>
+          <NavLink href="/chat" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+            <IoChatbubbleEllipses/> Trò chuyện
+          </NavLink>
+          <NavLink href="/blog" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+           <FaRegNewspaper/> Bài đăng
+          </NavLink>
+          <NavLink href="/meeting" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+           <MdVideoCameraFront/> Phòng họp
+          </NavLink>
+          <NavLink href="/schedule" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+           <FaCalendarAlt/> Lịch trình
+          </NavLink>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>

@@ -7,12 +7,11 @@ import './UI.css';
 import { useContext } from "react";
 import { AppContext } from "@/Context/Context";
 export default function Navbar() {
-    
-    const { display_name, setName } = useContext(AppContext);
+    const { display_name } = useContext(AppContext);
     
   return (
     <>
-    <nav className="fixed top-0 z-50 w-screen bg-white border-gray-200 dark:bg-gray-900">
+    <nav className="fixed top-0 z-20 w-screen bg-white border-gray-200 dark:bg-gray-900">
         <div className="max-w-screen-3xl flex flex-wrap items-center justify-between mx-auto p-4">
             <button data-drawer-target="separator-sidebar" data-drawer-toggle="separator-sidebar" aria-controls="separator-sidebar" type="button" className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
             <span className="sr-only">Open sidebar</span>
@@ -25,7 +24,7 @@ export default function Navbar() {
         </Link>
         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             <div className="me-1 flex">
-                 <span className="relative top-1 right-1 font-semibold">{display_name}</span>
+                 <span className="relative top-1 right-1 font-semibold hidden md:block">{display_name}</span>
                 <AvatarDropdown srcImg={favicon}/>
             </div>
             <ModeToggle/>

@@ -16,3 +16,16 @@
 .line-container::after {
     margin-left: 10px;
 }
+#containter{
+    width: 100% !important;
+}
+iframe{
+    margin: 0 auto !important;
+    border-radius: 20px;
+    padding-left: 0 !important;
+  @apply bg-white dark:bg-slate-800
+}
+.qJTHM{
+  width: fit-content !important;
+  @apply bg-white dark:bg-slate-800
+}
