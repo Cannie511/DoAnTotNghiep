@@ -64,6 +64,7 @@ const addUsersService = async (
     const isExists = await Model.User.findOne({
       where: {
         email: email,
+        
       },
       raw: true,
     });

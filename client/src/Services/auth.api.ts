@@ -16,6 +16,12 @@ export const AuthLogin = async({username, password}:LoginRequestType)=>{
     })
 }
 
+export const AuthLoginGoogle = async(google_token:string|undefined)=>{
+    return await http.post<AuthRes>('auth/loginWithGoogle',{
+        google_token
+    })
+}
+
 export const AuthRegister = async({email, password, display_name, language, premium, linked_account = 'không'}:RegisterRequestType)=>{
     return await http.post('auth/register',{
         email, password, display_name, language, premium, linked_account

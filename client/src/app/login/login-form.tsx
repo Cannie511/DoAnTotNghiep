@@ -4,19 +4,17 @@ import { Button, Card, Label, Spinner, TextInput, Tooltip } from "flowbite-react
 import { HiOutlineLogin } from "react-icons/hi";
 import '@/styles/login.css'
 import NavLogin from '@/components/ui/login-navigation';
-import { AuthEmail, AuthLogin } from '@/Services/auth.api';
+import { AuthEmail, AuthLogin, AuthLoginGoogle } from '@/Services/auth.api';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { LiaExchangeAltSolid } from "react-icons/lia";
 import { AppContext } from '@/Context/Context';
 import Link from 'next/link';
-import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from "jwt-decode";
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { useTheme } from 'next-themes';
 export default function LoginForm() {
   const router = useRouter();
-  const {theme} = useTheme();
   const [step, setStep] = useState<number>(1);
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -71,13 +69,13 @@ export default function LoginForm() {
                         description:"Chào mừng quay trở lại",
                         
                     })
+                    googleLogout();
                  })
                 .catch((err)=>{
                     console.log(err);
                     setValidatePassword(true);
                     setErrorMessage("Không có token")
                 })
-
             })
             .catch((err)=>{
                 setValidatePassword(true);
@@ -90,10 +88,6 @@ export default function LoginForm() {
         setLoading(false)
     }
   }
-  const GoogleAuth = useGoogleLogin({
-        onSuccess: tokenResponse => console.log(tokenResponse),
-        flow: 'auth-code',
-    });
     
   useEffect(()=>{
     setValidateUsername(false); 
@@ -124,23 +118,59 @@ export default function LoginForm() {
                             or
                         </div>
                         <GoogleLogin
-                                width="300px"
-                                theme='outline'
-                                size='large'
-                                shape = 'pill'
-                                logo_alignment='left'
-                                auto_select={false}
-                                useOneTap={false}
-                                onSuccess={credentialResponse => {
-                                    console.log(credentialResponse);
-                                    // const token:string|undefined = credentialResponse?.credential;
-                                    // const info = jwtDecode(String(token));
-                                    // console.log(info);
-                                }}
-                                onError={() => {
-                                    console.log('Login Failed');
-                                }}
-                            />
+                            width="300px"
+                            theme='outline'
+                            size='large'
+                            shape = 'pill'
+                            logo_alignment='left'
+                            auto_select={false}
+                            useOneTap={false}
+                            onSuccess={async (credentialResponse) => {
+                                setLoading(true);
+                                const token:string|undefined = credentialResponse?.credential;
+                                await AuthLoginGoogle(token)
+                                .then(async (data)=>{
+                                    console.log('google: ',data)
+                                    setName(data?.data?.data?.data?.display_name)
+                                    sessionStorage.setItem('user_data',JSON.stringify(data.data.data.data));
+                                    await axios.post('/api/auth',{access_token: data.data.data.access_token.token})
+                                    .then(async (data)=>{
+                                        await router.push('/');
+                                        toast({
+                                            title: "Chào mừng",
+                                            description:"Chào mừng quay trở lại",
+                                        });
+                                        setLoading(false)
+                                    })
+                                    .catch(err=>{
+                                        console.log(err);
+                                        toast({
+                                            title: "Lỗi",
+                                            description:"Đã có lỗi xảy ra",
+                                            variant:"destructive"
+                                        })
+                                        setLoading(false)
+                                    })
+                                })
+                                .catch(err=>{
+                                    console.log(err);
+                                    toast({
+                                        title: "Lỗi",
+                                        description:"Đã có lỗi xảy ra",
+                                        variant:"destructive"
+                                    })
+                                    setLoading(false)
+                                })
+                            }}
+                            onError={() => {
+                                toast({
+                                    title: "Lỗi",
+                                    description:"Đã có lỗi xảy ra",
+                                    variant:"destructive"
+                                })
+                                setLoading(false)
+                            }}
+                        />
                     </>
                     }{
                     step === 2 &&

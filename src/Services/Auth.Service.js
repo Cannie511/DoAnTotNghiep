@@ -2,8 +2,9 @@ const { createKey, createRefreshKey, checkKey } = require("./jwt");
 const Model = require('../models');
 const { checkPassword } = require("../Utils/HashPassword");
 const { handleResult, handleError } = require("../Utils/Http");
-const jwt = require("jsonwebtoken");
 const { jwtDecode } = require("jwt-decode");
+const { addUsersService } = require("./User.Service");
+const { addUsersGoogleService } = require("./Google.Service");
 const checkEmailService = async(email)=>{
   try {
     if(!email) handleResult(422,'Email is required');
@@ -35,7 +36,56 @@ const GoogleLoginService = async(token) =>{
   try {
     if(!token) return handleResult(422, "Token not found");
     const data = await jwtDecode(token);
-    if (data) return handleResult(200, "login with google successfully", data);
+    console.log(data);
+    if (data)
+    {
+      const account_user = await Model.User.findOne({
+        attributes: [
+          "id",
+          "email",
+          "display_name",
+          "language",
+          "premium",
+          "linked_account",
+          "createdAt",
+        ],
+        where: {
+          email: data.email,
+          linked_account: "google",
+        },
+        raw: true,
+      });
+      if(account_user) 
+      {
+        const access_token = await createKey({
+          id: account_user?.id,
+          email: account_user?.email,
+          display_name: account_user.display_name,
+        });
+        const refresh_token = await createRefreshKey({
+          id: account_user.id,
+          email: account_user.email,
+          display_name: account_user.display_name,
+        });
+        return handleResult(200, "Login with Google successfully", {access_token, refresh_token, data: account_user});
+      }
+      else {
+        const res = await addUsersGoogleService(data?.email,'', data?.name,1,0,'google')
+        if(res.status===200){
+          const access_token = await createKey({
+            id: res?.id,
+            email: res?.email,
+            display_name: res.display_name,
+          });
+          const refresh_token = await createRefreshKey({
+            id: res.id,
+            email: res.email,
+            display_name: res.display_name,
+          });
+          return handleResult(res.status, res.message, {access_token, refresh_token ,data: res.data});
+        } 
+      }
+    }
     else return handleResult(401, "Unauthorized");
   } catch (error) {
     return handleError(error);
@@ -55,8 +105,8 @@ const LoginService = async (username, password)=>{
     });
     if (account_user) {
       if(checkPassword(password, account_user.password)){
-          const access_token = await createKey({id:account_user.id, username, email:account_user.email, display_name: account_user.display_name});
-          const refresh_token = await createRefreshKey({id:account_user.id, username, email:account_user.email, display_name: account_user.display_name});
+          const access_token = await createKey({id:account_user.id, email:account_user.email, display_name: account_user.display_name});
+          const refresh_token = await createRefreshKey({id:account_user.id, email:account_user.email, display_name: account_user.display_name});
           return {
             status: 200,
             message: "Login successfully",
