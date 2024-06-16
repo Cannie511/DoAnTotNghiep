@@ -64,7 +64,7 @@ const addUsersService = async (
     const isExists = await Model.User.findOne({
       where: {
         email: email,
-        
+
       },
       raw: true,
     });
@@ -147,7 +147,6 @@ const updatePasswordService = async (user_id, old_password, new_password)=>{
     });
     if (isExist) {
        if (checkPassword(old_password, isExist.password)) {
-
         const data = await Model.User.update(
           {
             password: hashPassword(new_password),

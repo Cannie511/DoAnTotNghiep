@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { handleError } = require("../Utils/Http");
-const { Key }  = require('../models')
-const { Model } = require("sequelize");
+const { Session } = require("../models");
 require("dotenv").config();
 const secret_key = process.env.ACCESS_TOKEN_SECRET_KEY;
 const refresh_key = process.env.REFRESH_TOKEN_SECRET_KEY;
@@ -40,7 +39,7 @@ const createRefreshKey = async (payload) => {
         token: "",
       };
     const token = jwt.sign(payload, refresh_key);
-    await  Key.create({ token });
+    await Session.create({ token, user_id:payload.id });
     return {
       status: 200,
       message: "create refresh token successfully",

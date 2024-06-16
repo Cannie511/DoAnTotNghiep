@@ -106,7 +106,13 @@ const LoginService = async (username, password)=>{
     if (account_user) {
       if(checkPassword(password, account_user.password)){
           const access_token = await createKey({id:account_user.id, email:account_user.email, display_name: account_user.display_name});
-          const refresh_token = await createRefreshKey({id:account_user.id, email:account_user.email, display_name: account_user.display_name});
+          const refresh_token = await createRefreshKey(
+            {
+              id: account_user.id,
+              email: account_user.email,
+              display_name: account_user.display_name,
+            }
+          );
           return {
             status: 200,
             message: "Login successfully",

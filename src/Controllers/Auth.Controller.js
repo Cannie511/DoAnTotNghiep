@@ -14,6 +14,11 @@ const loginController = async (req, res) => {
         secure: process.env.NODE_ENV === "production", 
         sameSite: "lax",
       });
+      res.cookie("refresh_token", data.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
     }
     return res.status(data.status).json(data);
   } catch (error) {
