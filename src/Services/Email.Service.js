@@ -18,7 +18,7 @@ const sendMailService = async(email, code)=> {
   try {
     if (email) {
       const info = await transporter.sendMail({
-        from: `"Freet.com" <no-reply@freetco.com>`,
+        from: `"Freet.com" <no-reply@freetco>`,
         to: email,
         subject: `Xác thực địa chỉ Email của bạn: [${code}]`,
         html: `<div style='width:30rem; margin: 20px auto;'>

@@ -10,7 +10,7 @@ const checkEmailService = async(email)=>{
     const account_user = await Model.User.findOne({
       where: {
         email: email,
-        linked_account:""
+        linked_account:"verify"
       },
       raw: true,
     });
@@ -100,6 +100,7 @@ const LoginService = async (username, password)=>{
     const account_user = await Model.User.findOne({
       where: {
         email: username,
+        linked_account:"verify"
       },
       raw: true,
     });
