@@ -6,15 +6,12 @@ import '@/styles/login.css'
 import NavLogin from '@/components/ui/login-navigation';
 import { AuthEmail, AuthLogin, AuthLoginGoogle } from '@/Services/auth.api';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { LiaExchangeAltSolid } from "react-icons/lia";
 import { AppContext } from '@/Context/Context';
 import Link from 'next/link';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
-import { useTheme } from 'next-themes';
 export default function LoginForm() {
-  const router = useRouter();
   const [step, setStep] = useState<number>(1);
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');

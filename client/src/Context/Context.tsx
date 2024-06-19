@@ -49,9 +49,15 @@ export default function AppProvider({children}:{children: ReactNode}){
     useEffect(()=>{
         async function forceLog(){
             const id = user_data?.id;
-            await AuthLogout(Number(id));
+            console.log(id)
+            await AuthLogout(Number(id))
+            .then(data=>{
             sessionStorage.removeItem('user_data');
             router.push('/login')
+            })
+            .catch(err=>{
+                console.log(err)
+            })
         }
         if(forceLogout) forceLog();
     },[forceLogout])

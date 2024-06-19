@@ -29,9 +29,12 @@ export const AuthRegister = async({email, password, display_name, language, prem
 }
 
 export const AuthLogout = async(user_id:number)=>{
-     const res = await http.post('/auth/logout', {user_id})
-     if(res.status === 200)
-    return await getApiFromNextServer('/api/auth/logout')
+    try {
+        const res = await http.post('/auth/logout', {user_id})
+        return await getApiFromNextServer('/api/auth/logout')
+    } catch (error) {
+        console.log(error)
+    } 
 }
 
 export const AuthCheckSession = async()=>{

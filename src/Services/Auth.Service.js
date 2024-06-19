@@ -140,15 +140,12 @@ const LoginService = async (username, password)=>{
 const LogoutService = async(token, user_id)=>{
   try {
     const id = +user_id;
-    console.log("data: ", token, user_id)
     const session = await Model.Session.findOne({
       where: {
-        token: token,
         user_id: id,
       },
       raw:true
     });
-    console.log("session: ",session);
     if (session){
       const data = await Model.Session.destroy({
         where: {
@@ -158,7 +155,7 @@ const LogoutService = async(token, user_id)=>{
       if(data !== 1) return handleResult(400, "Log out failed");
       else return handleResult(200, "Log out successfully");
     }
-    return handleResult(403, "Session not found!");
+    return handleResult(200, "force log out from server");
   } catch (error) {
     return handleError(error);
   }
