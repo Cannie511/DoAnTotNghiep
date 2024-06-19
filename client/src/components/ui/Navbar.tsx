@@ -8,10 +8,14 @@ import { useContext } from "react";
 import { AppContext } from "@/Context/Context";
 export default function Navbar() {
     const { display_name } = useContext(AppContext);
-    
+    // function getName(){
+    //     const name = JSON.parse(sessionStorage.getItem('user_data') as string)?.display_name;
+    //     return name;
+    // }
+    // console.log(getName());
   return (
     <>
-    <nav className="fixed top-0 z-20 w-screen bg-white border-gray-200 dark:bg-gray-900">
+    <nav className="fixed top-0 z-50 w-screen bg-white border-gray-200 dark:bg-gray-900">
         <div className="max-w-screen-3xl flex flex-wrap items-center justify-between mx-auto p-4">
             <button data-drawer-target="separator-sidebar" data-drawer-toggle="separator-sidebar" aria-controls="separator-sidebar" type="button" className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
             <span className="sr-only">Open sidebar</span>

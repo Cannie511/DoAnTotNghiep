@@ -8,10 +8,8 @@ import { AuthRegister } from '@/Services/auth.api';
 import { useToast } from '@/components/ui/use-toast';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-interface Props {
-  setStep: Dispatch<SetStateAction<number>>;
-}
-export default function PasswordStep({setStep}:Props) {
+
+export default function PasswordStep() {
     const router = useRouter()
     const {isLoading, setLoading,setName} = useContext(AppContext);
     const {toast} = useToast();
@@ -38,7 +36,7 @@ export default function PasswordStep({setStep}:Props) {
                     display_name: info?.display_name as string, 
                     language: info?.language as number, 
                     premium:0, 
-                    linked_account:"không"})
+                    linked_account:"verify"})
                 .then(async(data)=>{
                     console.log(data.data.data.data?.display_name);
                     setName(data.data.data.data?.display_name)
@@ -46,8 +44,8 @@ export default function PasswordStep({setStep}:Props) {
                     await axios.post('/api/auth',{access_token: data.data.access_token})
                     .then(async(data)=>{
                         sessionStorage.removeItem('info');
-                        sessionStorage.removeItem("step")
-                        await router.push('/');
+                        sessionStorage.removeItem("step");
+                        window.location.reload();
                         toast({
                             title: "Chào mừng",
                             description:"Chào mừng bạn đến với Freet",
@@ -110,10 +108,7 @@ export default function PasswordStep({setStep}:Props) {
         <Button disabled={isLoading} type="button" onClick={handleCheckStep}>
             {isLoading ? <Spinner color={'info'} aria-label="Medium sized spinner example" size="md" /> : 
             <>Tiếp theo <GrFormNext className='text-xl'/></>}
-        </Button>                
-        {/* <div className="line-container">
-            or
-        </div> */}
+        </Button>
     </>
   )
 }

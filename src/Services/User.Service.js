@@ -64,7 +64,7 @@ const addUsersService = async (
     const isExists = await Model.User.findOne({
       where: {
         email: email,
-
+        linked_account:linked_account
       },
       raw: true,
     });
@@ -82,6 +82,7 @@ const addUsersService = async (
       return handleResult(400, "add user failed");
     return handleResult(200, "add user successfully", {
       data: {
+        id: users.id,
         email,
         display_name,
         language,

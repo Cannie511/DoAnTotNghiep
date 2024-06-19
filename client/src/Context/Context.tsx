@@ -1,7 +1,7 @@
 'use client'
-import { AuthCheckSession, AuthLogout } from "@/Services/auth.api";
+import { AuthLogout } from "@/Services/auth.api";
 import { UserData } from "@/types/type";
-import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { ReactNode, createContext, useEffect, useLayoutEffect, useState } from "react";
 
 interface AppContextType {
@@ -29,8 +29,9 @@ const defaultValue: AppContextType = {
 export const AppContext = createContext<any>(defaultValue);
 
 export default function AppProvider({children}:{children: ReactNode}){
+     const router = useRouter();
     const [display_name, setName] = useState<string|null>('');
-    const [isLoading, setLoading] = useState<boolean>(true);
+    const [isLoading, setLoading] = useState<boolean>(false);
     const [user_data, setUser_data] = useState<UserData|null>(null);
     const [forceLogout, setForceLogout] = useState<boolean>(false); 
     useLayoutEffect(()=>{
@@ -47,11 +48,22 @@ export default function AppProvider({children}:{children: ReactNode}){
     }, []);
     useEffect(()=>{
         async function forceLog(){
-            await AuthLogout();
-            window.location.reload();
+            const id = user_data?.id;
+            await AuthLogout(Number(id));
+            sessionStorage.removeItem('user_data');
+            router.push('/login')
         }
         if(forceLogout) forceLog();
     },[forceLogout])
+    useEffect(()=>{
+        router.prefetch('/user');
+        router.prefetch('/profile');
+        router.prefetch('/chat');
+        router.prefetch('/login');
+        router.prefetch('/register');
+        router.prefetch('/');
+        router.prefetch('/local_');
+    },[router])
     return (
         <AppContext.Provider value={{display_name, setName, isLoading, setLoading, user_data, setUser_data, forceLogout, setForceLogout}}>
             {children}

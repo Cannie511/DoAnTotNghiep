@@ -2,10 +2,9 @@
 import { AppContext } from '@/Context/Context';
 import { Button, Label, Spinner, TextInput } from 'flowbite-react'
 import React, { Dispatch, SetStateAction, useContext, useLayoutEffect, useState } from 'react';
-
 import { GrFormNext } from "react-icons/gr";
 import '@/styles/login.css'
-import { AuthEmail } from '@/Services/auth.api';
+import { AuthEmail, AuthGetVerifyCode } from '@/Services/auth.api';
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -34,10 +33,15 @@ export default function EmailStep({setStep}:Props) {
                     setValidateUsername(true);
                     setErrorMessage("Tài khoản này đã tồn tại! vui lòng chọn 1 tài khoản khác.")
                 })
-                .catch((err)=>{
-                    setStep(100);
-                    sessionStorage.setItem('info', JSON.stringify({display_name:info?.display_name, language: info?.language, email: username}))
-                    sessionStorage.setItem("step","100")
+                .catch(async(err)=>{
+                    setLoading(true);
+                    const res = await AuthGetVerifyCode(username);
+                    if(res.status === 200){
+                        setStep(75);
+                        sessionStorage.setItem('info', JSON.stringify({display_name:info?.display_name, language: info?.language, email: username}))
+                        sessionStorage.setItem("step","75")
+                    }
+                    else setValidateUsername(true)
                 })
             }
         } catch (error) {
@@ -63,9 +67,6 @@ export default function EmailStep({setStep}:Props) {
             {isLoading ? <Spinner color={'info'} aria-label="Medium sized spinner example" size="md" /> : 
             <>Tiếp theo <GrFormNext className='text-xl'/></>}
         </Button>                
-        {/* <div className="line-container">
-            or
-        </div> */}
     </>
   )
 }

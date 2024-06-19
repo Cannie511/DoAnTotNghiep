@@ -1,16 +1,10 @@
 'use client'
-import { useContext } from 'react'
 import '../styles/loading.css'
-import { AppContext } from '@/Context/Context';
 
 export default function LoadingComponent() {
-    const {isLoading} = useContext(AppContext);
     return (
         <>
-        {isLoading ? 
-            <div className="line-loading absolute top-0 z-50"></div> 
-            : ''
-        }
+         <div className="line-loading fixed -left-72 -top-10" style={{zIndex:100, width:'120%'}}></div>
         </>
     )
 }

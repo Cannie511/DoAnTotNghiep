@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { Suspense } from 'react'
 import Navbar from './ui/Navbar'
 import SideBar from './ui/Sidebar'
 import { usePathname } from 'next/navigation';
@@ -8,6 +8,7 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 import { authRoute } from '@/middleware';
+import Loading from '@/app/loading';
 export default function ClientNav({
   children,
 }: Readonly<{
@@ -19,7 +20,9 @@ export default function ClientNav({
   return (
     <>
         {!isLoginRoute ? <>
+        
         <QueryClientProvider client={queryClient}>
+          
             <Navbar/>
             <SideBar/>
             <div className="p-4 sm:ml-64">
@@ -30,6 +33,7 @@ export default function ClientNav({
                 </div>
               </div>
         </QueryClientProvider>
+        
         </>:<>
         <QueryClientProvider client={queryClient}>
           {children}

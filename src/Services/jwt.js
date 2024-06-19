@@ -55,6 +55,32 @@ const createRefreshKey = async (payload) => {
   }
 };
 
+const checkRefreshKey = async (token) => {
+  try {
+    if (!token)
+      return {
+        status: 403,
+        message: "token not found",
+      };
+    else {
+      const data = jwt.verify(token, refresh_key, true);
+      if (data) {
+        return {
+          status: 200,
+          message: "verify successfully",
+          data
+        };
+      }
+    }
+  } catch (error) {
+    handleError(error);
+    return {
+      status: 401,
+      message: "Unauthorized",
+    };
+  }
+};
+
 const checkKey = async (token) => {
   try {
     if (!token)
@@ -79,4 +105,4 @@ const checkKey = async (token) => {
     };
   }
 };
-module.exports = { createKey, checkKey, createRefreshKey };
+module.exports = { createKey, checkKey, createRefreshKey, checkRefreshKey };

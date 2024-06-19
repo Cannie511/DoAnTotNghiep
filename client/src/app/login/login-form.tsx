@@ -63,11 +63,11 @@ export default function LoginForm() {
                 sessionStorage.setItem('user_data',JSON.stringify(data.data.data));
                  await axios.post('/api/auth',{access_token: data.data.access_token})
                  .then(async (data)=>{
-                    await router.push('/');
+                    // router.push('/');
+                    window.location.reload();
                     toast({
                         title: "Chào mừng",
                         description:"Chào mừng quay trở lại",
-                        
                     })
                     googleLogout();
                  })
@@ -135,7 +135,7 @@ export default function LoginForm() {
                                     sessionStorage.setItem('user_data',JSON.stringify(data.data.data.data));
                                     await axios.post('/api/auth',{access_token: data.data.data.access_token.token})
                                     .then(async (data)=>{
-                                        await router.push('/');
+                                        window.location.reload();
                                         toast({
                                             title: "Chào mừng",
                                             description:"Chào mừng quay trở lại",

@@ -14,7 +14,7 @@ const addUsersGoogleService = async (
         email: email,
         linked_account:'google'
       },
-      raw: true,
+      raw: true
     });
     if (isExists)
       return handleResult(405, "User is already exist! Try another email");

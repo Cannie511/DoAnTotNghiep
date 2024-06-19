@@ -17,21 +17,21 @@ interface Props {
 export default function AvatarDropdown({srcImg}:Props) {
   const router = useRouter();
   const {toast} = useToast();
-  const {display_name,setLoading} = useContext(AppContext)
+  const {display_name,setLoading ,user_data} = useContext(AppContext)
   const {theme, setTheme} = useTheme();
+  
   const handleLogout =async ()=>{
     try {
-      
-      const res = await AuthLogout();
-      if(res.status === 200) {
+      const res = await AuthLogout(Number(user_data?.id));
+      if(res?.status === 200) {
         setLoading(true);
         sessionStorage.removeItem('user_data');
-        window.location.reload();
+        router.push('/login');
       }
       else
         toast({
           title:"Lỗi",
-          description: res.data,
+          description: res?.data,
           variant: "destructive",
         })
     } catch (error) {

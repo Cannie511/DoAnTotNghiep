@@ -3,7 +3,6 @@ const Model = require('../models');
 const { checkPassword } = require("../Utils/HashPassword");
 const { handleResult, handleError } = require("../Utils/Http");
 const { jwtDecode } = require("jwt-decode");
-const { addUsersService } = require("./User.Service");
 const { addUsersGoogleService } = require("./Google.Service");
 const checkEmailService = async(email)=>{
   try {
@@ -11,6 +10,7 @@ const checkEmailService = async(email)=>{
     const account_user = await Model.User.findOne({
       where: {
         email: email,
+        linked_account:""
       },
       raw: true,
     });
@@ -46,8 +46,7 @@ const GoogleLoginService = async(token) =>{
           "display_name",
           "language",
           "premium",
-          "linked_account",
-          "createdAt",
+          "linked_account"
         ],
         where: {
           email: data.email,
@@ -71,18 +70,19 @@ const GoogleLoginService = async(token) =>{
       }
       else {
         const res = await addUsersGoogleService(data?.email,'', data?.name,1,0,'google')
+        console.log(res);
         if(res.status===200){
           const access_token = await createKey({
-            id: res?.id,
-            email: res?.email,
-            display_name: res.display_name,
+            id: res?.data.data.id,
+            email: res?.data.data.email,
+            display_name: res.data.data.display_name,
           });
           const refresh_token = await createRefreshKey({
-            id: res.id,
-            email: res.email,
-            display_name: res.display_name,
+            id: res.data.data.id,
+            email: res.data.data.email,
+            display_name: res.data.data.display_name,
           });
-          return handleResult(res.status, res.message, {access_token, refresh_token ,data: res.data});
+          return handleResult(res.status, res.message, {access_token, refresh_token ,data: res.data.data});
         } 
       }
     }
@@ -136,9 +136,37 @@ const LoginService = async (username, password)=>{
   }
 }
 
+const LogoutService = async(token, user_id)=>{
+  try {
+    const id = +user_id;
+    console.log("data: ", token, user_id)
+    const session = await Model.Session.findOne({
+      where: {
+        token: token,
+        user_id: id,
+      },
+      raw:true
+    });
+    console.log("session: ",session);
+    if (session){
+      const data = await Model.Session.destroy({
+        where: {
+          id: session?.id,
+        },
+      });
+      if(data !== 1) return handleResult(400, "Log out failed");
+      else return handleResult(200, "Log out successfully");
+    }
+    return handleResult(403, "Session not found!");
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
 module.exports = {
   LoginService,
   checkEmailService,
   checkSessionService,
   GoogleLoginService,
+  LogoutService,
 };
