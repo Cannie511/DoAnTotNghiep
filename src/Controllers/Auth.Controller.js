@@ -5,6 +5,7 @@ const { createKey, createRefreshKey } = require("../Services/jwt");
 const { generateCode, listVerificationCode } = require("../Utils/CodeGenerate");
 const { hashPassword } = require("../Utils/HashPassword");
 const { handleError } = require("../Utils/Http");
+const validateEmail = require("../Utils/validateEmail");
 
 const loginController = async (req, res) => {
   try {
@@ -32,7 +33,7 @@ const loginController = async (req, res) => {
 const checkEmailController = async(req, res)=>{
   try {
     const {email} = req.body;
-    //console.log('email:', email);
+    if(validateEmail(email)===false) return res.status(422).json({message:"Vui lòng nhập đúng định dạng email"});
     const data = await checkEmailService(email);
     if(data) return res.status(data.status).json(data)
   } catch (error) {
@@ -83,7 +84,7 @@ const sendEmailController = async(req, res)=>{
       const data = await sendMailService(email, verificationCode);
       if (data) return res.status(data.status).json(data);
     }
-    return res.status(500).json({message:"code is null"});
+    return res.status(500).json({message:"Mã code không được rỗng"});
   } catch (error) {
     const err = handleError(error);
     return res.status(err.status).json({ message: err.message });
@@ -105,7 +106,7 @@ const logOutController = async(req,res)=>{
   try {
      const { user_id } = req.body;
      const { refresh_token } = req.cookies;
-     if(!user_id) return res.status(403).json({message: "user_id is required"});
+     if(!user_id) return res.status(403).json({message: "user_id không được bỏ trống"});
      if (!refresh_token)
        return res.status(403).json({ message: "Token not found" });
      const data = await LogoutService(refresh_token, user_id);
@@ -132,7 +133,11 @@ const logOutController = async(req,res)=>{
 const registerController = async (req, res) => {
   const { email, password, display_name, language, premium, linked_account } =
     req.body;
-  if (!email) return res.status(422).json({ message: "email is required" });
+  if (!email) return res.status(422).json({ message: "email không được để trống" });
+  if (validateEmail(email) === false)
+    return res
+      .status(422)
+      .json({ message: "Vui lòng nhập đúng định dạng email" });
   const hashPass = hashPassword(password);
   try {
     const data = await addUsersService(

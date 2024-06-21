@@ -9,6 +9,7 @@ const { hashPassword, checkPassword } = require('./Utils/HashPassword');
 const cors_config = require('./Middlewares/CORS')
 const io = require('socket.io');
 const { generateCode } = require('./Utils/CodeGenerate');
+const validateEmail = require('./Utils/validateEmail');
 require("dotenv").config();
 
 app.use(cors_config);
@@ -26,15 +27,11 @@ app.get('/', async(req, res)=>{
      code
     });
 });
-
-app.post("/verify", async (req, res) => {
-  const {verificationCode} = req.body;
-  if(verificationCode === code)
+app.post("/", async (req, res) => {
+  const {email} = req.body;
+  const validate = validateEmail(email);
   return res.status(200).json({
-    message:"verify successfully",
-  });
-  return res.status(403).json({
-    message: "verify code is incorrect",
+    validate,
   });
 });
 

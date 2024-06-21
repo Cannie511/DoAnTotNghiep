@@ -66,6 +66,11 @@ export default function ProfileUser() {
           <div className="col-1">{Number(user_data?.premium) === 0 || !user_data?.premium ? 'Tài khoản cơ bản':<span className="flex">Tài khoản Premium <FaCrown className="text-xl text-yellow-200 ms-1"/></span>}</div>
           <div className="col-1 text-end">{user_data?.premium === 0 || !user_data?.premium ? <Button size={'sm'}>Nâng cấp</Button>:''}</div>
         </div>
+        <div className="grid grid-cols-3">
+          <div className="col-1 font-bold">Mật khẩu:</div>
+          <div className="col-1">**********</div>
+          <div className="col-1 text-end"><Button size={'sm'}>Đổi mật khẩu</Button></div>
+        </div>
       </Card>
       </>      
     }

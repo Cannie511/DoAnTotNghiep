@@ -20,24 +20,19 @@ export default function ClientNav({
   return (
     <>
         {!isLoginRoute ? <>
-        
-        <QueryClientProvider client={queryClient}>
-          
-            <Navbar/>
-            <SideBar/>
-            <div className="p-4 sm:ml-64">
-                <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700 mt-16">
-                    <div className="grid gap-4 ">
-                      {children}
-                    </div>
+          <QueryClientProvider client={queryClient}>
+              <Navbar/>
+              <SideBar/>
+              <div className="p-4 sm:ml-64">
+                  <div className="p-4 rounded-lg dark:border-gray-700 mt-16">
+                    {children}
+                  </div>
                 </div>
-              </div>
-        </QueryClientProvider>
-        
-        </>:<>
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
+          </QueryClientProvider>
+          </>:<>
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
         </>}
         
     </>
