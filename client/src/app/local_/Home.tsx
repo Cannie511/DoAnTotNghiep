@@ -15,8 +15,8 @@ export default function HomePage() {
         const interval = setInterval(() => {
             setCurrentTime(getCurrentTime());
             setCurrentDate(formatDate(new Date() as any));
-        }, 100); // Cập nhật mỗi giây
-        return () => clearInterval(interval); // Xóa interval khi component bị unmount
+        }, 500);
+        return () => clearInterval(interval);
     }, []);
     return (
         <div className='h-96 w-96 mx-auto'>
@@ -29,20 +29,32 @@ export default function HomePage() {
             </Card>
             <div className='w-100 mx-auto space-y-2 my-2'>
                 <div className='w-full flex space-x-2'>
-                    <Button gradientDuoTone="greenToBlue" className='flex-1' size="xl"><IoChatbubbles className='text-2xl'/></Button>
-                    <Button gradientDuoTone="greenToBlue" className='flex-1' size="xl"><HiVideoCamera className='text-2xl'/></Button>
+                    <div className='flex-1'>
+                        <Button gradientDuoTone="purpleToBlue" className='w-full' size="xl"><IoChatbubbles className='text-2xl'/></Button>
+                        <div className='text-black dark:text-white font-bold text-center'>Trò chuyện</div>
+                    </div>
+                    <div className='flex-1'>
+                        <Button gradientDuoTone="pinkToOrange" className='w-full' size="xl"><HiVideoCamera className='text-2xl'/></Button>
+                        <div className='text-black dark:text-white font-bold text-center'>Phòng họp</div>
+                    </div>
                 </div>
                 <div className='w-full flex space-x-2'>
-                    <Button gradientDuoTone="greenToBlue" className='flex-1 flex' size="xl"><FaCalendarPlus className='text-2xl'/>
-                        <Badge color="failure" className='rounded-2xl mx-1' size="sm">
-                            3
-                        </Badge>
-                    </Button>
-                    <Button gradientDuoTone="greenToBlue" className='flex-1' size="xl"><IoNotifications className='text-2xl'/>
-                        <Badge color="failure" className='rounded-2xl' size="sm">
-                            {noti}
-                        </Badge>
-                    </Button>
+                    <div className='flex-1'>
+                        <Button gradientDuoTone="purpleToBlue" className='w-full' size="xl"><FaCalendarPlus className='text-2xl'/>
+                            <Badge color="failure" className='rounded-2xl mx-1' size="sm">
+                                3
+                            </Badge>
+                        </Button>
+                        <div className='text-black dark:text-white font-bold text-center'>Lịch trình</div>
+                    </div>
+                    <div className='flex-1'>
+                        <Button gradientDuoTone="purpleToBlue" className='w-full' size="xl"><IoNotifications className='text-2xl'/>
+                            <Badge color="failure" className='rounded-2xl' size="sm">
+                                {noti}
+                            </Badge>
+                        </Button>
+                        <div className='text-black dark:text-white font-bold text-center'>Thông báo</div>
+                    </div>
                 </div>
             </div>
         </div>

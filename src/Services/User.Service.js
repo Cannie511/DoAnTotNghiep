@@ -86,7 +86,8 @@ const addUsersService = async (
         email,
         display_name,
         language,
-        premium
+        premium,
+        linked_account,
       },
     });
   } catch (error) {
@@ -131,14 +132,37 @@ const updateUserService = async (
         return handleResult(200, "Update user successfully");
       return handleResult(405, "Update user failed");
     }
-    return handleResult(422, "User is not exist");
+    return handleResult(422, "Người dùng không tồn tại");
   } catch (error) {
     return handleError(error);
   }
 };
 
+const checkPassService = async(user_id,old_password)=>{
+  try {
+    const isExist = await Model.User.findOne({
+      attributes:["id", "password"],
+      where:{
+        id:user_id
+      },
+      raw:true
+    })
+    if(isExist){
+      if (checkPassword(old_password, isExist.password)) {
+        return handleResult(200, "Mật khẩu trùng khớp");
+      }
+      else return handleResult(421, "Mật khẩu không đúng");
+    }
+    return handleResult(400, "Người dùng không tồn tại!");
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
 const updatePasswordService = async (user_id, old_password, new_password)=>{
   try {
+    if(old_password === new_password)
+      return handleResult(422, "Mật khẩu cũ không được giống với mật khẩu mới");
     const isExist = await Model.User.findOne({
       attributes: ["id", "password"],
       where: {
@@ -160,12 +184,12 @@ const updatePasswordService = async (user_id, old_password, new_password)=>{
           }
         );
         if (+data === 1)
-          return handleResult(200, "Update user password successfully");
-        return handleResult(405, "Update user password failed");
+          return handleResult(200, "Đổi mật khẩu thành công");
+        return handleResult(405, "Đổi mật khẩu thất bại");
       }
-      return handleResult(422, "Old password is not correct");
+      return handleResult(421, "Mật khẩu cũ không đúng");
     }
-    return handleResult(422, "User is not exist");
+    return handleResult(422, "Người dùng không tồn tại");
   } catch (error) {
     return handleError(error)
   }
@@ -202,4 +226,5 @@ module.exports = {
   updateUserService,
   updatePasswordService,
   deleteUserService,
+  checkPassService,
 };

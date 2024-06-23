@@ -60,7 +60,6 @@ export default function LoginForm() {
                 sessionStorage.setItem('user_data',JSON.stringify(data.data.data));
                  await axios.post('/api/auth',{access_token: data.data.access_token})
                  .then(async (data)=>{
-                    // router.push('/');
                     window.location.reload();
                     toast({
                         title: "Chào mừng",
@@ -112,7 +111,7 @@ export default function LoginForm() {
                         <Button disabled={isLoading} type="button" onClick={handleStep}>{isLoading ? <Spinner color={'info'} aria-label="Medium sized spinner example" size="md" /> : 'Tiếp theo'}</Button>
                         <span>Chưa có tài khoản ? <Link className='text-indigo-700 font-semibold transition-all hover:underline hover:underline-offset-8' href={'/register'}>Đăng ký ngay</Link></span>
                         <div className="line-container">
-                            or
+                            Tiếp tục với
                         </div>
                         <GoogleLogin
                             width="300px"
@@ -185,6 +184,7 @@ export default function LoginForm() {
                                 helperText={validatePassword ? errorMessage:''}
                             />
                         </div>
+                        <Link className='text-center text-indigo-700 font-semibold transition-all hover:underline hover:underline-offset-8' href={'/forgot-password'}>Quên mật khẩu ?</Link>
                         <Button disabled={isLoading} type="submit">{isLoading ? <Spinner color={'info'} aria-label="Medium sized spinner example" size="md" /> : <>Đăng nhập <HiOutlineLogin className='text-xl ml-2' /></>}</Button>
                         </form>
                     </>

@@ -125,6 +125,7 @@ const LoginService = async (username, password)=>{
               display_name: account_user?.display_name,
               language: account_user?.language,
               premium: account_user?.premium,
+              linked_account:account_user?.linked_account
             },
           };
         }

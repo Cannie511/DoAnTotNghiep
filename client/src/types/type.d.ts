@@ -41,4 +41,16 @@ export interface UserData {
     display_name: string|null;
     language: number;
     premium: number;
+    linked_account:string|null;
+}
+
+export interface UserChangePasswordType {
+    user_id:number;
+    old_password: string;
+    new_password: string;
+}
+
+export interface UserCheckPasswordType {
+    user_id:number;
+    old_password: string;
 }

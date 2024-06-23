@@ -2,15 +2,17 @@
 import avatar from "@/app/favicon.ico";
 import Image from "next/image";
 import { Card } from "flowbite-react";
-import { useContext, useEffect } from "react";
+import { useContext, useState } from "react";
 import { AppContext } from "@/Context/Context";
 import { FaUserFriends } from "react-icons/fa";
 import { MdModeEdit } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { FaCrown } from "react-icons/fa6";
 import { Skeleton } from "@/components/ui/skeleton";
+import ModalInput from "@/components/ModalInput";
 export default function ProfileUser() {
-  const {display_name, user_data} = useContext(AppContext);
+  const {display_name, user_data, linked_account} = useContext(AppContext);
+  const [openModal, showModal] = useState<boolean>(false);
   return (
     <>
     {!display_name ? 
@@ -67,11 +69,19 @@ export default function ProfileUser() {
           <div className="col-1 text-end">{user_data?.premium === 0 || !user_data?.premium ? <Button size={'sm'}>Nâng cấp</Button>:''}</div>
         </div>
         <div className="grid grid-cols-3">
-          <div className="col-1 font-bold">Mật khẩu:</div>
-          <div className="col-1">**********</div>
-          <div className="col-1 text-end"><Button size={'sm'}>Đổi mật khẩu</Button></div>
+          <div className="col-1 font-bold">Tài khoản liên kết:</div>
+          <div className="col-1">{linked_account === 'google' ? 'account.google.com':'Không có'}</div>
         </div>
+        {linked_account === 'verify' &&
+          <div className="grid grid-cols-3">
+            <div className="col-1 font-bold">Mật khẩu:</div>
+            <div className="col-1">**********</div>
+            <div className="col-1 text-end"><Button size={'sm'} onClick={()=>showModal(true)}>Đổi mật khẩu</Button></div>
+          </div>
+        }
+        
       </Card>
+      <ModalInput openModal={openModal} setOpenModal={showModal}/>
       </>      
     }
     </>

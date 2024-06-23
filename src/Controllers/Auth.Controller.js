@@ -78,10 +78,10 @@ const checkSessionController = async(req, res)=>{
 
 const sendEmailController = async(req, res)=>{
   try {
-    const { email } = req.body;
+    const { email, subject } = req.body;
     const verificationCode = generateCode(email);
     if(verificationCode !== null){
-      const data = await sendMailService(email, verificationCode);
+      const data = await sendMailService(email, verificationCode, subject);
       if (data) return res.status(data.status).json(data);
     }
     return res.status(500).json({message:"Mã code không được rỗng"});

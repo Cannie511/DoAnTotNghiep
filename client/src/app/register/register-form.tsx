@@ -44,7 +44,6 @@ export default function RegisterForm() {
                 {process === 75 && <OTPConfirmStep setStep={setProcess}/>}
                 {process === 100 && <PasswordStep />}
         </Card>
-        
     </div>
     
   )

@@ -10,7 +10,7 @@ export default function UserList() {
   const {setForceLogout} = useContext(AppContext)
   const {data, isLoading, error} = useQuery({
         queryKey:['List user'],
-        queryFn: ()=>getUsers(),
+        queryFn: ()=>getUsers(1),
     })
     if(error) setForceLogout(true);
   return (

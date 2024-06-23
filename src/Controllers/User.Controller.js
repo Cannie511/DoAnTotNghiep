@@ -4,6 +4,7 @@ const {
   deleteUserService,
   updateUserService,
   updatePasswordService,
+  checkPassService,
 } = require("../Services/User.Service");
 const { hashPassword } = require("../Utils/HashPassword");
 const { handleError } = require("../Utils/Http");
@@ -83,10 +84,26 @@ const updateUserController = async (req, res) => {
   }
 };
 
+const checkPasswordController = async(req, res)=>{
+  try {
+    const {user_id} = req.params;
+    const {old_password} = req.body;
+    if(!user_id) return res.status(422).json({message:"Không nhận được user_id"});
+    if(!old_password) return res.status(422).json({message:"Không nhận được password"});
+    const data = await checkPassService(user_id, old_password);
+    if(data) return res.status(data.status).json(data);
+  } catch (error) {
+    const err = handleError(error);
+    return res.status(err.status).json({ message: err.message });
+  }
+}
+
 const updatePasswordController = async (req, res)=>{
   try {
     const { user_id } = req.params;
     const { old_password, new_password } = req.body;
+    if(!user_id) return res.status(422).json({message:"Không nhận được user_id"})
+    //console.log(user_id);
     const data = await updatePasswordService(
       user_id,
       old_password,
@@ -117,4 +134,5 @@ module.exports = {
   updateUserController,
   updatePasswordController,
   deleteUserController,
+  checkPasswordController,
 };

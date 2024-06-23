@@ -35,7 +35,7 @@ export default function EmailStep({setStep}:Props) {
                 })
                 .catch(async(err)=>{
                     setLoading(true);
-                    const res = await AuthGetVerifyCode(username);
+                    const res = await AuthGetVerifyCode(username, "đăng ký với Freet");
                     if(res.status === 200){
                         setStep(75);
                         sessionStorage.setItem('info', JSON.stringify({display_name:info?.display_name, language: info?.language, email: username}))

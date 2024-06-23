@@ -13,6 +13,9 @@ interface AppContextType {
     setUser_data: React.Dispatch<React.SetStateAction<UserData|null>>;
     forceLogout: boolean;
     setForceLogout: React.Dispatch<React.SetStateAction<boolean>>;
+    user_id:number;
+    linked_account:string|null;
+    email:string|null;
 }
 
 const defaultValue: AppContextType = {
@@ -24,16 +27,23 @@ const defaultValue: AppContextType = {
     setUser_data: ()=>{},
     forceLogout: false,
     setForceLogout: ()=>{},
+    user_id:-1,
+    linked_account:null,
+    email: null,
 };
 
 export const AppContext = createContext<any>(defaultValue);
 
 export default function AppProvider({children}:{children: ReactNode}){
-     const router = useRouter();
+    const router = useRouter();
+    
     const [display_name, setName] = useState<string|null>('');
     const [isLoading, setLoading] = useState<boolean>(false);
     const [user_data, setUser_data] = useState<UserData|null>(null);
     const [forceLogout, setForceLogout] = useState<boolean>(false); 
+    const user_id:number = Number(user_data?.id);
+    const email:string = String(user_data?.email);
+    const linked_account:string = String(user_data?.linked_account)
     useLayoutEffect(()=>{
         const user_data = sessionStorage.getItem('user_data');
         if (user_data) {
@@ -48,12 +58,11 @@ export default function AppProvider({children}:{children: ReactNode}){
     }, []);
     useEffect(()=>{
         async function forceLog(){
-            const id = user_data?.id;
-            console.log(id)
+            const id = await user_data?.id;
             await AuthLogout(Number(id))
             .then(data=>{
-            sessionStorage.removeItem('user_data');
-            router.push('/login')
+                sessionStorage.removeItem('user_data');
+                window.location.reload();
             })
             .catch(err=>{
                 console.log(err)
@@ -71,7 +80,12 @@ export default function AppProvider({children}:{children: ReactNode}){
         router.prefetch('/local_');
     },[router])
     return (
-        <AppContext.Provider value={{display_name, setName, isLoading, setLoading, user_data, setUser_data, forceLogout, setForceLogout}}>
+        <AppContext.Provider value={{display_name, setName, 
+        isLoading, setLoading, 
+        user_data, setUser_data, 
+        forceLogout, setForceLogout, 
+        user_id, linked_account, 
+        email}}>
             {children}
         </AppContext.Provider>
     )

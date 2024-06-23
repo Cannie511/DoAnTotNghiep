@@ -41,14 +41,14 @@ export const AuthCheckSession = async()=>{
     return await http.post('/auth/checkSession',{})
 }
 
-export const AuthGetVerifyCode = async(email:string)=>{
-    return await http.post('/auth/sendCode',{email})
+export const AuthGetVerifyCode = async(email:string, subject:string)=>{
+    return await http.post('/auth/sendCode',{email, subject})
 }
 
 export const AuthCheckVerifyCode = async(email:string, code:number)=>{
     return await http.post('/auth/verifyEmail',{email, code})
 }
 
-export const getUsers = async()=>{
+export const getUsers = async(page:number)=>{
     return await http.get('api/users?page=1')
 }

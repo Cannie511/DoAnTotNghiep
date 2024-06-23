@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const privateRoute = ['/profile', '/local_','/user', '/chat', '/schedule'];
-export const authRoute = ['/register','/login',]
+const privateRoute = ['/profile', '/local_','/user', '/chat', '/schedule', '/blogs'];
+export const authRoute = ['/register','/login','/forgot-password']
 
 export function middleware(request: NextRequest) {
   
@@ -26,6 +26,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/','/login','/register','/profile','/local_', '/user', '/chat', '/schedule'
+    '/','/login','/register','/profile','/local_', '/user', '/chat', '/schedule', '/forgot-password','/blogs'
   ],
 }
