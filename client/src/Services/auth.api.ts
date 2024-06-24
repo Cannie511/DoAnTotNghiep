@@ -52,3 +52,11 @@ export const AuthCheckVerifyCode = async(email:string, code:number)=>{
 export const getUsers = async(page:number)=>{
     return await http.get('api/users?page=1')
 }
+
+export const AuthFindEmailLike = async(searchValue:string)=>{
+    return await http.post<BasicResponse>(`auth/findUser`,{searchValue})
+}
+
+export const AuthForgotPassword = async(email:string, new_password:string)=>{
+    return await http.put<BasicResponse>('auth/forgotPassword', {email, new_password})
+}

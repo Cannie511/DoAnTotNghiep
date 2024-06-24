@@ -7,4 +7,4 @@ export const UserChangePassword = async ({user_id, old_password, new_password}:U
 
 export const UserCheckPassword = async ({user_id, old_password}:UserCheckPasswordType)=>{
     return await http.post<BasicResponse>(`/api/users/password/${user_id}`,{old_password});
-}   
+}

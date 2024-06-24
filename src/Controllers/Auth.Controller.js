@@ -2,7 +2,7 @@ const { LoginService, checkEmailService, checkSessionService, GoogleLoginService
 const { sendMailService, verifyEmailService } = require("../Services/Email.Service");
 const { addUsersService } = require("../Services/User.Service");
 const { createKey, createRefreshKey } = require("../Services/jwt");
-const { generateCode, listVerificationCode } = require("../Utils/CodeGenerate");
+const { generateCode } = require("../Utils/CodeGenerate");
 const { hashPassword } = require("../Utils/HashPassword");
 const { handleError } = require("../Utils/Http");
 const validateEmail = require("../Utils/validateEmail");
@@ -178,6 +178,9 @@ const registerController = async (req, res) => {
     return res.status(err.status).json({ message: err.message });
   }
 };
+
+
+
 module.exports = {
   loginController,
   registerController,

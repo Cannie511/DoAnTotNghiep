@@ -5,6 +5,8 @@ const {
   updateUserService,
   updatePasswordService,
   checkPassService,
+  findUserService,
+  updatePasswordWithoutOldPasswordService,
 } = require("../Services/User.Service");
 const { hashPassword } = require("../Utils/HashPassword");
 const { handleError } = require("../Utils/Http");
@@ -127,6 +129,32 @@ const deleteUserController = async (req, res) => {
   }
 };
 
+const findUserEmail = async (req, res) => {
+  try {
+    const { searchValue } = req.body;
+    if (!searchValue)
+      return res.status(422).json({ message: "Từ khóa không được để trống" });
+    const data = await findUserService(searchValue);
+    if (data) return res.status(data.status).json(data);
+  } catch (error) {
+    const err = handleError(error);
+    return res.status(err.status).json({ message: err.message });
+  }
+};
+
+const updatePasswordWithoutOldPasswordController = async (req, res)=>{
+  try {
+    const {email, new_password} = req.body;
+    if(!email) return res.status(422).json({ message: "email không được để trống" });
+    if(!new_password) return res.status(422).json({ message: "mật khẩu không được để trống" });
+    const data = await updatePasswordWithoutOldPasswordService(email, new_password);
+    if(data) return res.status(data.status).json(data);
+  } catch (error) {
+    const err = handleError(error);
+    return res.status(err.status).json({ message: err.message });
+  }
+}
+
 module.exports = {
   getUserByIdController,
   getUserController,
@@ -135,4 +163,6 @@ module.exports = {
   updatePasswordController,
   deleteUserController,
   checkPasswordController,
+  findUserEmail,
+  updatePasswordWithoutOldPasswordController,
 };

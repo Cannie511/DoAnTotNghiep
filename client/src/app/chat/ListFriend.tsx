@@ -13,7 +13,7 @@ interface Props{
 export default function ListFriend({setFriend}:Props) {
     const {data, isLoading, error} = useQuery({
         queryKey:['List user'],
-        queryFn: ()=>getUsers(),
+        queryFn: ()=>getUsers(1),
     })
     const {setForceLogout} = useContext(AppContext)
     if(error) setForceLogout(true);

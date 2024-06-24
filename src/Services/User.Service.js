@@ -1,4 +1,5 @@
 const Model = require("../models");
+const { Op } = require("sequelize");
 const { checkPassword, hashPassword } = require("../Utils/HashPassword");
 const { handleError, handleResult } = require("../Utils/Http");
 
@@ -159,6 +160,37 @@ const checkPassService = async(user_id,old_password)=>{
   }
 }
 
+const updatePasswordWithoutOldPasswordService = async(email, new_password)=>{
+  try {
+    const isExist = await Model.User.findOne({
+      attributes: ["id", "email", "password"],
+      where: {
+        email:email,
+        linked_account:"verify"
+      },
+      raw: true,
+    });
+    if (isExist) {
+      const data = await Model.User.update(
+        {
+          password: hashPassword(new_password),
+        },
+        {
+          where: {
+            id: isExist.id,
+          },
+          raw: true,
+        }
+      );
+      if (+data === 1) return handleResult(200, "Đổi mật khẩu thành công");
+      return handleResult(405, "Đổi mật khẩu thất bại");
+    }
+    return handleResult(421, "Người dùng không tồn tại");
+  } catch (error) {
+     return handleError(error);
+  }
+}
+
 const updatePasswordService = async (user_id, old_password, new_password)=>{
   try {
     if(old_password === new_password)
@@ -195,6 +227,31 @@ const updatePasswordService = async (user_id, old_password, new_password)=>{
   }
 }
 
+const findUserService = async (emailValue) => {
+  try {
+    const listUser = await Model.User.findAll({
+      attributes: [
+        "id",
+        "email",
+        "display_name",
+        "language",
+        "premium",
+        "linked_account",
+      ],
+      where: {
+        email: {
+          [Op.like]: `%${emailValue}%`,
+        },
+        linked_account: "verify",
+      },
+      raw:true
+    });
+    return handleResult(200, "search user", listUser);
+  } catch (error) {
+     return handleError(error);
+  }
+};
+
 const deleteUserService = async (user_id) => {
   try {
     const isExists = await Model.User.findOne({
@@ -227,4 +284,6 @@ module.exports = {
   updatePasswordService,
   deleteUserService,
   checkPassService,
+  findUserService,
+  updatePasswordWithoutOldPasswordService,
 };
