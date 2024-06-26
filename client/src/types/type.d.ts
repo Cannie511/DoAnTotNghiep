@@ -1,3 +1,5 @@
+import { StaticImageData } from "next/image";
+
 export interface AuthRes{
     status: number;
     message: string;
@@ -42,6 +44,7 @@ export interface UserData {
     language: number;
     premium: number;
     linked_account:string|null;
+    avatar: StaticImageData|String|null;
 }
 
 export interface UserChangePasswordType {

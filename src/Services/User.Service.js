@@ -59,7 +59,8 @@ const addUsersService = async (
   display_name,
   language,
   premium,
-  linked_account
+  linked_account,
+  avatar
 ) => {
   try {
     const isExists = await Model.User.findOne({
@@ -78,6 +79,7 @@ const addUsersService = async (
       language,
       premium,
       linked_account,
+      avatar,
     });
     if (!users)
       return handleResult(400, "add user failed");
@@ -89,6 +91,7 @@ const addUsersService = async (
         language,
         premium,
         linked_account,
+        avatar,
       },
     });
   } catch (error) {
@@ -102,7 +105,7 @@ const updateUserService = async (
   display_name,
   language,
   premium,
-  linked_account
+  linked_account,
 ) => {
   try {
     if (!user_id)

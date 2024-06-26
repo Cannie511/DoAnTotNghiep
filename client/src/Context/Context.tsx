@@ -1,6 +1,7 @@
 'use client'
 import { AuthLogout } from "@/Services/auth.api";
 import { UserData } from "@/types/type";
+import { StaticImageData } from "next/image";
 import { useRouter } from "next/navigation";
 import { ReactNode, createContext, useEffect, useLayoutEffect, useState } from "react";
 
@@ -16,6 +17,7 @@ interface AppContextType {
     user_id:number;
     linked_account:string|null;
     email:string|null;
+    avatar:StaticImageData|String|null;
 }
 
 const defaultValue: AppContextType = {
@@ -30,6 +32,7 @@ const defaultValue: AppContextType = {
     user_id:-1,
     linked_account:null,
     email: null,
+    avatar: null,
 };
 
 export const AppContext = createContext<any>(defaultValue);
@@ -43,6 +46,7 @@ export default function AppProvider({children}:{children: ReactNode}){
     const [forceLogout, setForceLogout] = useState<boolean>(false); 
     const user_id:number = Number(user_data?.id);
     const email:string = String(user_data?.email);
+    const avatar:StaticImageData = user_data?.avatar as StaticImageData;
     const linked_account:string = String(user_data?.linked_account)
     useLayoutEffect(()=>{
         const user_data = sessionStorage.getItem('user_data');
@@ -78,14 +82,15 @@ export default function AppProvider({children}:{children: ReactNode}){
         router.prefetch('/register');
         router.prefetch('/');
         router.prefetch('/local_');
+        router.prefetch('/schedule');
     },[router])
     return (
         <AppContext.Provider value={{display_name, setName, 
-        isLoading, setLoading, 
-        user_data, setUser_data, 
-        forceLogout, setForceLogout, 
-        user_id, linked_account, 
-        email}}>
+            isLoading, setLoading, 
+            user_data, setUser_data, 
+            forceLogout, setForceLogout, 
+            user_id, linked_account, 
+            email, avatar}}>
             {children}
         </AppContext.Provider>
     )

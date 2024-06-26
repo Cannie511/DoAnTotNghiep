@@ -36,7 +36,7 @@ const GoogleLoginService = async(token) =>{
   try {
     if(!token) return handleResult(422, "Token not found");
     const data = await jwtDecode(token);
-    console.log(data);
+    //console.log(data);
     if (data)
     {
       const account_user = await Model.User.findOne({
@@ -46,7 +46,8 @@ const GoogleLoginService = async(token) =>{
           "display_name",
           "language",
           "premium",
-          "linked_account"
+          "linked_account",
+          "avatar"
         ],
         where: {
           email: data.email,
@@ -54,19 +55,51 @@ const GoogleLoginService = async(token) =>{
         },
         raw: true,
       });
+      
       if(account_user) 
       {
-        const access_token = await createKey({
-          id: account_user?.id,
-          email: account_user?.email,
-          display_name: account_user.display_name,
-        });
-        const refresh_token = await createRefreshKey({
-          id: account_user.id,
-          email: account_user.email,
-          display_name: account_user.display_name,
-        });
-        return handleResult(200, "Login with Google successfully", {access_token, refresh_token, data: account_user});
+        const updateGoogleAccount = await Model.User.update(
+          {
+            email: data?.email,
+            display_name: data?.name,
+            language: account_user?.language,
+            premium: account_user?.premium,
+            linked_account: "google",
+            avatar: data?.picture,
+          },
+          {
+            where: {
+              id: account_user?.id,
+            },
+            raw: true,
+          }
+        );
+        if (+updateGoogleAccount === 1) {
+          const access_token = await createKey({
+            id: account_user?.id,
+            email: account_user?.email,
+            display_name: account_user.display_name,
+          });
+          const refresh_token = await createRefreshKey({
+            id: account_user.id,
+            email: account_user.email,
+            display_name: account_user.display_name,
+          });
+          return handleResult(200, "Đăng nhập với Google thành công", {
+            access_token,
+            refresh_token,
+            data: {
+              id: account_user?.id,
+              email: data?.email,
+              display_name: data?.name,
+              language: account_user?.language,
+              premium: account_user?.premium,
+              linked_account: "google",
+              avatar: data?.picture,
+            },
+          });
+        }
+        return handleResult(422, "Đăng nhập với Google thất bại");
       }
       else {
         const res = await addUsersGoogleService(data?.email,'', data?.name,1,0,'google')
@@ -125,7 +158,8 @@ const LoginService = async (username, password)=>{
               display_name: account_user?.display_name,
               language: account_user?.language,
               premium: account_user?.premium,
-              linked_account:account_user?.linked_account
+              linked_account: account_user?.linked_account,
+              avatar: account_user?.avatar,
             },
           };
         }

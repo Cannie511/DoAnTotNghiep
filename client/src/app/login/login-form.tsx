@@ -157,6 +157,7 @@ export default function LoginForm() {
                                     })
                                     setLoading(false)
                                 })
+                                //console.log(credentialResponse);
                             }}
                             onError={() => {
                                 toast({

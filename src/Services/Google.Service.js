@@ -6,7 +6,8 @@ const addUsersGoogleService = async (
   display_name,
   language,
   premium,
-  linked_account
+  linked_account,
+  avatar
 ) => {
   try {
     const isExists = await Model.User.findOne({
@@ -25,6 +26,7 @@ const addUsersGoogleService = async (
       language,
       premium,
       linked_account,
+      avatar,
     });
     if (!users) return handleResult(400, "add user failed");
     return handleResult(200, "add user successfully", {
@@ -34,6 +36,8 @@ const addUsersGoogleService = async (
         display_name,
         language,
         premium,
+        linked_account,
+        avatar,
       },
     });
   } catch (error) {

@@ -1,5 +1,5 @@
 'use client'
-import avatar from "@/app/favicon.ico";
+import srcAvatar from "@/app/favicon.ico";
 import Image from "next/image";
 import { Card } from "flowbite-react";
 import { useContext, useState } from "react";
@@ -11,7 +11,7 @@ import { FaCrown } from "react-icons/fa6";
 import { Skeleton } from "@/components/ui/skeleton";
 import ModalInput from "@/components/ModalInput";
 export default function ProfileUser() {
-  const {display_name, user_data, linked_account} = useContext(AppContext);
+  const {display_name, user_data, linked_account, avatar} = useContext(AppContext);
   const [openModal, showModal] = useState<boolean>(false);
   return (
     <>
@@ -29,9 +29,9 @@ export default function ProfileUser() {
      <Card className="">
       <div className="flex flex-row items-center">
         <Image
-          alt="Bonnie image"
+          alt="Freet Image"
           height="96"
-          src={avatar}
+          src={avatar || srcAvatar}
           width="96"
           className="rounded-full shadow-lg"
         />

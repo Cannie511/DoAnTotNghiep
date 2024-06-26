@@ -30,7 +30,8 @@ module.exports = (sequelize, DataTypes) => {
     display_name: DataTypes.STRING,
     language: DataTypes.INTEGER,
     premium: DataTypes.BOOLEAN,
-    linked_account: DataTypes.STRING
+    linked_account: DataTypes.STRING,
+    avatar: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

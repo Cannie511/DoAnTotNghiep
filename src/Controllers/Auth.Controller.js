@@ -46,6 +46,7 @@ const GoogleLoginController = async (req, res) => {
   try {
     const { google_token } = req.body;
     const data = await GoogleLoginService(google_token);
+    //console.log(data);
     if(data){
       res.cookie("access_token", data.data.access_token.token, {
         httpOnly: true,
@@ -133,6 +134,7 @@ const logOutController = async(req,res)=>{
 const registerController = async (req, res) => {
   const { email, password, display_name, language, premium, linked_account } =
     req.body;
+  const avatar = "";
   if (!email) return res.status(422).json({ message: "email không được để trống" });
   if (validateEmail(email) === false)
     return res
@@ -146,7 +148,8 @@ const registerController = async (req, res) => {
       display_name,
       language,
       premium,
-      linked_account
+      linked_account,
+      avatar
     );
     console.log(data)
     if (data && data.status === 200) {

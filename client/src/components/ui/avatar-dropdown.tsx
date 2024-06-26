@@ -11,13 +11,13 @@ import { AuthLogout } from '@/Services/auth.api'
 import { useToast } from './use-toast'
 
 interface Props {
-    srcImg: StaticImageData
+    srcImg: StaticImageData;
 }
 
 export default function AvatarDropdown({srcImg}:Props) {
   const router = useRouter();
   const {toast} = useToast();
-  const {display_name,setLoading ,user_data} = useContext(AppContext)
+  const {display_name,setLoading ,user_data, avatar} = useContext(AppContext)
   const {theme, setTheme} = useTheme();
   
   const handleLogout =async ()=>{
@@ -49,7 +49,7 @@ export default function AvatarDropdown({srcImg}:Props) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-            <Image src={srcImg} width={32} height={32} alt=''/>
+            <Image className='rounded-full' layout='fixed' src={avatar as StaticImageData || srcImg} width={32} height={32} alt=''/>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
