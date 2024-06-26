@@ -4,6 +4,7 @@ const { checkPassword } = require("../Utils/HashPassword");
 const { handleResult, handleError } = require("../Utils/Http");
 const { jwtDecode } = require("jwt-decode");
 const { addUsersGoogleService } = require("./Google.Service");
+const { deleteSessionService } = require("./Session.Service");
 const checkEmailService = async(email)=>{
   try {
     if(!email) handleResult(422,'Email is required');
@@ -36,7 +37,6 @@ const GoogleLoginService = async(token) =>{
   try {
     if(!token) return handleResult(422, "Token not found");
     const data = await jwtDecode(token);
-    //console.log(data);
     if (data)
     {
       const account_user = await Model.User.findOne({
@@ -182,12 +182,8 @@ const LogoutService = async(token, user_id)=>{
       raw:true
     });
     if (session){
-      const data = await Model.Session.destroy({
-        where: {
-          id: session?.id,
-        },
-      });
-      if(data !== 1) return handleResult(400, "Log out failed");
+      const data = await deleteSessionService(session?.user_id, token)
+      if(data.status !== 200) return handleResult(400, "Log out failed");
       else return handleResult(200, "Log out successfully");
     }
     return handleResult(200, "force log out from server");
