@@ -3,8 +3,8 @@ import { AuthLogout } from "@/Services/auth.api";
 import { UserData } from "@/types/type";
 import { StaticImageData } from "next/image";
 import { useRouter } from "next/navigation";
-import { ReactNode, createContext, useEffect, useLayoutEffect, useState } from "react";
-
+import { ReactNode, createContext, useContext, useEffect, useLayoutEffect, useState } from "react";
+import io from 'socket.io-client';
 interface AppContextType {
     display_name: string | null;
     setName: React.Dispatch<React.SetStateAction<string | null>>;
@@ -37,17 +37,21 @@ const defaultValue: AppContextType = {
 
 export const AppContext = createContext<any>(defaultValue);
 
+export const useSocket = () => {
+  return useContext(AppContext);
+};
+
 export default function AppProvider({children}:{children: ReactNode}){
     const router = useRouter();
-    
     const [display_name, setName] = useState<string|null>('');
     const [isLoading, setLoading] = useState<boolean>(false);
     const [user_data, setUser_data] = useState<UserData|null>(null);
-    const [forceLogout, setForceLogout] = useState<boolean>(false); 
+    const [forceLogout, setForceLogout] = useState<boolean>(false);
+    const [socket, setSocket] = useState(null);
     const user_id:number = Number(user_data?.id);
     const email:string = String(user_data?.email);
     const avatar:StaticImageData = user_data?.avatar as StaticImageData;
-    const linked_account:string = String(user_data?.linked_account)
+    const linked_account:string = String(user_data?.linked_account);
     useLayoutEffect(()=>{
         const user_data = sessionStorage.getItem('user_data');
         if (user_data) {
@@ -73,7 +77,20 @@ export default function AppProvider({children}:{children: ReactNode}){
             })
         }
         if(forceLogout) forceLog();
-    },[forceLogout])
+    },[forceLogout]);
+     useEffect(() => {
+        const socketIo:any = io('http://localhost:8888');
+
+        setSocket(socketIo);
+
+        socketIo.on('connect', () => {
+        console.log('a user connected');
+        });
+
+        return () => {
+        socketIo.disconnect();
+        };
+    }, []);
     useEffect(()=>{
         router.prefetch('/user');
         router.prefetch('/profile');

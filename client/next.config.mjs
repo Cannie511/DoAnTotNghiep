@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["lh3.googleusercontent.com"], // Thêm hostname của bạn vào đây
+    domains: ["lh3.googleusercontent.com", "scontent.fsgn2-3.fna.fbcdn.net"],
   },
 };
 

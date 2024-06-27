@@ -50,7 +50,7 @@ export const AuthCheckVerifyCode = async(email:string, code:number)=>{
 }
 
 export const getUsers = async(page:number)=>{
-    return await http.get('api/users?page=1')
+    return await http.get(`api/users?page=${page}`)
 }
 
 export const AuthFindEmailLike = async(searchValue:string)=>{

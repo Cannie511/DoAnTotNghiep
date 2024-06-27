@@ -16,7 +16,7 @@ export default function Meeting() {
         const getMedia = async () => {
             try {
                 if (video) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: audio });
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: video, audio: audio });
                     if (videoRef.current) {
                         videoRef.current.srcObject = stream;
                         setMediaStream(stream);
@@ -32,6 +32,7 @@ export default function Meeting() {
             }
         };
         getMedia();
+        if(!video)
         return () => {
             if (mediaStream) {
                 mediaStream.getTracks().forEach(track => track.stop());
