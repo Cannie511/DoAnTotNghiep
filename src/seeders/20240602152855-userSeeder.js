@@ -13,7 +13,7 @@ module.exports = {
           display_name: `account_demo${i}`,
           language: 1,
           premium: false,
-          linked_account: '',
+          linked_account: 'verify',
           createdAt: new Date(),
           updatedAt: new Date(),
         },

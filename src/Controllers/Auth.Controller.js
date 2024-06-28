@@ -10,7 +10,9 @@ const validateEmail = require("../Utils/validateEmail");
 const loginController = async (req, res) => {
   try {
     const { username, password } = req.body;
+    
     const data = await LoginService(username, password);
+  
     if (data && data.status === 200 && data.access_token) {
       res.cookie("access_token", data.access_token, {
         httpOnly: true,
