@@ -20,9 +20,7 @@ export default function Friends() {
         <div className='flex flex-wrap my-2'>
             {listFriend && listFriend.map((item:any)=>{
                 return(
-                    <>
-                        <CardFriend avatar={item.avatar||url_img_default} display_name={item.display_name}/>
-                    </>
+                    <CardFriend key={item?.id} avatar={item.avatar||url_img_default} display_name={item.display_name}/>
                 )
             })} 
             {isLoading &&
