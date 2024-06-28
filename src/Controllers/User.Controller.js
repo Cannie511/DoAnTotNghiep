@@ -34,6 +34,7 @@ const getUserController = async (req, res) => {
         "language",
         "premium",
         "linked_account",
+        "avatar",
         "createdAt",
       ];
       const data = await pagination("User", attr, page);

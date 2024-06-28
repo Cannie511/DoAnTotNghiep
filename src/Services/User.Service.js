@@ -40,6 +40,7 @@ const getUsersService = async () => {
         "display_name",
         "language",
         "premium",
+        "avatar",
         "linked_account",
         "createdAt",
       ],

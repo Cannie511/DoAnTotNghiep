@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const privateRoute = ['/profile', '/local_','/user', '/chat', '/schedule', '/blogs'];
+const privateRoute = ['/profile', '/local_','/user', '/chat', '/schedule', '/blogs', '/friends', '/friends/:friend_id'];
 export const authRoute = ['/register','/login','/forgot-password']
 
 export function middleware(request: NextRequest) {

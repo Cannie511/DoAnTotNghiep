@@ -1,0 +1,1 @@
+export const url_img_default:string = 'https://scontent.fsgn2-3.fna.fbcdn.net/v/t1.30497-1/143086968_2856368904622192_1959732218791162458_n.png?stp=dst-png_p100x100&_nc_cat=1&ccb=1-7&_nc_sid=136b72&_nc_ohc=5PdahfIzVLoQ7kNvgExCo0b&_nc_ht=scontent.fsgn2-3.fna&gid=APqfP3UYpvn27-HC5m1JZAW&oh=00_AYD9w6ERy26eB-n4uJmxwQeP8_J-KVJicjhlKO2Tdb2_Ow&oe=66A4D238'

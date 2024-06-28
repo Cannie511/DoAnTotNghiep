@@ -5,6 +5,7 @@ import { MdManageAccounts, MdVideoCameraFront } from "react-icons/md";
 import { IoChatbubbleEllipses } from "react-icons/io5";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaRegNewspaper } from "react-icons/fa6";
+import { FaUserFriends } from "react-icons/fa";
 export default function SideBar() {
   return (
     <>
@@ -25,6 +26,10 @@ export default function SideBar() {
           </NavLink>
           <NavLink href="/schedule" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
            <FaCalendarAlt/> Lịch trình
+          </NavLink>
+          <hr/>
+          <NavLink href="/friends" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+           <FaUserFriends/> Bạn bè
           </NavLink>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
