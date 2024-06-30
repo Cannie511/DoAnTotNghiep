@@ -53,6 +53,20 @@ export interface UserChangePasswordType {
     new_password: string;
 }
 
+export interface MessageRequestType{
+    user1: number;
+    user2: number;
+}
+
+export interface MessageResponseType{
+    id:number;
+    Message:string;
+    Send_by:number; 
+    Received_by:number;
+    createdAt:any;
+    updatedAt:any;
+}
+
 export interface UserCheckPasswordType {
     user_id:number;
     old_password: string;

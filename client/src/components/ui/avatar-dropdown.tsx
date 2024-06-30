@@ -49,7 +49,7 @@ export default function AvatarDropdown({srcImg}:Props) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-            <Image className='rounded-full' layout='fixed' src={avatar as StaticImageData || srcImg} width={32} height={32} alt=''/>
+            <Image className='rounded-full' src={avatar as StaticImageData || srcImg} width={32} height={32} alt=''/>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

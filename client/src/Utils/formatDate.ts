@@ -1,4 +1,4 @@
-
+const moment = require('moment-timezone');
 export const formatDate = (date_string:string, time?:string) =>{
     const dateObj = new Date(date_string);
     const daysOfWeek = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"];
@@ -26,3 +26,20 @@ export const getCurrentTime = ()=>{
     const formattedTime = `${hours}:${minutes}`;
     return formattedTime;
 }
+
+export const formatDateMessage = (dateString:string) => {
+  const inputDate = moment.tz(dateString, 'Asia/Ho_Chi_Minh');
+  const now = moment.tz('Asia/Ho_Chi_Minh');
+  const today = moment.tz('Asia/Ho_Chi_Minh').startOf('day');
+  const yesterday = moment.tz('Asia/Ho_Chi_Minh').subtract(1, 'days').startOf('day');
+  const dayBeforeYesterday = moment.tz('Asia/Ho_Chi_Minh').subtract(2, 'days').startOf('day');
+  if (inputDate.isSame(today, 'd')) {
+    return inputDate.format('HH:mm');
+  } else if (inputDate.isSame(yesterday, 'd')) {
+    return `hôm qua, ${inputDate.format('HH:mm')}`;
+  } else if (inputDate.isAfter(dayBeforeYesterday)) {
+    return inputDate.format('DD/MM HH:mm');
+  } else {
+    return inputDate.format('DD/MM HH:mm');
+  }
+};
