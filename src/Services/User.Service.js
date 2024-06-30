@@ -418,7 +418,77 @@ const FindUserByName = async (user_name) =>
       }
     };
   
-  
+  const agreeAddFriend = async(user_id, friend_ID,action)=>
+    {
+      try{
+          const request =  await Model.USER_FRIEND.findOne({
+            attributes: [
+              "User_ID",
+              "Friend_ID",
+              "status"
+            ],
+            where:{
+              User_ID: user_id,
+              Friend_ID:friend_ID,
+              status:0
+            }, 
+            raw: true
+          });
+          
+          const respone =  await Model.USER_FRIEND.findOne({
+            attributes: [
+              "User_ID",
+              "Friend_ID",
+              "status"
+            ],
+            where:{
+              User_ID:friend_ID,
+              Friend_ID:user_id,
+              status:0
+            }, 
+            raw: true
+          });
+          if(action == 1 )
+            {
+              if (request && response) {
+                const add1 =await Model.USER_FRIEND.update(
+                  { status: 1 },
+                  { where: { User_ID: user_id, Friend_ID: friend_ID } }
+                );
+        
+              const add2 =  await Model.USER_FRIEND.update(
+                  { status: 1 },
+                  { where: { User_ID: friend_ID, Friend_ID: user_id } }
+                );
+
+                if (add1 && add2)
+                  return handleResult(200, "agree add friend ");
+                return handleResult(400, "agree add friend error");
+            } else  
+            {
+            const des1 =  await Model.USER_FRIEND.destroy({
+                where: {
+                  User_ID:  friend_id,
+                  Friend_ID: user_id,
+                },
+              });
+
+            const des2 =  await Model.USER_FRIEND.destroy({
+                where: {
+                  User_ID: user_id ,
+                  Friend_ID: friend_id,
+                },
+              });
+              if (des1 && des2)
+                return handleResult(200, "disagree add friend ");
+              return handleResult(400, "disagree add friend error ");
+            }
+      }
+    }
+      catch{
+        return err = handleError(error);
+      }
+    }
 module.exports = {
   getUsersByIdService,
   getUsersService,
@@ -433,4 +503,5 @@ module.exports = {
   getAllFriend,
   deleteFriend,
   FindUserByName,
+  agreeAddFriend,
 };
