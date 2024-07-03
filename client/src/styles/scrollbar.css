@@ -1,0 +1,27 @@
+.hide-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+.message-box::-webkit-scrollbar {
+  width: 4px;
+  transition: all .2s ease-in-out;
+}
+
+.message-box::-webkit-scrollbar:hover {
+  width: 7px;
+}
+
+.message-box::-webkit-scrollbar-thumb:hover{
+    background-color: rgba(185, 183, 183, .7);
+    width: 7px;
+}
+
+.message-box::-webkit-scrollbar-thumb {
+  background-color: rgba(185, 183, 183, 0.1);
+  border-radius: 15px;
+  transition: all .2s ease-in-out;
+}
+
+.no-resize {
+  resize: none;
+}

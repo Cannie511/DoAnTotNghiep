@@ -9,6 +9,7 @@ const sequelize = new Sequelize("db_doantotnghiep", "root", "", {
     acquire: 30000,
     idle: 10000,
   },
+  logging: false,
 });
 
 const connectToDatabase = async(req, res, next)=>{

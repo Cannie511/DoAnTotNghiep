@@ -4,7 +4,7 @@ import { UserData } from "@/types/type";
 import { StaticImageData } from "next/image";
 import { useRouter } from "next/navigation";
 import { ReactNode, createContext, useContext, useEffect, useLayoutEffect, useState } from "react";
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 interface AppContextType {
     display_name: string | null;
     setName: React.Dispatch<React.SetStateAction<string | null>>;
@@ -18,6 +18,7 @@ interface AppContextType {
     linked_account:string|null;
     email:string|null;
     avatar:StaticImageData|String|null;
+    socket:Socket|null
 }
 
 const defaultValue: AppContextType = {
@@ -33,6 +34,7 @@ const defaultValue: AppContextType = {
     linked_account:null,
     email: null,
     avatar: null,
+    socket:null
 };
 
 export const AppContext = createContext<any>(defaultValue);
@@ -47,7 +49,7 @@ export default function AppProvider({children}:{children: ReactNode}){
     const [isLoading, setLoading] = useState<boolean>(false);
     const [user_data, setUser_data] = useState<UserData|null>(null);
     const [forceLogout, setForceLogout] = useState<boolean>(false);
-    const [socket, setSocket] = useState(null);
+    const [socket, setSocket] = useState<Socket|null>(null);
     const user_id:number = Number(user_data?.id);
     const email:string = String(user_data?.email);
     const avatar:StaticImageData = user_data?.avatar as StaticImageData;
@@ -79,12 +81,12 @@ export default function AppProvider({children}:{children: ReactNode}){
         if(forceLogout) forceLog();
     },[forceLogout]);
      useEffect(() => {
-        const socketIo:any = io('http://localhost:8888');
+        const socketIo:Socket = io('http://localhost:8888');
 
         setSocket(socketIo);
 
         socketIo.on('connect', () => {
-        console.log('a user connected');
+            console.log('Connect to server successfully');
         });
 
         return () => {
@@ -107,7 +109,7 @@ export default function AppProvider({children}:{children: ReactNode}){
             user_data, setUser_data, 
             forceLogout, setForceLogout, 
             user_id, linked_account, 
-            email, avatar}}>
+            email, avatar, socket}}>
             {children}
         </AppContext.Provider>
     )

@@ -44,8 +44,8 @@ const getUserController = async (req, res) => {
       const data = await pagination("User", attr, page);
       if (data) return res.status(data.status).json(data);
     }
-    const data = await getUsersService();
-    if (data) return res.status(data.status).json(data);
+    const response = await getUsersService();
+    if (response) return res.status(response.status).json(response);
   } catch (error) {
     const err = handleError(error);
     return res.status(err.status).json({ message: err.message });
@@ -227,6 +227,7 @@ const getAllFriendController = async(req,res)=>
       return res.status(er.status).json({message: err.message})
     }
   }
+
 
 module.exports = {
   getUserByIdController,

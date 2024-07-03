@@ -23,8 +23,8 @@ export default function ClientNav({
           <QueryClientProvider client={queryClient}>
               <Navbar/>
               <SideBar/>
-              <div className="p-4 sm:ml-64">
-                  <div className="p-4 rounded-lg dark:border-gray-700 mt-16">
+              <div className="md:p-4 sm:ml-64">
+                  <div className="md:p-4 rounded-lg dark:border-gray-700 mt-16">
                     {children}
                   </div>
                 </div>

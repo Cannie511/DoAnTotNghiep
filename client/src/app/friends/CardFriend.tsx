@@ -10,7 +10,7 @@ interface Props{
 
 export default function CardFriend({avatar, display_name}:Props) {
   return (
-    <div className='w-52 bg-slate-800 h-[22rem] rounded-md overflow-hidden m-2'>
+    <div className='w-52 shadow-md dark:bg-slate-800 h-[22rem] rounded-md overflow-hidden m-2'>
         <div className='h-[12rem] w-full overflow-hidden'>
             <Image src={avatar} height={192} width={208} alt="avatar"/>
         </div>
