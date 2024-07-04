@@ -8,3 +8,7 @@ export const UserChangePassword = async ({user_id, old_password, new_password}:U
 export const UserCheckPassword = async ({user_id, old_password}:UserCheckPasswordType)=>{
     return await http.post<BasicResponse>(`/api/users/password/${user_id}`,{old_password});
 }
+
+export const UserFindOne = async (user_id:number)=>{
+    return await http.get<BasicResponse>(`/api/users/${user_id}`);
+}

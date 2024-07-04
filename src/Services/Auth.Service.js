@@ -102,7 +102,15 @@ const GoogleLoginService = async(token) =>{
         return handleResult(422, "Đăng nhập với Google thất bại");
       }
       else {
-        const res = await addUsersGoogleService(data?.email,'', data?.name,1,0,'google')
+        const res = await addUsersGoogleService(
+          data?.email,
+          "",
+          data?.name,
+          1,
+          0,
+          "google",
+          data?.picture
+        );
         console.log(res);
         if(res.status===200){
           const access_token = await createKey({

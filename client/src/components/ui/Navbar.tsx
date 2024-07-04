@@ -6,13 +6,11 @@ import NavLink from "./NavLink";
 import './UI.css';
 import { useContext } from "react";
 import { AppContext } from "@/Context/Context";
+import { IoHome } from "react-icons/io5";
+import { FaUsers } from "react-icons/fa6";
+import { Tooltip } from "flowbite-react";
+import DropdownDefault from "./dropdownDefault";
 export default function Navbar() {
-    const { display_name } = useContext(AppContext);
-    // function getName(){
-    //     const name = JSON.parse(sessionStorage.getItem('user_data') as string)?.display_name;
-    //     return name;
-    // }
-    // console.log(getName());
   return (
     <>
     <nav className="fixed top-0 z-50 w-screen bg-white border-gray-200 dark:bg-gray-900">
@@ -27,28 +25,33 @@ export default function Navbar() {
             <b className="text-3xl text-indigo-600">Freet</b>
         </Link>
         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+            <ModeToggle/>
             <div className="me-1 flex">
-                 <span className="relative top-1 right-1 font-semibold hidden md:block">{display_name}</span>
                 <AvatarDropdown srcImg={favicon}/>
             </div>
-            <ModeToggle/>
-            
         </div>
         <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" >
             <ul  className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             <li>
                 <NavLink href="/local_" 
                 className="navbar-items block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-                >Home</NavLink>
+                >
+                    <Tooltip content="Trang chủ">
+                        <IoHome className="text-3xl"/>
+                    </Tooltip>
+                </NavLink>
             </li>
             <li>
-                <NavLink href="/user" className="navbar-items block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">User</NavLink>
+                <NavLink href="/user" className="navbar-items block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">
+                    <Tooltip content="Danh sách bạn bè">
+                        <FaUsers className="text-3xl"/>
+                    </Tooltip>
+                </NavLink>
             </li>
             <li>
-                <NavLink href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Pricing</NavLink>
-            </li>
-            <li>
-                <NavLink href="#" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700">Contact</NavLink>
+                <Tooltip content="Thông báo">
+                    <DropdownDefault/>
+                </Tooltip>
             </li>
             </ul>
         </div>

@@ -58,8 +58,8 @@ export default function LoginForm() {
             .then(async (data)=>{
                 setName(data?.data?.data?.display_name)
                 sessionStorage.setItem('user_data',JSON.stringify(data.data.data));
-                 await axios.post('/api/auth',{access_token: data.data.access_token})
-                 .then(async (data)=>{
+                await axios.post('/api/auth',{access_token: data.data.access_token})
+                .then(async (data)=>{
                     window.location.reload();
                     toast({
                         title: "Chào mừng",
@@ -126,7 +126,7 @@ export default function LoginForm() {
                                 const token:string|undefined = credentialResponse?.credential;
                                 await AuthLoginGoogle(token)
                                 .then(async (data)=>{
-                                    console.log('google: ',data)
+                                    //console.log('google: ',data)
                                     setName(data?.data?.data?.data?.display_name)
                                     sessionStorage.setItem('user_data',JSON.stringify(data.data.data.data));
                                     await axios.post('/api/auth',{access_token: data.data.data.access_token.token})
@@ -145,6 +145,8 @@ export default function LoginForm() {
                                             description:"Đã có lỗi xảy ra",
                                             variant:"destructive"
                                         })
+                                        setLoading(false)
+                                    }).finally(()=>{
                                         setLoading(false)
                                     })
                                 })

@@ -3,5 +3,4 @@ a.navbar-items.active{
 }
 li a.navbar-items.active {
     border-radius: 0px !important;
-    border-bottom: 2px solid  rgb(63,131, 248);
 }
