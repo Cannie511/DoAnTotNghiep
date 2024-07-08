@@ -175,21 +175,15 @@ const findFriendController = async (req, res) => {
   }
 };
 
-
-
-
-
 // Thêm bạn
 const addFriendController = async(req,res) =>
   {
-    
     try {
-    const {user_id} =req.params;
-    const {friend_id} = req.body;
-      const data = await addFriend(user_id,friend_id);
+      const {user_id} = req.params;
+      const {friend_id} = req.body;
+        const data = await addFriend(user_id,friend_id);
       if(data) return res.status(data.status).json(data);
-    }catch(error)
-    {
+    } catch(error) {
       const err = handleError(error);
       return res.status(er.status).json({message: err.message})
     }
@@ -214,19 +208,19 @@ const deleteFriendController = async(req,res) =>
 
 // hiện toàn bộ bạn bè
 const getAllFriendController = async(req,res)=>
+{
+  try
   {
-    try
-    {
-      const {user_id} =req.params;
-      if(!user_id) return res.status(422).json({message:"Không nhận được user_id"});
-      const data = await getAllFriend(user_id);
-      if(data) return res.status(data.status).json(data);
-    }catch(error)
-    {
-      const err = handleError(error);
-      return res.status(er.status).json({message: err.message})
-    }
+    const {user_id} = req.params;
+    if(!user_id) return res.status(422).json({message:"Không nhận được user_id"});
+    const data = await getAllFriend(user_id);
+    if(data) return res.status(data.status).json(data);
+  }catch(error)
+  {
+    const err = handleError(error);
+    return res.status(er.status).json({message: err.message})
   }
+}
 
 
 module.exports = {

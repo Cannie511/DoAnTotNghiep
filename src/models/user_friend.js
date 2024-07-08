@@ -6,7 +6,6 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       USER_FRIEND.belongsTo(models.User, { foreignKey: 'User_ID', as: 'User', onDelete: 'CASCADE' });
       USER_FRIEND.belongsTo(models.User, { foreignKey: 'Friend_ID', as: 'Friend', onDelete: 'CASCADE' });
-      
     }
   }
   USER_FRIEND.init({
