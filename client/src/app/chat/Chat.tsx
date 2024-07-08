@@ -1,7 +1,7 @@
 'use client'
-import { Avatar, Card, TextInput, Textarea } from 'flowbite-react'
+import { Avatar, Card, Textarea } from 'flowbite-react'
 import { Button } from '@/components/ui/button'
-import React, { useEffect, useState, useRef, useContext, ChangeEvent, useLayoutEffect } from 'react'
+import React, { useEffect, useState, useRef, useContext} from 'react'
 import { HiPaperAirplane } from "react-icons/hi";
 import { BsEmojiSmile } from "react-icons/bs";
 import ListFriend from './ListFriend';
@@ -11,11 +11,12 @@ import Message from './Message';
 import { AppContext } from '@/Context/Context';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { MessageResponseType, UserData } from '@/types/type';
-import { useQuery } from '@tanstack/react-query';
 import { GetMessage } from '@/Services/message.api';
 import { useToast } from '@/components/ui/use-toast';
 import { url_img_default } from '@/images/image';
-import { StaticImageData } from 'next/image';
+import { UserFindOne } from '@/Services/user.api';
+import { useRouter } from 'next/router';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface MessageInput {
   message: string;
@@ -31,7 +32,7 @@ export default function Chat() {
     const isScrollingRef = useRef<NodeJS.Timeout | null>(null);
     const {socket} = useContext(AppContext);
     const [listMessage, setListMessage] = useState<Array<MessageResponseType>>([]);
-   
+    const queryClient = useQueryClient();
     const getMessage = async() =>{
         const messages = await GetMessage({user1:user_id, user2:current_friend?.id as number});
         if(messages) setListMessage(messages.data.data)
@@ -50,6 +51,7 @@ export default function Chat() {
         }
     };
     const setTimeScroll = () =>{
+        
         const messageBox = messageBoxRef.current;
             if (messageBox) {
                 messageBox.addEventListener('scroll', handleScroll);
@@ -68,6 +70,7 @@ export default function Chat() {
     setTimeout(()=>{
         setTimeScroll();
     },200)
+    
     const handleEnterKey = (event: React.KeyboardEvent<HTMLTextAreaElement>)=>{
         let tempRow = row;
         setRow( tempRow + 1 );
@@ -83,40 +86,43 @@ export default function Chat() {
         textarea.selectionStart = textarea.selectionEnd = selectionStart + 1;
     }
     useEffect(() => {
-        socket.on('onChat', async(data:any) => {
+        if(socket){
+            socket.on('onChat', async(data:any) => {
+            console.log('chat:',data);
+            queryClient.invalidateQueries({ queryKey:['list friend']});
             if (data) {
                 if(current_friend && user_id){
                     const receivedByUser = data.data[0].Received_by;
                     const sendByUser = data.data[0].Send_by;
                     const notification = data.data[data.data.length-1];
                     const check = (sendByUser === user_id && receivedByUser === current_friend.id) || (sendByUser === current_friend.id && receivedByUser === user_id);
-                    console.log(check);
                     if(check)
                         setListMessage(data.data);
                     else {
-                        toast({
-                            title:`Người dùng ${notification.Send_by}`,
-                            description:notification.Message
-                        })
-                    }
+                        const user = await UserFindOne(notification.Send_by);
+                        if(user){
+                            toast({
+                                title: user.data.data.display_name,
+                                description:notification.Message
+                            })
+                        }
+                        else return;
+                    }   
                 }
             }
-        });
-        return () => {
-            socket.off('onChat');
-        };
-    }, [current_friend, user_id]);
+            });
+            return () => {
+                socket.off('onChat');
+            };
+        }
+        
+    }, [current_friend, user_id,socket]);
     useEffect(()=>{
         if(user_id && current_friend?.id){
             getMessage();
         }
     },[current_friend])
-    useEffect(()=>{
-        if(user_id && current_friend)
-            socket.emit('joinRoom', user_id + current_friend?.id);
-    },[user_id, current_friend]);
     useEffect(() => {
-        
         const input = document.querySelector('textarea')
         input?.focus()
         if (!current_friend) {
@@ -157,7 +163,6 @@ export default function Chat() {
             message: data.message,
             receivedBy: current_friend?.id
         });
-        console.log(listMessage)
         setTimeScroll();
         reset();
         setRow(1);
@@ -167,7 +172,7 @@ export default function Chat() {
         <div className='flex space-x-1 '>
             <Card className='w-6xl h-[51rem] flex-col flex-1'>
                 <div className='w-full flex dark:bg-slate-700 relative top-0 p-2 rounded-md dark:text-white bg-slate-100 text-black'>
-                    <Avatar size={'xs'} img={current_friend?.avatar as any || url_img_default} rounded status="online" statusPosition="top-right" />
+                    <Avatar size={'xs'} alt='AV' img={current_friend?.avatar as any || url_img_default} rounded status="online" statusPosition="top-right" />
                     <strong className='ml-2'>{current_friend ? current_friend?.display_name : <Skeleton className="h-4 w-[250px]" />}</strong>
                 </div>
                 <div

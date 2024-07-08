@@ -48,7 +48,6 @@ const GoogleLoginController = async (req, res) => {
   try {
     const { google_token } = req.body;
     const data = await GoogleLoginService(google_token);
-    //console.log(data);
     if(data){
       res.cookie("access_token", data.data.access_token.token, {
         httpOnly: true,

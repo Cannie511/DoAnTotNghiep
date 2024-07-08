@@ -16,7 +16,7 @@ export default function SideBar() {
             <MdManageAccounts/> Tài khoản
           </NavLink>
           <NavLink href="/chat" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-            <IoChatbubbleEllipses/> Trò chuyện
+            <IoChatbubbleEllipses/> Trò chuyện <div className='w-5 h-5 flex items-center justify-center rounded-full bg-red-600 relative mt-1 ml-16 text-xs text-white'>1</div>
           </NavLink>
           <NavLink href="/blog" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
            <FaRegNewspaper/> Bài đăng

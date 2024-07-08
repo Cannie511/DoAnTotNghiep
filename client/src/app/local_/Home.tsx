@@ -12,11 +12,15 @@ export default function HomePage() {
     const [currentDate, setCurrentDate] = useState(formatDate(new Date() as any));
     const [noti, setNoti] = useState<number>(7);
      useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentTime(getCurrentTime());
-            setCurrentDate(formatDate(new Date() as any));
-        }, 500);
-        return () => clearInterval(interval);
+        try {
+            const interval = setInterval(() => {
+                setCurrentTime(getCurrentTime());
+                setCurrentDate(formatDate(new Date() as any));
+            }, 500);
+            return () => clearInterval(interval);
+        } catch (error) {
+            return;
+        }
     }, []);
     return (
         <div className='h-96 w-96 mx-auto'>
