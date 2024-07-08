@@ -11,7 +11,7 @@ export default function Friends() {
     const {user_id} = useContext(AppContext);
     const {data, isLoading, error} = useQuery({
         queryKey:['List user'],
-        queryFn: ()=>getUsers(3),
+        queryFn: ()=>getUsers(1),
     })
     const listFriend = data?.data.data.filter((x:any)=>x.id!==user_id)
   return (
