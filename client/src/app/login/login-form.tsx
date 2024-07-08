@@ -57,7 +57,7 @@ export default function LoginForm() {
             await AuthLogin({username, password})
             .then(async (data)=>{
                 setName(data?.data?.data?.display_name)
-                sessionStorage.setItem('user_data',JSON.stringify(data.data.data));
+                localStorage.setItem('user_data',JSON.stringify(data.data.data));
                 await axios.post('/api/auth',{access_token: data.data.access_token})
                 .then(async (data)=>{
                     window.location.reload();
@@ -128,7 +128,7 @@ export default function LoginForm() {
                                 .then(async (data)=>{
                                     //console.log('google: ',data)
                                     setName(data?.data?.data?.data?.display_name)
-                                    sessionStorage.setItem('user_data',JSON.stringify(data.data.data.data));
+                                    localStorage.setItem('user_data',JSON.stringify(data.data.data.data));
                                     await axios.post('/api/auth',{access_token: data.data.data.access_token.token})
                                     .then(async (data)=>{
                                         window.location.reload();

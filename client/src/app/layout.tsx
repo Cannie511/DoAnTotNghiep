@@ -9,6 +9,8 @@ import LoadingComponent from "@/components/LoadingComponent";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Suspense } from "react";
 import Loading from "./loading";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import QueryProvider from "@/Context/QueryProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -21,8 +23,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+ 
   return (
-    
     <html lang="en" suppressHydrationWarning>
       <body>
         <Suspense fallback={<Loading/>}><></></Suspense>
@@ -33,15 +35,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-             
-            <AppProvider>
+            <QueryProvider>
+              <AppProvider>
                   <ClientNav>
                       {children}
                   </ClientNav>
               <Toaster/>
-              
            </AppProvider>
-           
+            </QueryProvider>
         </ThemeProvider>
         </GoogleOAuthProvider>
         

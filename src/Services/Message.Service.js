@@ -2,6 +2,7 @@ const { Op, col, literal, fn } = require("sequelize");
 const { handleResult, handleError } = require("../Utils/Http");
 const Model = require("../models");
 const moment = require("moment-timezone");
+const pagination = require("../Utils/Pagination");
 
 const saveMessageService = async (message, send_by, received_by) => {
   try {

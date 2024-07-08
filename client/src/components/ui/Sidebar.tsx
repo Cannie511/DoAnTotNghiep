@@ -6,7 +6,18 @@ import { IoChatbubbleEllipses } from "react-icons/io5";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaRegNewspaper } from "react-icons/fa6";
 import { FaUserFriends } from "react-icons/fa";
+import { useQuery } from "@tanstack/react-query";
+import { countNotification } from "@/Services/notification.api";
+import { useContext } from "react";
+import { AppContext } from "@/Context/Context";
 export default function SideBar() {
+  const {user_id} = useContext(AppContext);
+  const {data, isLoading, error} = useQuery({
+        queryKey:['message_noti'],
+        queryFn: ()=>countNotification({user_id:user_id, type:"message"}),
+        enabled:!!user_id,
+    })
+  let message_noti = data?.data;
   return (
     <>
     <Sidebar className="h-screen fixed transition-all sm:translate-x-0 -translate-x-full" aria-label="Sidebar with content separator example">
@@ -16,7 +27,10 @@ export default function SideBar() {
             <MdManageAccounts/> Tài khoản
           </NavLink>
           <NavLink href="/chat" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-            <IoChatbubbleEllipses/> Trò chuyện <div className='w-5 h-5 flex items-center justify-center rounded-full bg-red-600 relative mt-1 ml-16 text-xs text-white'>1</div>
+            <IoChatbubbleEllipses/> Trò chuyện 
+            {message_noti && 
+              <div className='w-5 h-5 flex items-center justify-center rounded-full bg-red-600 relative mt-1 ml-16 text-xs text-white'>{String(message_noti)}</div>
+            }
           </NavLink>
           <NavLink href="/blog" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
            <FaRegNewspaper/> Bài đăng

@@ -1,5 +1,5 @@
 'use client'
-import { Avatar, Card, Textarea } from 'flowbite-react'
+import { Avatar, Card, Textarea, Tooltip } from 'flowbite-react'
 import { Button } from '@/components/ui/button'
 import React, { useEffect, useState, useRef, useContext} from 'react'
 import { HiPaperAirplane } from "react-icons/hi";
@@ -15,9 +15,11 @@ import { GetMessage } from '@/Services/message.api';
 import { useToast } from '@/components/ui/use-toast';
 import { url_img_default } from '@/images/image';
 import { UserFindOne } from '@/Services/user.api';
-import { useRouter } from 'next/router';
-import { useQueryClient } from '@tanstack/react-query';
-
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getActiveStatus } from '@/Services/socket.api';
+import { IoCall } from "react-icons/io5";
+import { HiMiniVideoCamera } from "react-icons/hi2";
+import { SlOptionsVertical } from "react-icons/sl";
 interface MessageInput {
   message: string;
 }
@@ -26,6 +28,7 @@ export default function Chat() {
     const {toast} = useToast();
     const {user_id} = useContext(AppContext);
     const [current_friend, setCurrentFriend] = useState<UserData | null>(null);
+    const [friend_status, setFriendStatus] = useState<number>(0);
     const messageBoxRef = useRef<HTMLDivElement>(null);
     const [row, setRow] =useState<number>(1);
     const {register, handleSubmit, reset, formState:{errors}, setValue} = useForm<MessageInput>();
@@ -33,8 +36,19 @@ export default function Chat() {
     const {socket} = useContext(AppContext);
     const [listMessage, setListMessage] = useState<Array<MessageResponseType>>([]);
     const queryClient = useQueryClient();
+    const {data, isLoading, error} = useQuery({
+        queryKey:['active_sts'],
+        queryFn: ()=>getActiveStatus(current_friend?.id as number),
+        enabled: !!current_friend,
+    })
+    
+    useEffect(()=>{
+        if(data && data.data) 
+            setFriendStatus(data?.data?.data?.status);
+    },[data])
     const getMessage = async() =>{
         const messages = await GetMessage({user1:user_id, user2:current_friend?.id as number});
+        console.log(messages);
         if(messages) setListMessage(messages.data.data)
     }
     const handleScroll = () => {
@@ -70,7 +84,6 @@ export default function Chat() {
     setTimeout(()=>{
         setTimeScroll();
     },200)
-    
     const handleEnterKey = (event: React.KeyboardEvent<HTMLTextAreaElement>)=>{
         let tempRow = row;
         setRow( tempRow + 1 );
@@ -88,34 +101,32 @@ export default function Chat() {
     useEffect(() => {
         if(socket){
             socket.on('onChat', async(data:any) => {
-            console.log('chat:',data);
-            queryClient.invalidateQueries({ queryKey:['list friend']});
-            if (data) {
-                if(current_friend && user_id){
-                    const receivedByUser = data.data[0].Received_by;
-                    const sendByUser = data.data[0].Send_by;
-                    const notification = data.data[data.data.length-1];
-                    const check = (sendByUser === user_id && receivedByUser === current_friend.id) || (sendByUser === current_friend.id && receivedByUser === user_id);
-                    if(check)
-                        setListMessage(data.data);
-                    else {
-                        const user = await UserFindOne(notification.Send_by);
-                        if(user){
-                            toast({
-                                title: user.data.data.display_name,
-                                description:notification.Message
-                            })
-                        }
-                        else return;
-                    }   
+                queryClient.invalidateQueries({ queryKey:['list friend']});
+                if (data) {
+                    if(current_friend && user_id){
+                        const receivedByUser = data.data[0].Received_by;
+                        const sendByUser = data.data[0].Send_by;
+                        const notification = data.data[data.data.length-1];
+                        const check = (sendByUser === user_id && receivedByUser === current_friend.id) || (sendByUser === current_friend.id && receivedByUser === user_id);
+                        if(check)
+                            setListMessage(data.data);
+                        else {
+                            const user = await UserFindOne(notification.Send_by);
+                            if(user){
+                                toast({
+                                    title: user.data.data.display_name,
+                                    description:notification.Message
+                                })
+                            }
+                            else return;
+                        }   
+                    }
                 }
-            }
             });
             return () => {
                 socket.off('onChat');
             };
         }
-        
     }, [current_friend, user_id,socket]);
     useEffect(()=>{
         if(user_id && current_friend?.id){
@@ -171,9 +182,22 @@ export default function Chat() {
     return (
         <div className='flex space-x-1 '>
             <Card className='w-6xl h-[51rem] flex-col flex-1'>
-                <div className='w-full flex dark:bg-slate-700 relative top-0 p-2 rounded-md dark:text-white bg-slate-100 text-black'>
-                    <Avatar size={'xs'} alt='AV' img={current_friend?.avatar as any || url_img_default} rounded status="online" statusPosition="top-right" />
-                    <strong className='ml-2'>{current_friend ? current_friend?.display_name : <Skeleton className="h-4 w-[250px]" />}</strong>
+                <div className='w-full flex dark:bg-slate-700 relative top-0 p-2 rounded-sm dark:text-white bg-slate-100 text-black items-center'>
+                    <div className='flex flex-1'>
+                        <Avatar size={'xs'} alt='AV' img={current_friend?.avatar as any || url_img_default} rounded status="online" statusPosition="top-right" />
+                        <strong className='ml-2'>{current_friend ? current_friend?.display_name : <Skeleton className="h-4 w-[250px]" />}</strong>
+                    </div>
+                    <div className='flex items-center'>
+                        <Tooltip className='w-[8rem] z-50' content="Cuộc gọi thoại">
+                            <IoCall className='text-xl cursor-pointer hover:text-gray-500 transition-all mx-2'/> 
+                        </Tooltip>
+                        <Tooltip className='w-[8rem] z-50' content="Cuộc gọi video">
+                            <HiMiniVideoCamera className='text-2xl cursor-pointer hover:text-gray-500 transition-all mx-2'/> 
+                        </Tooltip>
+                        <Tooltip className='w-[8rem] z-50' content="Thông tin cuộc trò truyện">
+                            <SlOptionsVertical className='text-xl cursor-pointer hover:text-gray-500 transition-all mx-2'/> 
+                        </Tooltip>
+                    </div>
                 </div>
                 <div
                     ref={messageBoxRef}
@@ -181,7 +205,7 @@ export default function Chat() {
                 >
                     {listMessage && listMessage.map((message:MessageResponseType)=>{
                         return(
-                            <Message key={message?.id} message={message.Message} createAt={message.createdAt} me={message.Send_by === user_id} avatar={current_friend?.avatar}/>
+                            <Message key={message?.id} message={message.Message} createAt={message.createdAt} me={message.Send_by === user_id} status={friend_status} avatar={current_friend?.avatar}/>
                         )
                     })}
                 </div>

@@ -71,3 +71,11 @@ export interface UserCheckPasswordType {
     user_id:number;
     old_password: string;
 }
+
+export interface NotificationRequestType{
+    user_id:number;
+    message?:string;
+    send_by?:number;
+    type?:string;
+    status?:number;
+}

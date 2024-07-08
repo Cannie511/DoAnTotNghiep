@@ -29,12 +29,7 @@ export const AuthRegister = async({email, password, display_name, language, prem
 }
 
 export const AuthLogout = async(user_id:number)=>{
-    try {
-        const res = await http.post('/auth/logout', {user_id})
-        return await getApiFromNextServer('/api/auth/logout')
-    } catch (error) {
-        console.log(error)
-    } 
+    return await http.post('/auth/logout', {user_id});
 }
 
 export const AuthCheckSession = async()=>{

@@ -1,48 +1,37 @@
 const Model = require("../models");
 const { handleError } = require("./Http");
-const LIMIT = 10;
+require('dotenv').config();
+const LIMIT = +process.env.LIMIT_RECORD;
 
-const pagination = async (table, attr, page) => {
+const pagination = async (table, attr = {}, page, where = {}, order={}) => {
   try {
-    const offset = (+page - 1) * LIMIT;
-    if (!attr) {
-      const totalRecords = await Model[table].count();
-      const totalPages = Math.ceil(totalRecords / LIMIT);
-      const data = await Model[table].findAll({
-        limit: LIMIT,
-        offset,
-        raw: true,
-      });
-      if (data && totalPages) {
-        return {
-          status: 200,
-          message: "get data successfully",
-          currentPage: page,
-          total: totalPages,
-          data,
-        };
-      }
-    }
-
-    if (!table)
+    if (!table) {
       return {
         status: 422,
         message: "table is required",
       };
-    if (typeof attr !== "object")
+    }
+    if (typeof attr !== "object") {
       return {
         status: 422,
-        message: "attr must be an array",
+        message: "attr must be an object",
       };
+    }
+
     if (!page) page = 1;
-    const totalRecords = await Model[table].count();
+    const offset = (+page - 1) * LIMIT;
+
+    const totalRecords = await Model[table].count({ where });
     const totalPages = Math.ceil(totalRecords / LIMIT);
     const data = await Model[table].findAll({
       attributes: attr ? attr : ["*"],
       limit: LIMIT,
       offset,
+      where: where || {},
+      order: order || [],
       raw: true,
     });
+
     if (data && totalPages) {
       return {
         status: 200,
@@ -52,6 +41,7 @@ const pagination = async (table, attr, page) => {
         data,
       };
     }
+
     return {
       status: 422,
       message: "get data false",
@@ -66,4 +56,5 @@ const pagination = async (table, attr, page) => {
     };
   }
 };
+
 module.exports = pagination;

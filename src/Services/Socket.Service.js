@@ -56,7 +56,7 @@ class Socket {
          raw: true,
        });
        if (socket) return handleResult(200, "Tìm thấy socket",socket);
-       else return handleResult(400, "Không tìm thấy");
+       else return handleResult(200, "Người dùng chưa online");
     } catch (error) {
       return handleError(error);
     }

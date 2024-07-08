@@ -1,16 +1,14 @@
 'use client'
 import { AppContext } from '@/Context/Context';
 import { Button, Label, Spinner, TextInput } from 'flowbite-react'
-import React, { Dispatch, SetStateAction, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { GrFormNext } from "react-icons/gr";
 import '@/styles/login.css'
 import { AuthRegister } from '@/Services/auth.api';
 import { useToast } from '@/components/ui/use-toast';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 
 export default function PasswordStep() {
-    const router = useRouter()
     const {isLoading, setLoading,setName} = useContext(AppContext);
     const {toast} = useToast();
     const sesstionData = sessionStorage.getItem('info') as string;
@@ -38,9 +36,8 @@ export default function PasswordStep() {
                     premium:0, 
                     linked_account:"verify"})
                 .then(async(data)=>{
-                    console.log(data.data.data.data?.display_name);
                     setName(data.data.data.data?.display_name)
-                    sessionStorage.setItem('user_data',JSON.stringify(data.data.data.data));
+                    localStorage.setItem('user_data',JSON.stringify(data.data.data.data));
                     await axios.post('/api/auth',{access_token: data.data.access_token})
                     .then(async(data)=>{
                         sessionStorage.removeItem('info');

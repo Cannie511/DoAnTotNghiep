@@ -38,7 +38,7 @@ const getUserController = async (req, res) => {
         "avatar",
         "createdAt",
       ];
-      const data = await pagination("User", attr, page);
+      const data = await pagination("User", attr, page,{},[]);
       if (data) return res.status(data.status).json(data);
     }
     const response = await getUsersService();

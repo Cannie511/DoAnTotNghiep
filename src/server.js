@@ -5,19 +5,19 @@ const cookieParser = require("cookie-parser");
 const AuthRoute = require("./Routes/Auth.api");
 const UserRoute = require("./Routes/User.api");
 const MessageRoute = require("./Routes/Message.api");
+const SocketRoute = require('./Routes/Socket.api');
+const NotificationRoute = require('./Routes/Notificaction.api');
 const db_connect = require("./Database/db.connect");
 const cors_config = require("./Middlewares/CORS");
 const { Server } = require("socket.io");
 const { createServer } = require("node:http");
-
 const {
   saveMessageService,
   getMessageService,
-  getLatestMessageService,
 } = require("./Services/Message.Service");
 const Socket = require("./Services/Socket.Service");
-const socket = require("./models/socket");
 const { handleError } = require("./Utils/Http");
+const NotificationController = require("./Controllers/Notification.Controller");
 require("dotenv").config();
 const server = createServer(app);
 const io = new Server(server, {
@@ -36,14 +36,17 @@ const port = process.env.PORT || 5000;
 io.on("connection", async (socket) => {
   try {
     const user_id = socket.handshake.query.user_id;
-    console.log(`${user_id} have connected ${socket.id}`);
+    //console.log(`${user_id} have connected ${socket.id}`);
+    socket.on("connected",(user_id)=>{
+      
+    })
+    socket.broadcast.emit("online", user_id);
     if (!user_id) return;
     const socketIO = new Socket(user_id, socket.id, 1);
     await socketIO.connectSocket();
     socket.on("chat", async (data) => {
       const received_user = await socketIO.searchOne(data?.receivedBy);
       const send_user = await socketIO.searchOne(data?.sendBy);
-      console.log("received: ", received_user.data.socket_id);
       const response = await saveMessageService(
         data?.message,
         data?.sendBy,
@@ -58,24 +61,30 @@ io.on("connection", async (socket) => {
         io.to(send_user?.data.socket_id).emit("onChat", listMessage);
       }
     });
+    socket.on("user_disconnected",async(data)=>{
+      const id = data.user_id;
+      socket.broadcast.emit("offline", id);
+      const disconnectIo = new Socket(id, socket.id, 0);
+      disconnectIo.update();
+    });
   } catch (error) {
     return handleError(error);
   }
 });
 app.post("/", async(req, res)=>{
   try {
-    const {userId} = req.body;
-    const data = await getLatestMessageService(userId);
-    if(data) return res.status(data.status).json(data);
+    const test = new NotificationController(req, res);
+    return await test.getAll();
   } catch (error) {
     console.log(error)
     return res.status(500).json({ message: error.message });
   }
 })
 app.use("/auth", AuthRoute);
-app.use("/api", MessageRoute);
 app.use("/api", Authentication, UserRoute);
-
+app.use("/api", Authentication, SocketRoute);
+app.use("/api", Authentication, MessageRoute);
+app.use("/api", Authentication, NotificationRoute);
 app.use((req, res) => {
   res.status(404).json({ status: 404, message: "404 NOT FOUND" });
 });

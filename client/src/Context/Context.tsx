@@ -1,11 +1,13 @@
 'use client'
 import { AuthLogout } from "@/Services/auth.api";
+import { createNotification } from "@/Services/notification.api";
 import { UserFindOne } from "@/Services/user.api";
 import { useToast } from "@/components/ui/use-toast";
-import { UserData } from "@/types/type";
+import { NotificationRequestType, UserData } from "@/types/type";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { StaticImageData } from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, createContext, useContext, useEffect, useLayoutEffect, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import io, { Socket } from 'socket.io-client';
 interface AppContextType {
     display_name: string | null;
@@ -61,30 +63,30 @@ export default function AppProvider({children}:{children: ReactNode}){
     const email:string = String(user_data?.email);
     const avatar:StaticImageData = user_data?.avatar as StaticImageData;
     const linked_account:string = String(user_data?.linked_account);
-    useLayoutEffect(()=>{
-        const user_data = sessionStorage.getItem('user_data');
+    const queryClient = useQueryClient();
+    useEffect(()=>{
+        const user_data = localStorage.getItem('user_data');
         if (user_data) {
             setUser_data(JSON.parse(user_data));
         }
     },[])
-    useLayoutEffect(()=>{
+    useEffect(()=>{
         const friend = localStorage.getItem('user_data');
         if (!current_friend) {
             setCurrentFriend(JSON.parse(friend as string));
         }
     },[current_friend])
-    useLayoutEffect(() => {
-        const user_data = sessionStorage.getItem('user_data');
+    useEffect(() => {
+        const user_data = localStorage.getItem('user_data');
         if (user_data) {
             setName(JSON.parse(user_data).display_name);
         }
     }, []);
     useEffect(()=>{
         async function forceLog(){
-            const id = await user_data?.id;
-            await AuthLogout(Number(id))
-            .then(data=>{
-                sessionStorage.removeItem('user_data');
+            await AuthLogout(Number(user_id))
+            .then(async(data)=>{
+                //localStorage.removeItem('user_data');
                 window.location.reload();
             })
             .catch(err=>{
@@ -98,18 +100,37 @@ export default function AppProvider({children}:{children: ReactNode}){
             const socketIo:Socket = io('http://localhost:8888', {query:{user_id}});
             setSocket(socketIo);
             socketIo.on('connect', () => {
-                console.log('Connect to server successfully');
+                socketIo.emit('connected', { user_id });
                 socketIo.on('onChat', async(data:any) => {
-                    console.log(data);
                     const notification = data.data[data.data.length-1];
                     const user = await UserFindOne(notification.Send_by);
                     if(pathname !== '/chat'){
-                        toast({
-                            title: user.data.data.display_name,
-                            description:notification.Message
+                        const noti:NotificationRequestType = {
+                            user_id: user_id,
+                            message: " đã gửi tin nhắn ",
+                            send_by: notification?.Send_by,
+                            type: "message",
+                            status: 0,
+                        }
+                        await createNotification(noti)
+                        .then(data=>{
+                            toast({
+                                title: user.data.data.display_name,
+                                description:notification.Message
+                            })
+                        })
+                        .catch(err=>{
+                            console.log(err);
                         })
                     }
                 });
+            });
+            socketIo.on("online",(friend)=>{
+                queryClient.invalidateQueries({queryKey:['active_sts']});
+                queryClient.invalidateQueries({queryKey:['message_noti']});
+            })
+            window.addEventListener('beforeunload', () => {
+                socketIo.emit('user_disconnected', { user_id });
             });
             return () => {
                 socketIo.disconnect();

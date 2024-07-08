@@ -4,7 +4,7 @@ export async function POST(){
         status:200,
         headers:{
             'Set-Cookie':
-                `access_token=;Path=/;HttpOnly;Max-Age=0;refresh_token=;Path=/;HttpOnly;Max-Age=0;`  
+                `access_token=;Path=/;HttpOnly;Max-Age=0;`  
         }
     })
 }

@@ -23,9 +23,10 @@ export default function AvatarDropdown({srcImg}:Props) {
   const handleLogout =async ()=>{
     try {
       const res = await AuthLogout(Number(user_data?.id));
+      console.log(res);
       if(res?.status === 200) {
         setLoading(true);
-        sessionStorage.removeItem('user_data');
+        localStorage.removeItem('user_data');
         router.push('/login');
       }
       else
