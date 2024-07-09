@@ -276,212 +276,181 @@ const deleteUserService = async (user_id) => {
 };
 
 //tìm bạn với name(done)
-const FindUserByName = async (user_name) =>
-{
-  try 
-  {
-    const user = await Model.User.findAll(
-      {
-        attributes: [
-          "id",
-          "email",
-          "display_name",
-          "language",
-          "premium",
-          "createdAt",
-        ],
-        where: {
-          display_name: {
-            [Op.like]: `%${user_name}%`,
-          },
-
+const FindUserByName = async (user_name) => {
+  try {
+    const user = await Model.User.findAll({
+      attributes: [
+        "id",
+        "email",
+        "display_name",
+        "language",
+        "premium",
+        "createdAt",
+      ],
+      where: {
+        display_name: {
+          [Op.like]: `%${user_name}%`,
         },
-        raw:true
-      }
-    );
+      },
+      raw: true,
+    });
     if (user) {
       return handleResult(200, "get user successfully", user);
     }
     return handleResult(400, "User not found");
+  } catch (error) {
+    return (err = handleError(error));
   }
-  catch (error)
-  {
-    return err = handleError(error);
-  };
-}
- 
-  //thêm bạn(done)
-const addFriend = async(user_id,friend,id)=>
-    {
-      try {  
-        const user = await Model.USER_FRIEND.create({
-        User_ID: user_id,
-        Friend_ID: friend,id,
-        status:0
-      })
-      const Friend_user = await Model.USER_FRIEND.create({
-        User_ID: friend,id,
-        Friend_ID:user_id,
-        status:0
-      })
-      if (user) {
-        return handleResult(200, "Add friend successfully", user);
-      }
-        return handleResult(400, "Add friend error");
-      }catch(error)
-      {
-        return err = handleError(error);
-      }
+};
+
+//thêm bạn(done)
+const addFriend = async (user_id, friend, id) => {
+  try {
+    const user = await Model.USER_FRIEND.create({
+      User_ID: user_id,
+      Friend_ID: friend,
+      id,
+      status: 0,
+    });
+    const Friend_user = await Model.USER_FRIEND.create({
+      User_ID: friend,
+      id,
+      Friend_ID: user_id,
+      status: 0,
+    });
+    if (user) {
+      return handleResult(200, "Add friend successfully", user);
     }
-  
-  // xóa bạn(done)
-  const deleteFriend = async (user_id, friend_id) => {
-    try {  
-      const find = await Model.USER_FRIEND.findOne({
+    return handleResult(400, "Add friend error");
+  } catch (error) {
+    return (err = handleError(error));
+  }
+};
+
+// xóa bạn(done)
+const deleteFriend = async (user_id, friend_id) => {
+  try {
+    const find = await Model.USER_FRIEND.findOne({
+      where: {
+        User_ID: user_id,
+        Friend_ID: friend_id,
+      },
+      raw: true,
+    });
+
+    if (find) {
+      const data = await Model.USER_FRIEND.destroy({
         where: {
           User_ID: user_id,
           Friend_ID: friend_id,
         },
-        raw: true,
       });
-      
-      if (find) {
-        const data = await Model.USER_FRIEND.destroy({
+      const dataFriend = await Model.USER_FRIEND.destroy({
+        where: {
+          User_ID: friend_id,
+          Friend_ID: user_id,
+        },
+      });
+      if (data === 1) {
+        return handleResult(200, "Delete friend successfully");
+      } else {
+        return handleResult(400, "Delete friend error");
+      }
+    } else {
+      return handleResult(404, "Friend not found");
+    }
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+//lấy danh sách bạn bè(done)
+const getAllFriend = async (user_id) => {
+  try {
+    const friends = await Model.USER_FRIEND.findAll({
+      attributes: ["Friend_ID"],
+      where: {
+        User_ID: user_id,
+        status: 1,
+      },
+      raw: true,
+    });
+
+    if (friends.length === 0) {
+      return handleResult(400, "No friends found");
+    }
+    const friendIds = friends.map((friend) => friend.Friend_ID);
+    //console.log(friendIds);
+    const list = await Model.User.findAll({
+      attributes: ["email", "display_name"],
+      where: {
+        id: friendIds,
+      },
+    });
+    return handleResult(200, "List Friends", list);
+  } catch (error) {
+    return (err = handleError(error));
+  }
+};
+//chưa test
+const agreeAddFriend = async (user_id, friend_ID, action) => {
+  try {
+    const request = await Model.USER_FRIEND.findOne({
+      attributes: ["id", "User_ID", "Friend_ID", "status"],
+      where: {
+        User_ID: user_id,
+        Friend_ID: friend_ID,
+        status: 0,
+      },
+      raw: true,
+    });
+
+    const response = await Model.USER_FRIEND.findOne({
+      attributes: ["id", "User_ID", "Friend_ID", "status"],
+      where: {
+        User_ID: friend_ID,
+        Friend_ID: user_id,
+        status: 0,
+      },
+      raw: true,
+    });
+    if (action == 1) {
+      if (request && response) {
+        const add1 = await Model.USER_FRIEND.update(
+          { status: 1 },
+          { where: { User_ID: user_id, Friend_ID: friend_ID } }
+        );
+
+        const add2 = await Model.USER_FRIEND.update(
+          { status: 1 },
+          { where: { User_ID: friend_ID, Friend_ID: user_id } }
+        );
+
+        if (add1 && add2) return handleResult(200, "agree add friend ");
+        return handleResult(400, "agree add friend error");
+      } else {
+        const des1 = await Model.USER_FRIEND.destroy({
+          where: {
+            User_ID: friend_id,
+            Friend_ID: user_id,
+          },
+        });
+
+        const des2 = await Model.USER_FRIEND.destroy({
           where: {
             User_ID: user_id,
             Friend_ID: friend_id,
           },
         });
-        const dataFriend = await Model.USER_FRIEND.destroy({
-          where: {
-            User_ID:  friend_id,
-            Friend_ID: user_id,
-          },
-        });
-        if (data === 1) {
-          return handleResult(200, "Delete friend successfully");
-        } else {
-          return handleResult(400, "Delete friend error");
-        }
-      } else {
-        return handleResult(404, "Friend not found");
+        if (des1 && des2) return handleResult(200, "disagree add friend ");
+        return handleResult(400, "disagree add friend error ");
       }
-    } catch (error) {
-      return handleError(error);
     }
-  };
-  
-
-    //lấy danh sách bạn bè(done)
-const getAllFriend = async(user_id)=>
-{
-  try
-  {
-    const friends = await Model.USER_FRIEND.findAll({
-      attributes: [
-        "Friend_ID"
-      ],
-      where:{
-        User_ID: user_id,
-        status:1
-      }, 
-      raw: true
-    });
-    
-    if(friends.length === 0)
-    {
-      return handleResult(400,"No friends found")
-    }
-      const friendIds = friends.map(friend => friend.Friend_ID);
-      //console.log(friendIds);
-      const list = await Model.User.findAll({
-      attributes: [
-        "email",
-        "display_name",
-      ],where:{
-        id:friendIds 
-      }
-    })
-    return handleResult(200, "List Friends", list);
-  }catch(error)
-  {
-    return err = handleError(error);
+  } catch {
+    return (err = handleError(error));
   }
 };
-  //chưa test
-const agreeAddFriend = async(user_id, friend_ID,action)=>
-{
-  try{
-      const request =  await Model.USER_FRIEND.findOne({
-        attributes: [
-          "User_ID",
-          "Friend_ID",
-          "status"
-        ],
-        where:{
-          User_ID: user_id,
-          Friend_ID:friend_ID,
-          status:0
-        }, 
-        raw: true
-      });
-      
-      const respone =  await Model.USER_FRIEND.findOne({
-        attributes: [
-          "User_ID",
-          "Friend_ID",
-          "status"
-        ],
-        where:{
-          User_ID:friend_ID,
-          Friend_ID:user_id,
-          status:0
-        }, 
-        raw: true
-      });
-      if(action == 1 )
-        {
-          if (request && response) {
-            const add1 =await Model.USER_FRIEND.update(
-              { status: 1 },
-              { where: { User_ID: user_id, Friend_ID: friend_ID } }
-            );
-    
-          const add2 =  await Model.USER_FRIEND.update(
-              { status: 1 },
-              { where: { User_ID: friend_ID, Friend_ID: user_id } }
-            );
 
-            if (add1 && add2)
-              return handleResult(200, "agree add friend ");
-            return handleResult(400, "agree add friend error");
-        } else  
-        {
-        const des1 =  await Model.USER_FRIEND.destroy({
-            where: {
-              User_ID:  friend_id,
-              Friend_ID: user_id,
-            },
-          });
-
-        const des2 =  await Model.USER_FRIEND.destroy({
-            where: {
-              User_ID: user_id ,
-              Friend_ID: friend_id,
-            },
-          });
-          if (des1 && des2)
-            return handleResult(200, "disagree add friend ");
-          return handleResult(400, "disagree add friend error ");
-        }
-  }
-}
-  catch{
-    return err = handleError(error);
-  }
-}
-
- 
 module.exports = {
   getUsersByIdService,
   getUsersService,

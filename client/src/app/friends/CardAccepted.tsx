@@ -5,7 +5,7 @@ import { createNotification } from '@/Services/notification.api';
 import { Button } from 'flowbite-react'
 import Image, { StaticImageData } from 'next/image'
 import React, { useContext } from 'react'
-import { MdPersonAddAlt1 } from "react-icons/md";
+import { FaCircleCheck } from "react-icons/fa6";
 
 interface Props{
     avatar: string|StaticImageData;
@@ -13,7 +13,7 @@ interface Props{
     id:number;
 }
 
-export default function CardFriend({avatar, display_name, id}:Props) {
+export default function CardAccept({avatar, display_name, id}:Props) {
     const {user_id} = useContext(AppContext);
     const {toast} = useToast();
     const handleAddFriend = async()=>{
@@ -50,19 +50,11 @@ export default function CardFriend({avatar, display_name, id}:Props) {
             {display_name}
             <br/>
             <small>
-                {/* <Avatar.Group>
-                    <Avatar img={"@/app/favicon.ico"} rounded stacked />
-                    <Avatar img={"@/app/favicon.ico"} rounded stacked />
-                    <Avatar.Counter total={2} href="#" />
-                </Avatar.Group> */}
                 3 bạn chung
             </small>
         </div>
         <div className='p-2 space-y-1'>
-            <Button className='w-full' color={"blue"} size="sm" onClick={handleAddFriend}>
-                Thêm bạn bè 
-                <MdPersonAddAlt1 className='text-lg ml-1'/>
-            </Button>
+            <Button className='w-full' color={"blue"} size="sm" onClick={handleAddFriend}>Xác nhận <FaCircleCheck className='text-lg ml-1'/></Button>
             <Button color="gray" className='w-full' size="sm">Xóa</Button>
         </div>
     </div>
