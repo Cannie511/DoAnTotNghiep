@@ -62,7 +62,7 @@ class NotificationService {
         order: [["createdAt", "DESC"]],
         raw: true,
       });
-       if (data) return handleResult(200, "Lấy báo thành công", data);
+       if (data) return handleResult(200, "Lấy thông báo thành công", data);
        else return handleResult(422, "Lấy thông báo thất bại");
     } catch (error) {
       return handleError(error);

@@ -8,6 +8,7 @@ const MessageRoute = require("./Routes/Message.api");
 const SocketRoute = require('./Routes/Socket.api');
 const NotificationRoute = require('./Routes/Notificaction.api');
 const RoomRoute = require("./Routes/Room.api");
+const ScheduleRoute = require("./Routes/Schedule.api");
 const db_connect = require("./Database/db.connect");
 const cors_config = require("./Middlewares/CORS");
 const { Server } = require("socket.io");
@@ -113,7 +114,7 @@ app.use("/api", Authentication, SocketRoute);
 app.use("/api", Authentication, MessageRoute);
 app.use("/api", Authentication, NotificationRoute);
 app.use("/api", Authentication, RoomRoute);
-
+app.use("/api", Authentication, ScheduleRoute);
 app.use((req, res) => {
   res.status(404).json({ status: 404, message: "404 NOT FOUND" });
 });

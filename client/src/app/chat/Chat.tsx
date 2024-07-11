@@ -98,6 +98,32 @@ export default function Chat() {
         setValue('message', newValue);
         textarea.selectionStart = textarea.selectionEnd = selectionStart + 1;
     }
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter' && !event.altKey && !event.shiftKey){
+            event.preventDefault();
+            handleSubmit(onSubmit)();
+        }
+        else if (event.key === 'Enter' && event.shiftKey){
+            let tempRow = row;
+            setRow( tempRow + 1 );
+            if(row >=6) setRow(6);
+        }
+        else if (event.key === 'Enter' && event.altKey){
+            let tempRow = row;
+            setRow( tempRow + 1 );
+            handleEnterKey(event);
+        }
+        if (event.key === 'Backspace'){
+            if(row === 1) return;
+            const textarea = event.target as HTMLTextAreaElement;
+            const selectionStart = textarea.selectionStart || 0;
+            const currentLineStart = textarea.value.lastIndexOf('\n', selectionStart - 1) + 1;
+            if (selectionStart === currentLineStart) {
+                let tempRow = row;
+                setRow(tempRow - 1);
+            }
+        }
+    };
     useEffect(() => {
         if(socket){
             socket.on('onChat', async(data:any) => {
@@ -141,32 +167,7 @@ export default function Chat() {
             setCurrentFriend(friend);
         }
     }, [current_friend]);
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (event.key === 'Enter' && !event.altKey && !event.shiftKey){
-            event.preventDefault();
-            handleSubmit(onSubmit)();
-        }
-        else if (event.key === 'Enter' && event.shiftKey){
-            let tempRow = row;
-            setRow( tempRow + 1 );
-            if(row >=6) setRow(6);
-        }
-        else if (event.key === 'Enter' && event.altKey){
-            let tempRow = row;
-            setRow( tempRow + 1 );
-            handleEnterKey(event);
-        }
-        if (event.key === 'Backspace'){
-            if(row === 1) return;
-            const textarea = event.target as HTMLTextAreaElement;
-            const selectionStart = textarea.selectionStart || 0;
-            const currentLineStart = textarea.value.lastIndexOf('\n', selectionStart - 1) + 1;
-            if (selectionStart === currentLineStart) {
-                let tempRow = row;
-                setRow(tempRow - 1);
-            }
-        }
-    };
+
     const onSubmit: SubmitHandler<MessageInput> = (data) => {
         if(!data.message || data.message.trim() === '') return;
         socket.emit('chat', {

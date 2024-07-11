@@ -38,7 +38,7 @@ export default function DropdownDefault() {
           <IoNotifications className='text-3xl'/>
         </>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent className='px-3 py-1' align="end">
         {notificationList 
         && notificationList.map((noti:any, index:number)=>{
           return(
@@ -50,6 +50,11 @@ export default function DropdownDefault() {
             </DropdownMenuItem>
           )
         })}
+        {notificationList?.length === 0 &&
+          <div>
+            <strong>Chưa có thông báo nào</strong>
+          </div>
+        }
         
       </DropdownMenuContent>
     </DropdownMenu>
