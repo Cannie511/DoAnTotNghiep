@@ -113,8 +113,8 @@ const findUserByName = async (user_name) =>
             include: [
               {
                 model: Model.User,
-                as: 'Friend', // Chỉ rõ tên liên kết
-                attributes: ["email", "display_name","avatar"]
+                as: 'Friend',
+                attributes: ["email", "display_name","avatar","id"]
               }
             ],
             raw: true
@@ -136,7 +136,7 @@ const findUserByName = async (user_name) =>
     const agreeAddFriend = async(user_id, friend_ID,action)=>
       {
         try{
-            const request =  await Model.USER_FRIEND.findOne({
+            const request =  await Model.USER_FRIEND.findAll({
               attributes: [
                 "User_ID",
                 "Friend_ID",
@@ -173,7 +173,8 @@ const findUserByName = async (user_name) =>
                   if (add)
                     return handleResult(200, "agree add friend ");
                   return handleResult(400, "agree add friend error");
-              } else  
+              }
+             } else  
               {
                 const des = await Model.USER_FRIEND.destroy({
                   where: {
@@ -186,17 +187,19 @@ const findUserByName = async (user_name) =>
                   return handleResult(200, "disagree add friend ");
                 return handleResult(400, "disagree add friend error ");
               }
-        }
+        
       }
         catch{
           return err = handleError(error);
         }
       }
-
+     
+      
       module.exports = {
         findUserByName,
         addFriend,
         deleteFriend,
         getAllFriend,
         agreeAddFriend,
+       
       };

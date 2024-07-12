@@ -1,12 +1,16 @@
+const { Op } = require("sequelize");
+const Model = require('../models');
 const {
         findUserByName,
         addFriend,
         deleteFriend,
         getAllFriend,
         agreeAddFriend,
+        getInfoAllFriend
 } = require("../Services/Friend.Service");
 const { handleError } = require("../Utils/Http");
 const pagination = require("../Utils/Pagination");
+const LIMIT = +process.env.LIMIT_RECORD;
 // tìm bạn theo tên
 
 const findFriendController = async (req, res) => {
@@ -60,11 +64,17 @@ const findFriendController = async (req, res) => {
     {
       try
       {
-       
+        const { page } = req.query;
         const {user_id} =req.params;
-        if(!user_id) return res.status(422).json({message:"Không nhận được user_id"});
-        const data = await getAllFriend(user_id);
-        if(data) return res.status(data.status).json(data);
+        const whereCondition = {
+          User_ID: user_id,
+          status: 1
+        };
+        const totalRecords = await  Model.USER_FRIEND.count({where: whereCondition});
+        const totalPages = Math.ceil(totalRecords / LIMIT);
+        const paginate = await pagination("USER_FRIEND",{},totalPages,whereCondition,[])
+        if(!user_id) return res.status(422).json({message:"Không nhận được user_id"})
+        if(paginate) return res.status(paginate.status).json(paginate);
       }catch(error)
       {
         const err = handleError(error);
