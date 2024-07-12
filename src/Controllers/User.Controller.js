@@ -7,10 +7,7 @@ const {
   checkPassService,
   findUserService,
   updatePasswordWithoutOldPasswordService,
-  addFriend,
-  getAllFriend,
-  deleteFriend,
-  FindUserByName,
+  updatePremiumService
 } = require("../Services/User.Service");
 const { hashPassword } = require("../Utils/HashPassword");
 const { handleError } = require("../Utils/Http");
@@ -160,67 +157,19 @@ const updatePasswordWithoutOldPasswordController = async (req, res)=>{
   }
 }
 
-// tìm bạn theo tên
 
-const findFriendController = async (req, res) => {
-  try {
-    const {name} = req.body;
-    if (!name)
-      return res.status(422).json({ message: "Từ khóa không được để trống" });
-    const data = await FindUserByName(name);
-    if (data) return res.status(data.status).json(data);
-  } catch (error) {
-    const err = handleError(error);
-    return res.status(err.status).json({ message: err.message });
-  }
-};
 
-// Thêm bạn
-const addFriendController = async(req,res) =>
+const updatePremiumController = async (req, res)=>
   {
     try {
-      const {user_id} = req.params;
-      const {friend_id} = req.body;
-        const data = await addFriend(user_id,friend_id);
+      const {user_id} = req.body;
+      const data = await updatePremiumService(user_id);
       if(data) return res.status(data.status).json(data);
-    } catch(error) {
+    }catch (error){
       const err = handleError(error);
-      return res.status(er.status).json({message: err.message})
+      return res.status(err.status).json({ message: err.message });
     }
   }
-//Xóa kết bạn
-const deleteFriendController = async(req,res) =>
-  {
-    try{
-      const {user_id} =req.params;
-      const {friend_id} = req.body;
-      console.log(friend_id);
-    if(!user_id) return res.status(422).json({message:"Không nhận được user_id"});
-    if(!friend_id) return res.status(422).json({message:"Không nhận được friend_id"});
-      const data = await deleteFriend(user_id,friend_id);
-      if (data) return res.status(data.status).json(data);
-    }catch(error)
-    {
-      const err = handleError(error);
-      return res.status(er.status).json({message: err.message})
-    }
-  }
-
-// hiện toàn bộ bạn bè
-const getAllFriendController = async(req,res)=>
-{
-  try
-  {
-    const {user_id} = req.params;
-    if(!user_id) return res.status(422).json({message:"Không nhận được user_id"});
-    const data = await getAllFriend(user_id);
-    if(data) return res.status(data.status).json(data);
-  }catch(error)
-  {
-    const err = handleError(error);
-    return res.status(er.status).json({message: err.message})
-  }
-}
 
 
 module.exports = {
@@ -233,8 +182,5 @@ module.exports = {
   checkPasswordController,
   findUserEmail,
   updatePasswordWithoutOldPasswordController,
-  findFriendController,
-  addFriendController,
-  deleteFriendController,
-  getAllFriendController
+  updatePremiumController
 };

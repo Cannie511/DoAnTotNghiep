@@ -7,10 +7,7 @@ const {
   getUserByIdController,
   updatePasswordController,
   checkPasswordController,
-  findFriendController,
-  addFriendController,
-  getAllFriendController,
-  deleteFriendController,
+  
 } = require("../Controllers/User.Controller");
 const router = express.Router();
 
@@ -31,17 +28,6 @@ router.put("/users/password/:user_id", async (req, res) =>
 router.delete("/users/:user_id", async (req, res) =>
   deleteUserController(req, res)
 );
-
-//friends
-router.get("/friend/:user_id", async (req, res) =>
-  getAllFriendController(req, res)
-);
-router.post("/friend", async (req, res) => findFriendController(req, res));
-router.post("/friend/:user_id", async (req, res) =>
-  addFriendController(req, res)
-);
-router.delete("/friend/:user_id", async (req, res) =>
-  deleteFriendController(req, res)
-);
+router.post("/users/premium", async(req,res) => updatePremiumController(req,res));
 
 module.exports = router;

@@ -4,6 +4,7 @@ const Authentication = require("./Middlewares/Authentication");
 const cookieParser = require("cookie-parser");
 const AuthRoute = require("./Routes/Auth.api");
 const UserRoute = require("./Routes/User.api");
+const FriendRoute = require("./Routes/Friend.api");
 const MessageRoute = require("./Routes/Message.api");
 const SocketRoute = require('./Routes/Socket.api');
 const NotificationRoute = require('./Routes/Notificaction.api');
@@ -115,6 +116,7 @@ app.use("/api", Authentication, MessageRoute);
 app.use("/api", Authentication, NotificationRoute);
 app.use("/api", Authentication, RoomRoute);
 app.use("/api", Authentication, ScheduleRoute);
+app.use("/api",Authentication,FriendRoute);
 app.use((req, res) => {
   res.status(404).json({ status: 404, message: "404 NOT FOUND" });
 });
