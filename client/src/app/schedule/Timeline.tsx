@@ -5,7 +5,7 @@ interface Props{
     schedule: []
 }
 export default function TimeLine({schedule}:Props) {
-    console.log(schedule)
+  //console.log(schedule)
   return (
     <div className="m-5">
         <Timeline>
@@ -27,7 +27,11 @@ export default function TimeLine({schedule}:Props) {
                 </Timeline.Item>
             )
         })}
-        
+        {schedule && schedule.length===0 &&
+            <div>
+                <span>Bạn chưa có lịch họp nào gần đây</span>
+            </div>
+        }
         </Timeline>
     </div>
   )

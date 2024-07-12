@@ -181,11 +181,11 @@ const addFriendController = async(req,res) =>
     try {
       const {user_id} = req.params;
       const {friend_id} = req.body;
-        const data = await addFriend(user_id,friend_id);
+      const data = await addFriend(user_id,friend_id);
       if(data) return res.status(data.status).json(data);
     } catch(error) {
       const err = handleError(error);
-      return res.status(er.status).json({message: err.message})
+      return res.status(err.status).json({message: err.message})
     }
   }
 //Xóa kết bạn
@@ -202,7 +202,7 @@ const deleteFriendController = async(req,res) =>
     }catch(error)
     {
       const err = handleError(error);
-      return res.status(er.status).json({message: err.message})
+      return res.status(err.status).json({message: err.message})
     }
   }
 
@@ -218,7 +218,7 @@ const getAllFriendController = async(req,res)=>
   }catch(error)
   {
     const err = handleError(error);
-    return res.status(er.status).json({message: err.message})
+    return res.status(err.status).json({message: err.message})
   }
 }
 

@@ -47,9 +47,16 @@ export default function Chat() {
             setFriendStatus(data?.data?.data?.status);
     },[data])
     const getMessage = async() =>{
-        const messages = await GetMessage({user1:user_id, user2:current_friend?.id as number});
-        console.log(messages);
-        if(messages) setListMessage(messages.data.data)
+        try {
+            if(user_id && current_friend){
+                const messages = await GetMessage({user1:user_id, user2:current_friend?.id as number});
+                if(messages) setListMessage(messages.data.data)
+            }
+            else return;
+        } catch (error) {
+            console.log(error);
+        }
+        
     }
     const handleScroll = () => {
         if (messageBoxRef.current) {
@@ -183,6 +190,7 @@ export default function Chat() {
     return (
         <div className='flex space-x-1 '>
             <Card className='w-6xl h-[51rem] flex-col flex-1'>
+                {(listMessage || !current_friend) && 
                 <div className='w-full flex dark:bg-slate-700 relative top-0 p-2 rounded-sm dark:text-white bg-slate-100 text-black items-center'>
                     <div className='flex flex-1'>
                         <Avatar size={'xs'} alt='AV' img={current_friend?.avatar as any || url_img_default} rounded status="online" statusPosition="top-right" />
@@ -200,6 +208,7 @@ export default function Chat() {
                         </Tooltip>
                     </div>
                 </div>
+                }
                 <div
                     ref={messageBoxRef}
                     className='message-box h-[48rem] dark:bg-slate-600 w-full rounded-sm px-2 flex flex-col overflow-auto'
@@ -209,14 +218,22 @@ export default function Chat() {
                             <Message key={message?.id} message={message.Message} createAt={message.createdAt} me={message.Send_by === user_id} status={friend_status} avatar={current_friend?.avatar}/>
                         )
                     })}
+                    {!listMessage && 
+                        <div className='mx-auto mt-60 flex flex-col'>
+                            <span className='text-3xl'>Bạn chưa nhắn tin với ai</span>
+                            <Button className='mx-auto my-1'>Trò chuyện ngay</Button>
+                        </div>
+                    }
                 </div>
+                {(listMessage || !current_friend) && 
                 <form className='flex space-x-1 w-full mb-1' onSubmit={handleSubmit(onSubmit)}>
                     <Button size={'icon'} className='h-full bg-transparent shadow-none text-yellow-300 hover:bg-transparent'><BsEmojiSmile className='text-3xl' /></Button>
                     <Textarea onKeyDown={handleKeyDown} {...register("message",{required:true})} className='w-11/12 flex-1 no-resize' rows={row} placeholder="Tin nhắn..." />
                     <Button size={'icon'} type='submit' className='h-full'><HiPaperAirplane className='text-2xl' /></Button>
                 </form>
+                }
             </Card>
-            <ListFriend setFriend={setCurrentFriend} />
+            <ListFriend setFriend={setCurrentFriend} friend={current_friend}/>
         </div>
     );
 }

@@ -100,7 +100,6 @@ export default function AppProvider({children}:{children: ReactNode}){
             const socketIo:Socket = io('http://localhost:8888', {query:{user_id}});
             setSocket(socketIo);
             socketIo.on('connect', () => {
-                socketIo.emit('connected', { user_id });
                 socketIo.on('onChat', async(data:any) => {
                     const notification = data.data[data.data.length-1];
                     const user = await UserFindOne(notification.Send_by);
@@ -128,6 +127,13 @@ export default function AppProvider({children}:{children: ReactNode}){
             socketIo.on("online",(friend)=>{
                 queryClient.invalidateQueries({queryKey:['active_sts']});
                 queryClient.invalidateQueries({queryKey:['message_noti']});
+            });
+            socketIo.on("addFriend_notification", (friend)=>{
+                console.log(friend);
+                toast({
+                    title: "Bạn có thông báo mới!",
+                    description:"1 thông báo"
+                })
             })
             window.addEventListener('beforeunload', () => {
                 socketIo.emit('user_disconnected', { user_id });
