@@ -27,6 +27,9 @@ module.exports = {
       Password: {
         type: Sequelize.STRING
       },
+      Room_key: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

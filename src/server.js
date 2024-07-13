@@ -4,6 +4,7 @@ const Authentication = require("./Middlewares/Authentication");
 const cookieParser = require("cookie-parser");
 const AuthRoute = require("./Routes/Auth.api");
 const UserRoute = require("./Routes/User.api");
+const FriendRoute = require("./Routes/Friend.api");
 const MessageRoute = require("./Routes/Message.api");
 const SocketRoute = require('./Routes/Socket.api');
 const NotificationRoute = require('./Routes/Notificaction.api');
@@ -17,11 +18,13 @@ const {
   saveMessageService,
   getMessageService,
 } = require("./Services/Message.Service");
-const { addFriend, agreeAddFriend, getUsersByIdService } = require("./Services/User.Service");
-const { getUserByIdController, addFriendController } = require("./Controllers/User.Controller");
+const {  getUsersByIdService } = require("./Services/User.Service");
+const { getUserByIdController} = require("./Controllers/User.Controller");
 const Socket = require("./Services/Socket.Service");
 const { handleError } = require("./Utils/Http");
 const NotificationController = require("./Controllers/Notification.Controller");
+const { addFriendController } = require("./Controllers/Friend.Controller");
+const { addFriend } = require("./Services/Friend.Service");
 require("dotenv").config();
 const server = createServer(app);
 const io = new Server(server, {
@@ -62,11 +65,12 @@ io.on("connection", async (socket) => {
     });
     
     socket.on("friend_request", async (data) => {
-      const addFriends = await addFriendController(data.user_id, data.friend_id);
+      const addFriends = await addFriend(data.userId, data.friend_id);
+      console.log("Friend request received: ", data);
       // Gửi thông báo lại cho client
       if (addFriends.status === 200) {
-        const dataUser = await getUserByIdController(data.user_id);
-        client[data.friend_id].emit("addFriend_notification", dataUser);
+        const dataUser = await getUsersByIdService(data.userId);
+        client[data.friend_id].emit("notification", dataUser);
         delete client[data.friend_id];
       }
     });
@@ -113,6 +117,7 @@ app.use("/api", Authentication, MessageRoute);
 app.use("/api", Authentication, NotificationRoute);
 app.use("/api", Authentication, RoomRoute);
 app.use("/api", Authentication, ScheduleRoute);
+app.use("/api", Authentication,FriendRoute);
 app.use((req, res) => {
   res.status(404).json({ status: 404, message: "404 NOT FOUND" });
 });
