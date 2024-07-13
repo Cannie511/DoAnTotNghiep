@@ -80,7 +80,6 @@ export const combineDateTime = (dateString:string, timeString:string)=> {
     datePart.setHours(hours);
     datePart.setMinutes(minutes);
     datePart.setSeconds(0);
-
     return datePart;
 }
 

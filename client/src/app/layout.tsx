@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import AppProvider from "@/Context/Context";
 import LoadingComponent from "@/components/LoadingComponent";
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import Loading from "./loading";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import QueryProvider from "@/Context/QueryProvider";
@@ -25,7 +25,8 @@ export default function RootLayout({
 }>) {
  
   return (
-    <html lang="en" suppressHydrationWarning>
+     <React.StrictMode>
+      <html lang="en" suppressHydrationWarning>
       <body>
         <Suspense fallback={<Loading/>}><></></Suspense>
         <GoogleOAuthProvider clientId="251347409729-4ebihjc5jjhof6fqchid3u310msmrfr1.apps.googleusercontent.com">
@@ -45,8 +46,9 @@ export default function RootLayout({
             </QueryProvider>
         </ThemeProvider>
         </GoogleOAuthProvider>
-        
       </body>
     </html>
+     </React.StrictMode>
+    
   );
 }

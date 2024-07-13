@@ -14,32 +14,42 @@ interface Props{
 }
 
 export default function CardFriend({avatar, display_name, id}:Props) {
-    const {user_id} = useContext(AppContext);
+    const {user_id, socket} = useContext(AppContext);
     const {toast} = useToast();
     const handleAddFriend = async()=>{
-        await addFriend(user_id, id)
-        .then(async(data)=>{
-            await createNotification({user_id: id, message: " đã gửi lời mời kết bạn ", send_by: user_id, type:"friend", status:0 })
-            .then((res)=>{
-                toast({
-                    title: "Đã gửi lời mời kết bạn thành công"
-                })
-            })
-            .catch((err)=>{
-                console.log(err);
-                toast({
-                    title: "Đã có lỗi xảy ra",
-                    variant:"destructive"
-                })
-            })
-        })
-        .catch((err)=>{
-            console.log(err);
-            toast({
-                title: "Đã có lỗi xảy ra",
-                variant:"destructive"
-            })
-        })
+        // await addFriend(user_id, id)
+        // .then(async(data)=>{
+        //     await createNotification({user_id: id, message: " đã gửi lời mời kết bạn ", send_by: user_id, type:"friend", status:0 })
+        //     .then((res)=>{
+        //         toast({
+        //             title: "Đã gửi lời mời kết bạn thành công"
+        //         });
+        //         if(socket){
+        //             socket.emit("friend_request",{user_id, friend_id:id});
+        //         }
+        //     })
+        //     .catch((err)=>{
+        //         console.log(err);
+        //         toast({
+        //             title: "Đã có lỗi xảy ra",
+        //             variant:"destructive"
+        //         })
+        //     })
+        // })
+        // .catch((err)=>{
+        //     console.log(err);
+        //     toast({
+        //         title: "Đã có lỗi xảy ra",
+        //         variant:"destructive"
+        //     })
+        // })
+
+         toast({
+            title: "Đã gửi lời mời kết bạn thành công"
+        });
+        if(socket){
+            socket.emit("friend_request",{user_id, friend_id:id});
+        }
     }
   return (
     <div className='w-51 shadow-md dark:bg-slate-800 h-[22rem] rounded-md overflow-hidden m-2'>

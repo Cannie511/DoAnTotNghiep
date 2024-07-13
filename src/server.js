@@ -71,7 +71,6 @@ io.on("connection", async (socket) => {
       if (addFriends.status === 200) {
         const dataUser = await getUsersByIdService(data.userId);
         client[data.friend_id].emit("notification", dataUser);
-        
         delete client[data.friend_id];
       }
     });
@@ -82,7 +81,6 @@ io.on("connection", async (socket) => {
         data.friend_id,
         data.action
       );
-      //console.log("response: ", data);
       // Gửi thông báo lại cho client
       if (addFriends.status === 200) {
         const dataUser = await getUsersByIdService(data.userId);
@@ -103,15 +101,15 @@ io.on("connection", async (socket) => {
 });
 
 
-app.post("/", async(req, res)=>{
-  try {
-    const test = new NotificationController(req, res);
-    return await test.getAll();
-  } catch (error) {
-    console.log(error)
-    return res.status(500).json({ message: error.message });
-  }
-})
+// app.post("/", async(req, res)=>{
+//   try {
+//     const test = new NotificationController(req, res);
+//     return await test.getAll();
+//   } catch (error) {
+//     console.log(error)
+//     return res.status(500).json({ message: error.message });
+//   }
+// })
 app.use("/auth", AuthRoute);
 app.use("/api", Authentication, UserRoute);
 app.use("/api", Authentication, SocketRoute);

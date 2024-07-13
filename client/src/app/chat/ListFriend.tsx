@@ -8,14 +8,16 @@ import { useContext, useEffect } from "react";
 import { AppContext } from "@/Context/Context";
 import { getLatestMessage } from "@/Services/message.api";
 interface Props{
+    friend: UserData | null;
     setFriend: React.Dispatch<React.SetStateAction<UserData | null >>
 }
-export default function ListFriend({setFriend}:Props) {
+export default function ListFriend({setFriend, friend}:Props) {
     const {user_id} = useContext(AppContext);
     const {data, isLoading, error} = useQuery({
         queryKey:['list friend'],
         queryFn: ()=>getLatestMessage(user_id),
     })
+    const messageList = data?.data?.data;
     const {setForceLogout} = useContext(AppContext);
     if(error) setForceLogout(true);
     const handleFriend = (friend:any)=>{
@@ -45,9 +47,13 @@ export default function ListFriend({setFriend}:Props) {
                 </div>
             </div>
         </>}
-        {data && data?.data?.data.map((item:any)=>{
+        {messageList && messageList.map((item:any)=>{
             return (
-                <div key={item?.id} className='cursor-pointer dark:hover:bg-gray-700 transition-all hover:bg-slate-100 flex rounded-lg border w-full border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 flex-col flex-none px-2 py-4'
+                <div key={item?.id} className=
+                {friend?.id === item?.Send_by || friend?.id === item.Received_by ? 
+                    'cursor-pointer dark:hover:bg-gray-700 transition-all hover:bg-slate-100 flex rounded-lg border w-full border-gray-200 bg-gray-300 shadow-md dark:border-gray-700 dark:bg-gray-700 flex-col flex-none px-2 py-4':
+                    'cursor-pointer dark:hover:bg-gray-700 transition-all hover:bg-slate-100 flex rounded-lg border w-full border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 flex-col flex-none px-2 py-4'
+                }
                     onClick={()=>handleFriend(item)}
                 >
                     <div className="flex items-center space-x-3">

@@ -79,7 +79,9 @@ export default function Schedule() {
                 title:"Tạo lịch họp thành công",
                 description: `Bắt đầu lúc: ${formatDate(date, time)}`
             });
+            queryClient.invalidateQueries({queryKey:["schedule_list"]})
             reset();
+            setPassword(false);
             genKey();
         })
         .catch(err=>{
