@@ -24,7 +24,7 @@ const getMessageController = async (req, res)=>{
       const order = [["createdAt", "ASC"]];
       const totalRecords = await Model.MESSAGE.count({ where: whereCondition });
       const totalPages = Math.ceil(totalRecords / LIMIT);
-      const paginate = await pagination("MESSAGE",{}, totalPages, whereCondition,order);
+      const paginate = await pagination("MESSAGE",{}, totalPages, whereCondition,order,[]);
       if(paginate.status === 422) return res.status(200).json({message:"Người dùng chưa từng có tin nhắn"});
       if (paginate) return res.status(paginate.status).json(paginate);
   } catch (error) {

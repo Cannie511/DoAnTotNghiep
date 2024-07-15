@@ -128,12 +128,40 @@ export default function AppProvider({children}:{children: ReactNode}){
                 queryClient.invalidateQueries({queryKey:['active_sts']});
                 queryClient.invalidateQueries({queryKey:['message_noti']});
             });
-            socketIo.on("addFriend_notification", (friend)=>{
-                console.log(friend);
-                toast({
-                    title: "Bạn có thông báo mới!",
-                    description:"1 thông báo"
+            socketIo.on("addFriend_notification", async(friend)=>{
+                const noti:NotificationRequestType = {
+                    user_id: user_id,
+                    message: " đã gửi lời mời kết bạn ",
+                    send_by: friend?.id,
+                    type: "friend",
+                    status: 0,
+                }
+                await createNotification(noti)
+                .then(()=>{
+                    queryClient.invalidateQueries({queryKey:["friend_noti"]})
+                    toast({
+                        title: "Lời mời kết bạn",
+                        description:"Bạn có 1 lời mời kết bạn từ " + friend?.display_name
+                    });
                 })
+                .catch((err)=>{
+                    toast({
+                        title: "Lỗi: " + err.message,
+                        variant:"destructive"
+                    });
+                })
+            })
+            socketIo.on("friend_res_noti",(friend)=>{
+                toast({
+                    title:`Bạn và ${friend?.display_name} đã trở thành bạn bè`
+                })
+                queryClient.invalidateQueries({queryKey:["friend_noti"]});
+            })
+            socketIo.on("resFriend_notification", (friend)=>{
+                toast({
+                    title:`${friend?.display_name} đã đồng ý lời mời kết bạn`
+                })
+                queryClient.invalidateQueries({queryKey:["friend_request"]});
             })
             window.addEventListener('beforeunload', () => {
                 socketIo.emit('user_disconnected', { user_id });

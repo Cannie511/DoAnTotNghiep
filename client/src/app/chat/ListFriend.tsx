@@ -7,6 +7,7 @@ import { UserData } from "@/types/type";
 import { useContext, useEffect } from "react";
 import { AppContext } from "@/Context/Context";
 import { getLatestMessage } from "@/Services/message.api";
+import { TextInput } from "flowbite-react";
 interface Props{
     friend: UserData | null;
     setFriend: React.Dispatch<React.SetStateAction<UserData | null >>
@@ -34,7 +35,8 @@ export default function ListFriend({setFriend, friend}:Props) {
       <div className='w-full relative top-0 p-2 rounded-md dark:text-white text-black'>
         <h1 className='text-2xl text-black dark:text-white flex'><FaUserFriends className="text-3xl me-2 relative"/> Bạn bè</h1>
       </div>
-      <div className='h-[43rem] w-full rounded-sm space-y-1'>
+      <TextInput placeholder="Tìm kiếm" color="info"/>
+      <div className='h-[43rem] w-full rounded-sm space-y-1 mt-2'>
         {isLoading && 
         <>
             <div className='flex rounded-lg border w-full border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 flex-col flex-none px-2 py-4'>

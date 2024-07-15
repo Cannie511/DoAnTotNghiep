@@ -3,7 +3,7 @@ const { handleError } = require("./Http");
 require('dotenv').config();
 const LIMIT = +process.env.LIMIT_RECORD;
 
-const pagination = async (table, attr = {}, page, where = {}, order={}) => {
+const pagination = async (table, attr = {}, page, where = {}, order={}, include={}) => {
   try {
     if (!table) {
       return {
@@ -21,9 +21,10 @@ const pagination = async (table, attr = {}, page, where = {}, order={}) => {
     if (!page) page = 1;
     const offset = (+page - 1) * LIMIT;
 
-    const totalRecords = await Model[table].count({ where });
+    const totalRecords = await Model[table].count({ include, where });
     const totalPages = Math.ceil(totalRecords / LIMIT);
     const data = await Model[table].findAll({
+      include,
       attributes: attr ? attr : ["*"],
       limit: LIMIT,
       offset,

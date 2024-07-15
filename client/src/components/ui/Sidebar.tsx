@@ -10,6 +10,8 @@ import { useQuery } from "@tanstack/react-query";
 import { countNotification } from "@/Services/notification.api";
 import { useContext } from "react";
 import { AppContext } from "@/Context/Context";
+import { BsPersonFillAdd } from "react-icons/bs";
+import { PiUserListFill } from "react-icons/pi";
 export default function SideBar() {
   const {user_id} = useContext(AppContext);
   const {data, isLoading, error} = useQuery({
@@ -42,9 +44,14 @@ export default function SideBar() {
            <FaCalendarAlt/> Lịch trình
           </NavLink>
           <hr/>
-          <NavLink href="/friends" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-           <FaUserFriends/> Bạn bè
-          </NavLink>
+          <Sidebar.Collapse icon={FaUserFriends} label="Bạn bè">
+            <NavLink href="/friends" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+              <BsPersonFillAdd/> Lời mời kết bạn
+            </NavLink>
+            <NavLink href="/friends/list" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+              <PiUserListFill/> Tất cả bạn bè
+            </NavLink>
+          </Sidebar.Collapse>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>

@@ -38,7 +38,7 @@ const getUserController = async (req, res) => {
         "avatar",
         "createdAt",
       ];
-      const data = await pagination("User", attr, page,{},[]);
+      const data = await pagination("User", attr, page,{},[],[]);
       if (data) return res.status(data.status).json(data);
     }
     const response = await getUsersService();
@@ -170,41 +170,6 @@ const updatePremiumController = async (req, res)=>
       return res.status(err.status).json({message: err.message})
     }
   }
-//Xóa kết bạn
-const deleteFriendController = async(req,res) =>
-  {
-    try{
-      const {user_id} =req.params;
-      const {friend_id} = req.body;
-      console.log(friend_id);
-    if(!user_id) return res.status(422).json({message:"Không nhận được user_id"});
-    if(!friend_id) return res.status(422).json({message:"Không nhận được friend_id"});
-      const data = await deleteFriend(user_id,friend_id);
-      if (data) return res.status(data.status).json(data);
-    }catch(error)
-    {
-      const err = handleError(error);
-      return res.status(err.status).json({message: err.message})
-    }
-  }
-
-// hiện toàn bộ bạn bè
-const getAllFriendController = async(req,res)=>
-{
-  try
-  {
-    const {user_id} = req.params;
-    if(!user_id) return res.status(422).json({message:"Không nhận được user_id"});
-    const data = await getAllFriend(user_id);
-    if(data) return res.status(data.status).json(data);
-  }catch(error)
-  {
-    const err = handleError(error);
-    return res.status(err.status).json({message: err.message})
-  }
-}
-
-
 
 module.exports = {
   getUserByIdController,
@@ -216,5 +181,5 @@ module.exports = {
   checkPasswordController,
   findUserEmail,
   updatePasswordWithoutOldPasswordController,
-  updatePremiumController
+  updatePremiumController,
 };

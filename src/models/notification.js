@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Notification.belongsTo(models.User, { foreignKey: "send_by", as: "Sender" });
+      Notification.belongsTo(models.User, { foreignKey: "user_id", as: "Receiver" });
     }
   }
   Notification.init({

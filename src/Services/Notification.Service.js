@@ -1,3 +1,4 @@
+const { col } = require('sequelize');
 const Model = require('../models');
 const { handleError, handleResult } = require('../Utils/Http');
 class NotificationService {
@@ -26,6 +27,27 @@ class NotificationService {
       return handleError(error);
     }
   };
+
+  update = async (noti_id) => {
+    try {
+      const data = await Model.Notification.update(
+        {
+          status: 1,
+        },
+        {
+          where: {
+            id: noti_id,
+          },
+          raw: true,
+        }
+      );
+      if (data) return handleResult(200, "Cập nhật báo thành công", data);
+      else return handleResult(422, "Cập nhật thông báo thất bại");
+    } catch (error) {
+      return handleError(error);
+    }
+  };
+
   update = async (noti_id) => {
     try {
       const data = await Model.Notification.update(
@@ -55,9 +77,15 @@ class NotificationService {
             attributes: ["display_name", "avatar"],
           }
         ],
+        attributes:[
+          "id","user_id", "message", "send_by", "status",
+          [col("Sender.display_name"), "display_name"],
+          [col("Sender.avatar"), "avatar"],
+        ],
         where: {
           user_id: this.user_id,
           type: this.type,
+          status: this.status
         },
         order: [["createdAt", "DESC"]],
         raw: true,
@@ -68,6 +96,41 @@ class NotificationService {
       return handleError(error);
     }
   }
+
+  getRequest = async()=>{
+    try {
+      const data = await Model.Notification.findAll({
+        include: [
+          {
+            model: Model.User,
+            as: "Receiver",
+            attributes: ["display_name", "avatar"],
+          },
+        ],
+        attributes: [
+          "id",
+          "user_id",
+          "message",
+          "send_by",
+          "status",
+          [col("Receiver.display_name"), "display_name"],
+          [col("Receiver.avatar"), "avatar"],
+        ],
+        where: {
+          send_by: this.send_by,
+          type: this.type,
+          status: this.status,
+        },
+        order: [["createdAt", "DESC"]],
+        raw: true,
+      });
+       if (data) return handleResult(200, "Lấy thông báo thành công", data);
+       else return handleResult(422, "Lấy thông báo thất bại");
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   countAll = async()=>{
     try {
       const data = await Model.Notification.count({

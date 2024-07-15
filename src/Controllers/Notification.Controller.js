@@ -35,13 +35,28 @@ class NotificationController {
         }
     }
 
-    getAll = async()=>{
+    getAll = async() => {
         try {
             const { user_id, type } = this.req.body;
             if(!user_id) 
                 return this.res.status(422).json({message:"Các trường đều bắt buộc!"});
             const service = new NotificationService(user_id, "", 0, type, 0);
             const response = await service.getAll();
+            if(response) return this.res.status(response.status).json(response.data);
+        } catch (error) {
+            const err = handleError(error);
+            return this.res.status(err.status).json({ message: err.message });
+        }
+    }
+
+    getRequest = async() => {
+        try {
+            const { send_by, type } = this.req.body;
+            //console.log("get req:",send_by, type);
+            if(!send_by) 
+                return this.res.status(422).json({message:"Các trường đều bắt buộc!"});
+            const service = new NotificationService(0, "", send_by, type, 0);
+            const response = await service.getRequest();
             if(response) return this.res.status(response.status).json(response.data);
         } catch (error) {
             const err = handleError(error);

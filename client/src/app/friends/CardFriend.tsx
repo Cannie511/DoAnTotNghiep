@@ -1,58 +1,39 @@
 import { useToast } from '@/components/ui/use-toast';
 import { AppContext } from '@/Context/Context';
-import { addFriend } from '@/Services/friend.api';
-import { createNotification } from '@/Services/notification.api';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from 'flowbite-react'
 import Image, { StaticImageData } from 'next/image'
 import React, { useContext } from 'react'
-import { MdPersonAddAlt1 } from "react-icons/md";
 
 interface Props{
+    noti_id: number;
     avatar: string|StaticImageData;
     display_name:string;
     id:number;
+    typeView:string;
 }
 
-export default function CardFriend({avatar, display_name, id}:Props) {
+export default function CardFriend({noti_id, avatar, display_name, id, typeView}:Props) {
     const {user_id, socket} = useContext(AppContext);
+    const queryClient = useQueryClient();
     const {toast} = useToast();
-    const handleAddFriend = async()=>{
-        // await addFriend(user_id, id)
-        // .then(async(data)=>{
-        //     await createNotification({user_id: id, message: " đã gửi lời mời kết bạn ", send_by: user_id, type:"friend", status:0 })
-        //     .then((res)=>{
-        //         toast({
-        //             title: "Đã gửi lời mời kết bạn thành công"
-        //         });
-        //         if(socket){
-        //             socket.emit("friend_request",{user_id, friend_id:id});
-        //         }
-        //     })
-        //     .catch((err)=>{
-        //         console.log(err);
-        //         toast({
-        //             title: "Đã có lỗi xảy ra",
-        //             variant:"destructive"
-        //         })
-        //     })
-        // })
-        // .catch((err)=>{
-        //     console.log(err);
-        //     toast({
-        //         title: "Đã có lỗi xảy ra",
-        //         variant:"destructive"
-        //     })
-        // })
-
-         toast({
+    const handleAddFriend =()=>{
+        queryClient.invalidateQueries({queryKey:['friend_request']});
+        if(socket){
+            socket.emit("friend_request",{noti_id, user_id, friend_id:id});
+        }
+        toast({
             title: "Đã gửi lời mời kết bạn thành công"
         });
+    }
+    const handleAcceptFriend = (action:number) => {
         if(socket){
-            socket.emit("friend_request",{user_id, friend_id:id});
+            if(!id || !user_id) return;
+            socket.emit("friend_response",{noti_id, user_id, friend_id:id, action});
         }
     }
   return (
-    <div className='w-51 shadow-md dark:bg-slate-800 h-[22rem] rounded-md overflow-hidden m-2'>
+    <div className='w-51 shadow-md dark:bg-slate-800 h-[22rem] rounded-xl overflow-hidden m-2'>
         <div className='h-[12rem] w-full overflow-hidden'>
             <Image src={avatar} height={192} width={208} alt="avatar"/>
         </div>
@@ -60,20 +41,19 @@ export default function CardFriend({avatar, display_name, id}:Props) {
             {display_name}
             <br/>
             <small>
-                {/* <Avatar.Group>
-                    <Avatar img={"@/app/favicon.ico"} rounded stacked />
-                    <Avatar img={"@/app/favicon.ico"} rounded stacked />
-                    <Avatar.Counter total={2} href="#" />
-                </Avatar.Group> */}
-                3 bạn chung
+                0 bạn chung
             </small>
         </div>
         <div className='p-2 space-y-1'>
-            <Button className='w-full' color={"blue"} size="sm" onClick={handleAddFriend}>
-                Thêm bạn bè 
-                <MdPersonAddAlt1 className='text-lg ml-1'/>
+            <Button className='w-full' color={"blue"} size="sm" onClick={
+                typeView === "request" ? handleAddFriend :
+                typeView === "confirm" ? ()=>handleAcceptFriend(1) : ()=>{}
+            }>
+                {typeView === "confirm" && "Xác nhận"}
+                {typeView === "cancel" && "Hủy lời mời"} 
+                {typeView === "request" && "Thêm bạn bè"}
             </Button>
-            <Button color="gray" className='w-full' size="sm">Xóa</Button>
+            <Button color="gray" className='w-full' size="sm" onClick={typeView === "confirm" ? ()=>handleAcceptFriend(0): ()=>{}}>Xóa</Button>
         </div>
     </div>
   )

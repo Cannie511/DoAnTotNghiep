@@ -6,8 +6,8 @@ const AuthRoute = require("./Routes/Auth.api");
 const UserRoute = require("./Routes/User.api");
 const FriendRoute = require("./Routes/Friend.api");
 const MessageRoute = require("./Routes/Message.api");
-const SocketRoute = require('./Routes/Socket.api');
-const NotificationRoute = require('./Routes/Notificaction.api');
+const SocketRoute = require("./Routes/Socket.api");
+const NotificationRoute = require("./Routes/Notification.api");
 const RoomRoute = require("./Routes/Room.api");
 const ScheduleRoute = require("./Routes/Schedule.api");
 const db_connect = require("./Database/db.connect");
@@ -18,13 +18,11 @@ const {
   saveMessageService,
   getMessageService,
 } = require("./Services/Message.Service");
-const {  getUsersByIdService } = require("./Services/User.Service");
-const { getUserByIdController} = require("./Controllers/User.Controller");
+const { getUsersByIdService } = require("./Services/User.Service");
 const Socket = require("./Services/Socket.Service");
 const { handleError } = require("./Utils/Http");
-const NotificationController = require("./Controllers/Notification.Controller");
-const { addFriendController } = require("./Controllers/Friend.Controller");
-const { addFriend } = require("./Services/Friend.Service");
+const { addFriend, agreeAddFriend } = require("./Services/Friend.Service");
+const NotificationService = require("./Services/Notification.Service");
 require("dotenv").config();
 const server = createServer(app);
 const io = new Server(server, {
@@ -50,10 +48,24 @@ io.on("connection", async (socket) => {
     if (!user_id) return;
     const socketIO = new Socket(user_id, socket.id, 1);
     await socketIO.connectSocket();
+    socket.on("onTyping", async (received_id, display_name) => {
+      console.log("đang nhập");
+      const received_user = await socketIO.searchOne(received_id);
+      io.to(received_user?.data.socket_id).emit("typing", display_name);
+    });
+    socket.on("onStopTyping", async (received_id) => {
+      console.log("hết nhập");
+      const received_user = await socketIO.searchOne(received_id);
+      io.to(received_user?.data.socket_id).emit("stopTyping");
+    });
     socket.on("chat", async (data) => {
       const received_user = await socketIO.searchOne(data?.receivedBy);
       const send_user = await socketIO.searchOne(data?.sendBy);
-      const response = await saveMessageService(data?.message, data?.sendBy, data?.receivedBy);
+      const response = await saveMessageService(
+        data?.message,
+        data?.sendBy,
+        data?.receivedBy
+      );
       if (response?.status === 200) {
         const listMessage = await getMessageService(
           data?.sendBy,
@@ -63,29 +75,43 @@ io.on("connection", async (socket) => {
         io.to(send_user?.data.socket_id).emit("onChat", listMessage);
       }
     });
-    
+
     socket.on("friend_request", async (data) => {
-      const addFriends = await addFriend(data.userId, data.friend_id);
       console.log("Friend request received: ", data);
-      // Gửi thông báo lại cho client
+      const addFriends = await addFriend(data.user_id, data.friend_id);
       if (addFriends.status === 200) {
-        const dataUser = await getUsersByIdService(data.userId);
-        client[data.friend_id].emit("notification", dataUser);
-        delete client[data.friend_id];
+        const received_user = await socketIO.searchOne(data?.friend_id);
+        const received_info = await getUsersByIdService(data?.user_id);
+        io.to(received_user?.data.socket_id).emit(
+          "addFriend_notification",
+          received_info.data
+        );
       }
     });
 
     socket.on("friend_response", async (data) => {
       const addFriends = await agreeAddFriend(
-        data.userId,
+        data.user_id,
         data.friend_id,
         data.action
       );
-      // Gửi thông báo lại cho client
       if (addFriends.status === 200) {
-        const dataUser = await getUsersByIdService(data.userId);
-        client[data.userId].emit("notification_response", dataUser);
-        delete client[data.userId];
+        const notification = new NotificationService();
+        await notification.update(data?.noti_id)
+        .then(async()=>{
+          const received_user = await socketIO.searchOne(data?.friend_id);
+          const senderInfo = await getUsersByIdService(data.user_id);
+          const receiverInfo = await getUsersByIdService(data?.friend_id);
+          if(+data.action === 1){
+            io.to(socket.id).emit("friend_res_noti", receiverInfo.data);
+            io.to(received_user?.data.socket_id).emit("resFriend_notification",senderInfo.data);
+          }
+          if(+data.action !== 0) return;
+        })
+        .catch((err)=>{
+          console.log(err.message);
+          return 
+        })
       }
     });
 
@@ -100,16 +126,6 @@ io.on("connection", async (socket) => {
   }
 });
 
-
-// app.post("/", async(req, res)=>{
-//   try {
-//     const test = new NotificationController(req, res);
-//     return await test.getAll();
-//   } catch (error) {
-//     console.log(error)
-//     return res.status(500).json({ message: error.message });
-//   }
-// })
 app.use("/auth", AuthRoute);
 app.use("/api", Authentication, UserRoute);
 app.use("/api", Authentication, SocketRoute);
@@ -117,7 +133,7 @@ app.use("/api", Authentication, MessageRoute);
 app.use("/api", Authentication, NotificationRoute);
 app.use("/api", Authentication, RoomRoute);
 app.use("/api", Authentication, ScheduleRoute);
-app.use("/api", Authentication,FriendRoute);
+app.use("/api", Authentication, FriendRoute);
 app.use((req, res) => {
   res.status(404).json({ status: 404, message: "404 NOT FOUND" });
 });

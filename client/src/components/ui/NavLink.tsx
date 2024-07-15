@@ -11,9 +11,8 @@ interface Props {
 
 export default function NavLink({ href, children, className }:Props) {
     const router = usePathname();
-    //console.log(router === href)
     return (
-        <Link href={href} className={router.includes(href) || router === href ? className + ' active': className}>
+        <Link href={href} className={router === href ? className + ' active': className}>
             {children}
         </Link>
     );

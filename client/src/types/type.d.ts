@@ -73,7 +73,7 @@ export interface UserCheckPasswordType {
 }
 
 export interface NotificationRequestType{
-    user_id:number;
+    user_id?:number;
     message?:string;
     send_by?:number;
     type?:string;

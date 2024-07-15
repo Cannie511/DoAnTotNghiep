@@ -14,5 +14,9 @@ export const countNotification = async ({user_id, type}:NotificationRequestType)
 }
 
 export const getNotification = async ({user_id, type}:NotificationRequestType)=>{
-    return await http.post<BasicResponse>(`/api/notification/getAll`,{user_id, type});
+    return await http.post<BasicResponse>(`/api/notification/getAll`,{user_id, type, status});
+}
+
+export const getFriendRequest = async ({send_by, type}:NotificationRequestType)=>{
+    return await http.post<BasicResponse>(`/api/notification/getRequest`,{send_by, type, status});
 }

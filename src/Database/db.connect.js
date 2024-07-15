@@ -9,13 +9,15 @@ const sequelize = new Sequelize("db_doantotnghiep", "root", "", {
     acquire: 30000,
     idle: 10000,
   },
-  logging: false,
+  logging:false
 });
 
 const connectToDatabase = async(req, res, next)=>{
     try {
-        await sequelize.authenticate();
-        console.log("Connection has been established successfully.");
+        await sequelize.authenticate()
+        .then(()=>{
+          console.log("Connection has been established successfully.");
+        })
     } catch (error) {
         console.error("Unable to connect to the database:", error);
     }

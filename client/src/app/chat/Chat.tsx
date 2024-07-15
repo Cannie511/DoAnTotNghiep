@@ -1,7 +1,7 @@
 'use client'
 import { Avatar, Card, Textarea, Tooltip } from 'flowbite-react'
 import { Button } from '@/components/ui/button'
-import React, { useEffect, useState, useRef, useContext} from 'react'
+import React, { useEffect, useState, useRef, useContext, useCallback} from 'react'
 import { HiPaperAirplane } from "react-icons/hi";
 import { BsEmojiSmile } from "react-icons/bs";
 import ListFriend from './ListFriend';
@@ -26,26 +26,24 @@ interface MessageInput {
 
 export default function Chat() {
     const {toast} = useToast();
-    const {user_id} = useContext(AppContext);
-    const [current_friend, setCurrentFriend] = useState<UserData | null>(null);
+    const {user_id, socket} = useContext(AppContext);
+    const [onTyping, setTyping] = useState<boolean>(false);
+    const [isTyping, setIsTyping] = useState<boolean>(false);
     const [friend_status, setFriendStatus] = useState<number>(0);
+    const [current_friend, setCurrentFriend] = useState<UserData | null>(null);
+    const [listMessage, setListMessage] = useState<Array<MessageResponseType>>([]);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isScrollingRef = useRef<NodeJS.Timeout | null>(null);
     const messageBoxRef = useRef<HTMLDivElement>(null);
     const [row, setRow] =useState<number>(1);
     const {register, handleSubmit, reset, formState:{errors}, setValue} = useForm<MessageInput>();
-    const isScrollingRef = useRef<NodeJS.Timeout | null>(null);
-    const {socket} = useContext(AppContext);
-    const [listMessage, setListMessage] = useState<Array<MessageResponseType>>([]);
     const queryClient = useQueryClient();
-    const {data, isLoading, error} = useQuery({
+    const {data} = useQuery({
         queryKey:['active_sts'],
         queryFn: ()=>getActiveStatus(current_friend?.id as number),
         enabled: !!current_friend,
     })
-    
-    useEffect(()=>{
-        if(data && data.data) 
-            setFriendStatus(data?.data?.data?.status);
-    },[data])
+    //function
     const getMessage = async() =>{
         try {
             if(user_id && current_friend){
@@ -131,6 +129,35 @@ export default function Chat() {
             }
         }
     };
+    const onSubmit: SubmitHandler<MessageInput> = (data) => {
+        if(!data.message || data.message.trim() === '') return;
+        socket.emit('chat', {
+            sendBy: user_id,
+            message: data.message,
+            receivedBy: current_friend?.id
+        });
+        setTimeScroll();
+        reset();
+        setRow(1);
+    };
+    const typing = useCallback(() => {
+        if (!isTyping) {
+            setIsTyping(true);
+        if (socket && current_friend) {
+            socket.emit("onTyping", current_friend.id, current_friend.display_name);
+        }
+        }
+        if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        }
+        typingTimeoutRef.current = setTimeout(() => {
+        setIsTyping(false);
+        if (socket && current_friend) {
+            socket.emit("onStopTyping", current_friend.id);
+        }
+        }, 2000);
+    }, [isTyping, socket, current_friend]);
+    //useEffect
     useEffect(() => {
         if(socket){
             socket.on('onChat', async(data:any) => {
@@ -156,6 +183,12 @@ export default function Chat() {
                     }
                 }
             });
+            socket.on("typing",()=>{
+                setTyping(true);
+            })
+            socket.on("stopTyping",()=>{
+                setTyping(false);
+            })
             return () => {
                 socket.off('onChat');
             };
@@ -174,18 +207,17 @@ export default function Chat() {
             setCurrentFriend(friend);
         }
     }, [current_friend]);
-
-    const onSubmit: SubmitHandler<MessageInput> = (data) => {
-        if(!data.message || data.message.trim() === '') return;
-        socket.emit('chat', {
-            sendBy: user_id,
-            message: data.message,
-            receivedBy: current_friend?.id
-        });
-        setTimeScroll();
-        reset();
-        setRow(1);
-    };
+    useEffect(()=>{
+        if(data && data.data) 
+            setFriendStatus(data?.data?.data?.status);
+    },[data])
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+        };
+    }, []);
     
     return (
         <div className='flex space-x-1 '>
@@ -224,11 +256,16 @@ export default function Chat() {
                             <Button className='mx-auto my-1'>Trò chuyện ngay</Button>
                         </div>
                     }
+                    {onTyping && current_friend &&
+                        <div className='fixed px-5 bg-gray-300 bg-opacity-50 -m-2 translate-y-96 mt-[243px] md:w-1/3 w-1/2 rounded-sm'>
+                            <span className='opacity-100'>{current_friend?.display_name} đang nhập . . .</span>
+                        </div>
+                    }
                 </div>
                 {(listMessage || !current_friend) && 
                 <form className='flex space-x-1 w-full mb-1' onSubmit={handleSubmit(onSubmit)}>
                     <Button size={'icon'} className='h-full bg-transparent shadow-none text-yellow-300 hover:bg-transparent'><BsEmojiSmile className='text-3xl' /></Button>
-                    <Textarea onKeyDown={handleKeyDown} {...register("message",{required:true})} className='w-11/12 flex-1 no-resize' rows={row} placeholder="Tin nhắn..." />
+                    <Textarea onKeyDown={handleKeyDown} {...register("message",{required:true})} className='w-11/12 flex-1 no-resize' onChange={typing} rows={row} placeholder="Tin nhắn..." />
                     <Button size={'icon'} type='submit' className='h-full'><HiPaperAirplane className='text-2xl' /></Button>
                 </form>
                 }
