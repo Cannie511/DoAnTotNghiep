@@ -69,7 +69,23 @@ const getRoomKeyService = async ()=>{
   } 
 }
 
+const findRoomService = async(room_key) =>{
+  try {
+    const room = await Model.Rooms.findOne({
+      where: {
+        Room_key: room_key,
+      },
+      raw: true,
+    });
+    if(room) return handleResult(200, "Tìm thấy phòng", room)
+    return handleResult(422, "Không tìm thấy phòng");
+  } catch (error) {
+    return handleError(error)
+  } 
+}
+
 module.exports = {
   createRoomService,
   getRoomKeyService,
+  findRoomService,
 };

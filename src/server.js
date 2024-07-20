@@ -38,7 +38,6 @@ app.use(express.json());
 app.use(cookieParser());
 //PORT SERVER
 const port = process.env.PORT || 5000;
-const client = {};
 io.on("connection", async (socket) => {
   try {
     const user_id = socket.handshake.query.user_id;
@@ -77,7 +76,7 @@ io.on("connection", async (socket) => {
     });
 
     socket.on("friend_request", async (data) => {
-      console.log("Friend request received: ", data);
+      //console.log("Friend request received: ", data);
       const addFriends = await addFriend(data.user_id, data.friend_id);
       if (addFriends.status === 200) {
         const received_user = await socketIO.searchOne(data?.friend_id);

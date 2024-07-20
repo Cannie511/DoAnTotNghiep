@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const privateRoute = ['/profile', '/local_','/user', '/chat', '/schedule', '/blogs', '/friends', '/friends/:friend_id'];
-export const authRoute = ['/register','/login','/forgot-password']
+const privateRoute = ['/profile', '/local_','/user', '/chat', '/schedule', '/blogs', '/friends', '/friends/:friend_id', '/meeting'];
+export const authRoute = ['/register','/login','/forgot-password', '/:room_id']
 
 export function middleware(request: NextRequest) {
   
@@ -26,6 +26,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/','/login','/register','/profile','/local_', '/user', '/chat', '/schedule', '/forgot-password','/blogs'
+    '/','/login','/register','/profile','/local_', '/user', '/chat', '/schedule', '/forgot-password','/blogs', '/meeting','/friends', '/friends/:friend_id',
   ],
 }

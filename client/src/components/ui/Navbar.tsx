@@ -4,8 +4,6 @@ import { ModeToggle } from "./mode-toggle";
 import Link from "next/link";
 import NavLink from "./NavLink";
 import './UI.css';
-import { useContext } from "react";
-import { AppContext } from "@/Context/Context";
 import { IoHome } from "react-icons/io5";
 import { FaUsers } from "react-icons/fa6";
 import { Tooltip } from "flowbite-react";

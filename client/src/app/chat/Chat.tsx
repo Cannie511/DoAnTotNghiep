@@ -104,6 +104,7 @@ export default function Chat() {
         textarea.selectionStart = textarea.selectionEnd = selectionStart + 1;
     }
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        typing();
         if (event.key === 'Enter' && !event.altKey && !event.shiftKey){
             event.preventDefault();
             handleSubmit(onSubmit)();
@@ -142,17 +143,18 @@ export default function Chat() {
     };
     const typing = useCallback(() => {
         if (!isTyping) {
-            setIsTyping(true);
-        if (socket && current_friend) {
-            socket.emit("onTyping", current_friend.id, current_friend.display_name);
-        }
+        setIsTyping(true);
+            if (socket && current_friend) {
+                socket.emit("onTyping", current_friend.id, current_friend.display_name);
+            }
         }
         if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
+            clearTimeout(typingTimeoutRef.current);
         }
         typingTimeoutRef.current = setTimeout(() => {
         setIsTyping(false);
         if (socket && current_friend) {
+            console.log("Emitting onStopTyping");
             socket.emit("onStopTyping", current_friend.id);
         }
         }, 2000);
@@ -265,7 +267,7 @@ export default function Chat() {
                 {(listMessage || !current_friend) && 
                 <form className='flex space-x-1 w-full mb-1' onSubmit={handleSubmit(onSubmit)}>
                     <Button size={'icon'} className='h-full bg-transparent shadow-none text-yellow-300 hover:bg-transparent'><BsEmojiSmile className='text-3xl' /></Button>
-                    <Textarea onKeyDown={handleKeyDown} {...register("message",{required:true})} className='w-11/12 flex-1 no-resize' onChange={typing} rows={row} placeholder="Tin nhắn..." />
+                    <Textarea onKeyDown={handleKeyDown} {...register("message",{required:true})} className='w-11/12 flex-1 no-resize' rows={row} placeholder="Tin nhắn..." />
                     <Button size={'icon'} type='submit' className='h-full'><HiPaperAirplane className='text-2xl' /></Button>
                 </form>
                 }

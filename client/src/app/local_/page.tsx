@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
-import HomePage from './Home';
+import dynamic from 'next/dynamic';
 export const metadata: Metadata = {
   title:'Trang chủ',
   description:'Index page'
 }
-
-export default function Home() {
+const HomePage = dynamic(() => import('./Home'), { ssr: false });
+const Home = () => {
   return (
-    <HomePage/>
-  )
-}
+    <HomePage />
+  );
+};
+export default Home;

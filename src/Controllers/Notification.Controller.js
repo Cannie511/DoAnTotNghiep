@@ -20,7 +20,6 @@ class NotificationController {
             return this.res.status(err.status).json({ message: err.message });
         }
     }
-
     update = async()=>{
         try {
             const {noti_id} = this.req.body;

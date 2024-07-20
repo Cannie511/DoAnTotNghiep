@@ -4,3 +4,7 @@ import http from "@/Utils/https";
 export const getRoomKey = async ()=>{
     return await http.get<BasicResponse>(`/api/room/getRoomKey`);
 }
+
+export const findRoom = async (room_key:number)=>{
+    return await http.post<BasicResponse>(`/api/room/findRoom`, {room_key});
+}

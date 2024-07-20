@@ -5,11 +5,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import ClientNav from "@/components/ClientNav";
 import { Toaster } from "@/components/ui/toaster";
 import AppProvider from "@/Context/Context";
-import LoadingComponent from "@/components/LoadingComponent";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import React, { Suspense } from "react";
 import Loading from "./loading";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import QueryProvider from "@/Context/QueryProvider";
 const inter = Inter({ subsets: ["latin"] });
 
