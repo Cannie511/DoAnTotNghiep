@@ -1,16 +1,45 @@
+'use client'
+import { useToast } from '@/components/ui/use-toast';
+import { AppContext } from '@/Context/Context';
+import { leftRoom } from '@/Services/user_join.api';
 import { Button, Modal } from 'flowbite-react'
-import React, { Dispatch, SetStateAction } from 'react'
+import { useParams } from 'next/navigation';
+import React, { Dispatch, SetStateAction, useContext, useState } from 'react'
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 interface Props{
     openModal:boolean;
     setOpenModal: Dispatch<SetStateAction<boolean>>;
+    id:number;
 }
 
 
-export default function ConfirmDialog({openModal, setOpenModal}:Props) {
-    const handleOffMeeting = () => {
-        setOpenModal(false)
-        window.close();
+export default function ConfirmDialog({openModal, setOpenModal, id}:Props) {
+    const { user_id, socket} = useContext(AppContext);
+    const {room_id} = useParams();
+    const {toast} = useToast();
+    const [isLoading, setLoading] = useState<boolean>(false);
+    const handleLeftMeeting = async () => {
+        if(socket){
+            setLoading(true);
+            if(user_id && id)
+            await leftRoom(Number(user_id), id)
+            .then((data)=>{
+                socket.emit("user-left", user_id,room_id);
+                setOpenModal(false);
+                window.close();
+            })
+            .catch((err)=>{
+                toast({
+                    title:"Lỗi hệ thống: " + err.message + " !!!",
+                    variant:"destructive"
+                })
+                setOpenModal(false);
+            })
+            .finally(()=>{
+                setLoading(false);
+            })
+        }
+        
     };
   return (
     <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
@@ -25,7 +54,7 @@ export default function ConfirmDialog({openModal, setOpenModal}:Props) {
                 <Button color="gray" onClick={() => setOpenModal(false)}>
                     Hủy
                 </Button>
-                <Button color="failure" onClick={handleOffMeeting}>
+                <Button isProcessing={isLoading} color="failure" onClick={handleLeftMeeting}>
                     Rời khỏi
                 </Button>
             </div>

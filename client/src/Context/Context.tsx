@@ -2,13 +2,16 @@
 import { AuthLogout } from "@/Services/auth.api";
 import { createNotification } from "@/Services/notification.api";
 import { UserFindOne } from "@/Services/user.api";
+import { confirmDialogJS } from "@/Utils/beforeUnload";
 import { useToast } from "@/components/ui/use-toast";
 import { NotificationRequestType, UserData } from "@/types/type";
-import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { StaticImageData } from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import Peer from "peerjs";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import io, { Socket } from 'socket.io-client';
+
 interface AppContextType {
     display_name: string | null;
     setName: React.Dispatch<React.SetStateAction<string | null>>;
@@ -24,6 +27,7 @@ interface AppContextType {
     avatar:StaticImageData|String|null;
     socket:Socket|null;
     current_friend: UserData|null;
+    peer: Peer|null;
 }
 
 const defaultValue: AppContextType = {
@@ -41,6 +45,7 @@ const defaultValue: AppContextType = {
     avatar: null,
     socket:null,
     current_friend:null,
+    peer: null,
 };
 
 export const AppContext = createContext<any>(defaultValue);
@@ -54,6 +59,7 @@ export default function AppProvider({children}:{children: ReactNode}){
     const {toast} = useToast();
     const pathname = usePathname();
     const [display_name, setName] = useState<string|null>('');
+    const [peer, setPeer] = useState<Peer | null>(null);
     const [isLoading, setLoading] = useState<boolean>(false);
     const [user_data, setUser_data] = useState<UserData|null>(null);
     const [forceLogout, setForceLogout] = useState<boolean>(false);
@@ -95,7 +101,7 @@ export default function AppProvider({children}:{children: ReactNode}){
         }
         if(forceLogout) forceLog();
     },[forceLogout]);
-     useEffect(() => {
+    useEffect(() => {
         if(user_id){
             const socketIo:Socket = io('http://localhost:8888', {query:{user_id}});
             setSocket(socketIo);
@@ -163,7 +169,26 @@ export default function AppProvider({children}:{children: ReactNode}){
                 })
                 queryClient.invalidateQueries({queryKey:["friend_request"]});
             })
-            window.addEventListener('beforeunload', () => {
+            
+            socketIo.on("user-joinIn", (userJoin:any)=>{
+                if(pathname.includes("/onMeeting/")){
+                    queryClient.invalidateQueries({queryKey:['user_join']});
+                    toast({
+                        title: userJoin?.display_name + " đã tham gia phòng họp"
+                    })
+                }
+            })
+
+            socketIo.on("user-leftRoom",(userJoin:any)=>{
+                if(pathname.includes("/onMeeting/")){
+                    queryClient.invalidateQueries({queryKey:['user_join']});
+                    toast({
+                        title: userJoin?.display_name + " đã rời phòng họp"
+                    })
+                }
+            })
+        
+            window.addEventListener('beforeunload', async () => {
                 socketIo.emit('user_disconnected', { user_id });
             });
             return () => {
@@ -171,6 +196,18 @@ export default function AppProvider({children}:{children: ReactNode}){
             };
         }
     }, [user_id, pathname]);
+
+    useEffect(()=>{
+        // if(user_id){
+        //     const peer = new Peer(user_id.toString(), {
+        //         host: 'localhost',
+        //         port: 1234,
+        //         path: '/peer-server'
+        //     });
+        //     setPeer(peer);
+        // }
+    },[user_id])
+
     useEffect(()=>{
         router.prefetch('/user');
         router.prefetch('/profile');
@@ -180,6 +217,7 @@ export default function AppProvider({children}:{children: ReactNode}){
         router.prefetch('/');
         router.prefetch('/local_');
         router.prefetch('/schedule');
+        router.prefetch('/onMeeting/:room_id');
     },[router])
     return (
         <AppContext.Provider value={{display_name, setName, 
@@ -188,7 +226,7 @@ export default function AppProvider({children}:{children: ReactNode}){
             forceLogout, setForceLogout, 
             user_id, linked_account, 
             email, avatar, socket,
-            current_friend, setCurrentFriend}}>
+            current_friend, setCurrentFriend, peer}}>
             {children}
         </AppContext.Provider>
     )

@@ -7,7 +7,8 @@ import { UserData } from "@/types/type";
 import { useContext, useEffect } from "react";
 import { AppContext } from "@/Context/Context";
 import { getLatestMessage } from "@/Services/message.api";
-import { TextInput } from "flowbite-react";
+import { TextInput, Tooltip } from "flowbite-react";
+import { TbMessageCirclePlus } from "react-icons/tb";
 interface Props{
     friend: UserData | null;
     setFriend: React.Dispatch<React.SetStateAction<UserData | null >>
@@ -32,8 +33,13 @@ export default function ListFriend({setFriend, friend}:Props) {
     }
   return (
     <div className='hidden md:flex rounded-lg border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 flex-col flex-none w-72 px-1 py-4 overflow-y-auto'>
-      <div className='w-full relative top-0 p-2 rounded-md dark:text-white text-black'>
-        <h1 className='text-2xl text-black dark:text-white flex'><FaUserFriends className="text-3xl me-2 relative"/> Bạn bè</h1>
+      <div className='w-full relative top-0 p-2 rounded-md dark:text-white text-black flex'>
+        <div className="flex-1"><h1 className='text-2xl text-black dark:text-white flex'><FaUserFriends className="text-3xl me-2 relative"/> Bạn bè</h1></div>
+        <div>
+            <Tooltip content="Tin nhắn mới">
+                <TbMessageCirclePlus className="text-3xl relative me-auto cursor-pointer" />
+            </Tooltip>
+        </div>
       </div>
       <TextInput placeholder="Tìm kiếm" color="info"/>
       <div className='h-[43rem] w-full rounded-sm space-y-1 mt-2'>

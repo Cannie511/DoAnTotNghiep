@@ -1,5 +1,5 @@
 const Model = require("../models");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 const { checkPassword, hashPassword } = require("../Utils/HashPassword");
 const { handleError, handleResult } = require("../Utils/Http");
 

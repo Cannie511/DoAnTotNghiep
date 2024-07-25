@@ -1,12 +1,14 @@
 'use client'
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/components/ui/input-otp'
 import { useToast } from '@/components/ui/use-toast';
+import { AppContext } from '@/Context/Context';
 import { findRoom } from '@/Services/room.api';
 import { Button } from 'flowbite-react'
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useContext, useState } from 'react';
 import { IoSearch } from "react-icons/io5";
 
 export default function SearchInput() {
+    const {user_id, socket} = useContext(AppContext);
     const [value,setValue] = useState<string>('');
     const {toast} = useToast();
     const onSubmit = async (e:ChangeEvent<HTMLFormElement>) =>{
@@ -16,7 +18,9 @@ export default function SearchInput() {
         await findRoom(Number(value))
         .then((data)=>{
             const url = `/onMeeting/${value}`;
+            //socket.emit("join-in", value, user_id);
             window.open(url, '_blank');
+            setValue('');
         })
         .catch((err)=>{
             if(err.response.status === 422){

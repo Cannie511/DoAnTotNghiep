@@ -10,6 +10,7 @@ const SocketRoute = require("./Routes/Socket.api");
 const NotificationRoute = require("./Routes/Notification.api");
 const RoomRoute = require("./Routes/Room.api");
 const ScheduleRoute = require("./Routes/Schedule.api");
+const UserJoinRoute = require("./Routes/User_Join.api")
 const db_connect = require("./Database/db.connect");
 const cors_config = require("./Middlewares/CORS");
 const { Server } = require("socket.io");
@@ -23,40 +24,47 @@ const Socket = require("./Services/Socket.Service");
 const { handleError } = require("./Utils/Http");
 const { addFriend, agreeAddFriend } = require("./Services/Friend.Service");
 const NotificationService = require("./Services/Notification.Service");
+const UserJoin = require("./Services/User_Join.Service");
+const chalk = require("chalk");
+const { findRoomService } = require("./Services/Room.Service");
 require("dotenv").config();
 const server = createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: ["http://localhost:3000", "http://192.168.1.172"],
     methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
+
 app.use(cors_config);
 app.use(db_connect);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-//PORT SERVER
+
 const port = process.env.PORT || 5000;
+
 io.on("connection", async (socket) => {
   try {
     const user_id = socket.handshake.query.user_id;
-    //console.log(`${user_id} have connected ${socket.id}`);
 
     socket.broadcast.emit("online", user_id);
     if (!user_id) return;
+
     const socketIO = new Socket(user_id, socket.id, 1);
     await socketIO.connectSocket();
+
     socket.on("onTyping", async (received_id, display_name) => {
-      console.log("đang nhập");
       const received_user = await socketIO.searchOne(received_id);
       io.to(received_user?.data.socket_id).emit("typing", display_name);
     });
+
     socket.on("onStopTyping", async (received_id) => {
-      console.log("hết nhập");
       const received_user = await socketIO.searchOne(received_id);
       io.to(received_user?.data.socket_id).emit("stopTyping");
     });
+
     socket.on("chat", async (data) => {
       const received_user = await socketIO.searchOne(data?.receivedBy);
       const send_user = await socketIO.searchOne(data?.sendBy);
@@ -75,8 +83,30 @@ io.on("connection", async (socket) => {
       }
     });
 
+    socket.on("join-in", async (roomKey, userId) => {
+      console.log(chalk.bgGreen(`${userId} joined room: - ${roomKey}`));
+      await socket.join(roomKey)
+      const room = await findRoomService(roomKey);
+      const user_join = new UserJoin(userId, room?.data?.id);
+      const find_user_join =  await user_join.findOne();
+      const userData = await getUsersByIdService(userId);
+      if(find_user_join.status !== 200){
+        return;
+      }
+      socket.to(roomKey).emit("user-joinIn", userData.data);
+    });
+
+    socket.on("user-left", async (userId, roomKey) => {
+      const room = await findRoomService(roomKey);
+      const userData = await getUsersByIdService(userId);
+      const user_left = new UserJoin(userId, room?.data?.id);
+      const find_user_left = await user_left.findOne();
+      if (find_user_left.status !== 200) {
+        socket.to(roomKey).emit("user-leftRoom", userData.data);
+      } else return;
+    });
+
     socket.on("friend_request", async (data) => {
-      //console.log("Friend request received: ", data);
       const addFriends = await addFriend(data.user_id, data.friend_id);
       if (addFriends.status === 200) {
         const received_user = await socketIO.searchOne(data?.friend_id);
@@ -96,21 +126,25 @@ io.on("connection", async (socket) => {
       );
       if (addFriends.status === 200) {
         const notification = new NotificationService();
-        await notification.update(data?.noti_id)
-        .then(async()=>{
-          const received_user = await socketIO.searchOne(data?.friend_id);
-          const senderInfo = await getUsersByIdService(data.user_id);
-          const receiverInfo = await getUsersByIdService(data?.friend_id);
-          if(+data.action === 1){
-            io.to(socket.id).emit("friend_res_noti", receiverInfo.data);
-            io.to(received_user?.data.socket_id).emit("resFriend_notification",senderInfo.data);
-          }
-          if(+data.action !== 0) return;
-        })
-        .catch((err)=>{
-          console.log(err.message);
-          return 
-        })
+        await notification
+          .update(data?.noti_id)
+          .then(async () => {
+            const received_user = await socketIO.searchOne(data?.friend_id);
+            const senderInfo = await getUsersByIdService(data.user_id);
+            const receiverInfo = await getUsersByIdService(data?.friend_id);
+            if (+data.action === 1) {
+              io.to(socket.id).emit("friend_res_noti", receiverInfo.data);
+              io.to(received_user?.data.socket_id).emit(
+                "resFriend_notification",
+                senderInfo.data
+              );
+            }
+            if (+data.action !== 0) return;
+          })
+          .catch((err) => {
+            console.log(err.message);
+            return;
+          });
       }
     });
 
@@ -133,11 +167,15 @@ app.use("/api", Authentication, NotificationRoute);
 app.use("/api", Authentication, RoomRoute);
 app.use("/api", Authentication, ScheduleRoute);
 app.use("/api", Authentication, FriendRoute);
+app.use("/api", Authentication, UserJoinRoute);
 app.use((req, res) => {
   res.status(404).json({ status: 404, message: "404 NOT FOUND" });
 });
-server.listen(port, () => {
-  console.log(
-    `[Đồ án tốt nghiệp] is running on port ${port}, domain: http://localhost:${port}`
-  );
-});
+
+server
+  .listen(port, () => {
+    console.log(
+      `[Đồ án tốt nghiệp] is running on port ${port}, domain: http://localhost:${port}`
+    );
+  })
+

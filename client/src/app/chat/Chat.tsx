@@ -48,13 +48,12 @@ export default function Chat() {
         try {
             if(user_id && current_friend){
                 const messages = await GetMessage({user1:user_id, user2:current_friend?.id as number});
-                if(messages) setListMessage(messages.data.data)
+                if(messages) setListMessage(messages.data.data.reverse())
             }
             else return;
         } catch (error) {
             console.log(error);
         }
-        
     }
     const handleScroll = () => {
         if (messageBoxRef.current) {

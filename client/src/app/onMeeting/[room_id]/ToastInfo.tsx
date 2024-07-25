@@ -6,7 +6,7 @@ interface Props{
 }
 export default function ToastInfo({room_id}:Props) {
   return (
-    <Toast className='fixed'>
+    <Toast className='fixed top-[80vh]'>
         <div className="grid w-full max-w-64">
           <div className="ml-64 p-0 fixed flex justify-center items-center">
             <Toast.Toggle />
