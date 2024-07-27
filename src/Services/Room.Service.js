@@ -78,15 +78,43 @@ const findRoomService = async(room_key) =>{
       },
       raw: true,
     });
-    if(room) return handleResult(200, "Tìm thấy phòng", room)
+    
+    if(room){
+      const roomTemp = {
+        id: room.id,
+        Room_key: room.Room_key,
+        User_amount: room.User_amount,
+        Host_id: room.Host_id,
+        Create_by: room.Create_by,
+        Password: room.Password ? true : false,
+      };
+      return handleResult(200, "Tìm thấy phòng", roomTemp);
+    } 
     return handleResult(422, "Không tìm thấy phòng");
   } catch (error) {
     return handleError(error)
   } 
 }
 
+const checkRoomPasswordService = async(room_id, password)=>{
+  try {
+    const room = await Model.Rooms.findOne({
+      where: {
+        id: room_id,
+      },
+      raw: true,
+    });
+    if (room.Password === password) {
+      return handleResult(200, "Mật khẩu trùng khớp");
+    } else return handleResult(422, "Mật khẩu không trùng khớp");
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
 module.exports = {
   createRoomService,
   getRoomKeyService,
   findRoomService,
+  checkRoomPasswordService,
 };

@@ -5,19 +5,29 @@ import { findRoom } from '@/Services/room.api';
 import { Button } from 'flowbite-react'
 import { ChangeEvent, useState } from 'react';
 import { IoSearch } from "react-icons/io5";
+import ModalPassword from './ModalPassword';
 
 export default function SearchInput() {
     const [value,setValue] = useState<string>('');
+    const [roomID, setRoomID] = useState<number>();
+    const [isPassword, setIsPassword] = useState<boolean>(false);
     const {toast} = useToast();
     const onSubmit = async (e:ChangeEvent<HTMLFormElement>) =>{
         e.preventDefault();
         if(!value) return;
         if(value.length < 9) return;
         await findRoom(Number(value))
-        .then((data)=>{
-            const url = `/onMeeting/${value}`;
-            window.open(url, '_blank');
-            setValue('');
+        .then((data:any)=>{
+            //console.log(data.data)
+            setRoomID(data.data?.id);
+            if(data.data?.Password){
+                setIsPassword(true);
+            }
+            else{
+                const url = `/onMeeting/${value}`;
+                window.open(url, '_blank');
+                setValue('');
+            }
         })
         .catch((err)=>{
             if(err.response.status === 422){
@@ -63,6 +73,7 @@ export default function SearchInput() {
                 <Button type='submit' size={"sm"}><IoSearch className='text-xl'/></Button>
             </form>
         </div>
+        <ModalPassword openModal={isPassword} setOpenModal={setIsPassword} room_id={roomID} room_key={Number(value)}/>
     </div>
   )
 }

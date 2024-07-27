@@ -13,3 +13,6 @@ export const createRoom = async (user_id:number, time:string, password:string, r
     return await http.post<BasicResponse>(`/api/room/createRoom`, {user_id, time, password, roomKey});
 }
 
+export const checkRoomPassword = async(room_id:number, password:string)=>{
+    return await http.post('/api/room/checkRoomPassword', {room_id, password});
+}

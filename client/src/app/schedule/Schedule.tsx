@@ -121,7 +121,7 @@ export default function Schedule() {
                                     <TextInput 
                                         {...register("password",{required:password})}
                                         type='password'
-                                        placeholder='Nhập password vào đây...'
+                                        placeholder='Nhập mật khẩu tại đây...'
                                     />
                                 </div>
                             }
