@@ -97,7 +97,7 @@ const getLatestMessageService = async (userId) => {
         [col("Sender.display_name"), "sender_display_name"],
         [col("Sender.avatar"), "sender_avt"],
         [col("Receiver.display_name"), "receiver_display_name"],
-        [col("Receiver.avatar"), "receiver_avt"], // Đổi tên cột Receiver.avatar thành receiver_avt
+        [col("Receiver.avatar"), "receiver_avt"],
         "createdAt",
       ],
       order: [["createdAt", "DESC"]],

@@ -180,6 +180,7 @@ export default function AppProvider({children}:{children: ReactNode}){
             socketIo.on("room-chat",(user_id, message)=>{
                 if(pathname.includes("/onMeeting/")){
                     console.log(user_id + " :" + message)
+                    queryClient.invalidateQueries({queryKey:['room_message_list']})
                 }
             })
             socketIo.on("on-Mic",(user_id)=>{

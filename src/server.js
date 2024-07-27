@@ -11,6 +11,7 @@ const NotificationRoute = require("./Routes/Notification.api");
 const RoomRoute = require("./Routes/Room.api");
 const ScheduleRoute = require("./Routes/Schedule.api");
 const UserJoinRoute = require("./Routes/User_Join.api")
+const RoomMessageRoute = require("./Routes/Room_Message.api");
 const db_connect = require("./Database/db.connect");
 const cors_config = require("./Middlewares/CORS");
 const { Server } = require("socket.io");
@@ -27,6 +28,7 @@ const NotificationService = require("./Services/Notification.Service");
 const UserJoin = require("./Services/User_Join.Service");
 const chalk = require("chalk");
 const { findRoomService } = require("./Services/Room.Service");
+const RoomMessage = require("./Services/Room_Message.Service");
 require("dotenv").config();
 const server = createServer(app);
 
@@ -98,7 +100,14 @@ io.on("connection", async (socket) => {
       socket.on("room-chat", async (data) => {
         const { room_id, user_id, message } = data;
         console.log(chalk.bgCyan(room_id, " - ", user_id, ": ", message));
-        socket.to(roomKey).emit("room-chat", user_id,message);
+        const room_message = new RoomMessage(room_id, user_id, message);
+        await room_message.create()
+        .then((data)=>{
+          socket.to(roomKey).emit("room-chat", user_id, message);
+        })
+        .catch((err)=>{
+          return handleError(err)
+        })
       });
       socket.to(roomKey).emit("user-joinIn", userData.data);
       socket.on("onMic", (roomId, userId) => {
@@ -188,6 +197,7 @@ app.use("/api", Authentication, RoomRoute);
 app.use("/api", Authentication, ScheduleRoute);
 app.use("/api", Authentication, FriendRoute);
 app.use("/api", Authentication, UserJoinRoute);
+app.use("/api", Authentication, RoomMessageRoute);
 app.use((req, res) => {
   res.status(404).json({ status: 404, message: "404 NOT FOUND" });
 });
