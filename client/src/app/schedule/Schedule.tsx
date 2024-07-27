@@ -10,9 +10,8 @@ import { MdChangeCircle } from "react-icons/md";
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useToast } from '@/components/ui/use-toast';
 import { getRoomKey } from '@/Services/room.api';
-interface ScheduleInput{
-    password:string;
-}
+import { ScheduleInput } from '@/types/type';
+
 export default function Schedule() {
     const today = new Date();
     const queryClient = useQueryClient();

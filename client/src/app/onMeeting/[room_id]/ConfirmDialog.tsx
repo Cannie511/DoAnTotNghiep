@@ -12,7 +12,6 @@ interface Props{
     id:number;
 }
 
-
 export default function ConfirmDialog({openModal, setOpenModal, id}:Props) {
     const { user_id, socket} = useContext(AppContext);
     const {room_id} = useParams();

@@ -5,6 +5,7 @@ import { useContext } from 'react';
 import { AppContext } from '@/Context/Context';
 import { getFriendRequest, getNotification } from '@/Services/notification.api';
 import FriendView from './FriendView';
+import FriendComponent from './FriendComponent';
 export default function Friends() {
     const {user_id} = useContext(AppContext);
     const {data:listUser, isLoading, error:err_user} = useQuery({
@@ -24,7 +25,7 @@ export default function Friends() {
     const listFriend = listUser?.data.data.filter((x:any)=>x.id!==user_id);
     const acceptedList:any = friend_noti?.data;
     const friendReq:any = friendRequest?.data;
-    console.log("friend: ", friendRequest)
+    //console.log("friend: ", listFriend)
   return (
     <>
         <FriendView header='Lời mời kết bạn' dataList={acceptedList} isLoading={isLoading} btn_content={"Xác nhận"} typeView='confirm'/>

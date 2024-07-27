@@ -1,0 +1,124 @@
+const getVideoStream = async () => {
+    try {
+      if (video) {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setVideoStream(stream);
+        if (videoRef.current) {
+          const combinedStream = new MediaStream([...(stream.getVideoTracks()), ...(audioStream ? audioStream.getAudioTracks() : [])]);
+          videoRef.current.srcObject = combinedStream;
+        }
+      } else {
+        if (videoStream) {
+          videoStream.getTracks().forEach(track => track.stop());
+          setVideoStream(null);
+        }
+        if (audioStream && videoRef.current) {
+          videoRef.current.srcObject = new MediaStream(audioStream.getAudioTracks());
+        }
+      }
+    } catch (error) {
+      console.error('Lỗi thiết bị video: ', error);
+      toast({
+        title: "Lỗi thiết bị video!",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getAudioStream = async () => {
+    try {
+      if (audio) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        setAudioStream(stream);
+        if (videoRef.current) {
+          const combinedStream = new MediaStream([...(videoStream ? videoStream.getVideoTracks() : []), ...(stream.getAudioTracks())]);
+          videoRef.current.srcObject = combinedStream;
+        } else if (videoRef.current) {
+          videoRef.current.srcObject = new MediaStream(stream.getAudioTracks());
+        }
+      } else {
+        if (audioStream) {
+          audioStream.getTracks().forEach(track => track.stop());
+          setAudioStream(null);
+        }
+        if (videoStream && videoRef.current) {
+          videoRef.current.srcObject = new MediaStream(videoStream.getVideoTracks());
+        }
+      }
+    } catch (error) {
+      console.error('Lỗi thiết bị audio: ', error);
+      toast({
+        title: "Lỗi thiết bị audio!",
+        variant: "destructive"
+      });
+    }
+  };
+
+    // useEffect(() => {
+  //   getVideoStream();
+  //   getAudioStream();
+  //   return () => {
+  //     if (videoStream) {
+  //       videoStream.getTracks().forEach(track => track.stop());
+  //       setVideoStream(null);
+  //     }
+  //     if (audioStream) {
+  //       audioStream.getTracks().forEach(track => track.stop());
+  //       setAudioStream(null);
+  //     }
+  //   };
+  // }, [video, audio]);
+
+  // if(videoStream) {
+      //   userJoinList.forEach((user: any) => {
+      //     const call = peer.call(user?.User_ID.toString(), videoStream);
+      //     if(!video && !audio) return;
+      //     call.on('stream', (remoteStream: MediaStream) => {
+      //       setRemoteStream(remoteStream);
+      //     });
+      //   });
+      // }
+      // if(audioStream){
+      //   userJoinList.forEach((user: any) => {
+      //     const call = peer.call(user?.User_ID.toString(), audioStream);
+      //     if(!video && !audio) return;
+      //     call.on('stream', (remoteStream: MediaStream) => {
+      //       setRemoteStream(remoteStream);
+      //     });
+      //   });
+      // }
+      // if(videoStream && audioStream){
+      //   const combinedStream = new MediaStream([
+      //     ...(videoStream ? videoStream.getVideoTracks() : []), 
+      //     ...(audioStream ? audioStream.getAudioTracks() : [])
+      //   ]);
+      //   userJoinList.forEach((user: any) => {
+      //     const call = peer.call(user?.User_ID.toString(), combinedStream);
+      //     if(!video && !audio) return;
+      //     call.on('stream', (remoteStream: MediaStream) => {
+      //       setRemoteStream(remoteStream);
+      //     });
+      //   });
+      // }
+
+      // navigator.mediaDevices.getUserMedia({video:true, audio:true})
+      // .then(stream=>{
+      //     peer.on('call', function(call:any){
+      //       call.answer(stream)
+      //       call.on('stream', (remoteStream:MediaStream)=>{
+      //         setRemoteStreams(prevStreams => [...prevStreams, remoteStream]);
+      //       },(err:any)=>{
+      //           console.log('error',err)
+      //       })
+      //     })
+      // })
+      // peer.on('call', (call: any) => {
+      //   call.answer();
+      //   call.on('stream', (remoteStream: MediaStream) => {
+      //     setRemoteStream(remoteStream);
+      //   });
+      // });
+
+      // return () => {
+      //   peer.destroy();
+      // };

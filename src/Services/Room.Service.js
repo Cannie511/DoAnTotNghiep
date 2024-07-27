@@ -26,7 +26,7 @@ const createRoomService = async (host_ID, time, password, roomKey) => {
         Create_by: host_ID,
         Time_start: time,
         Time_end: endTime,
-        Password: password ? hashPassword(password): "",
+        Password: password ? password: "",
       });
     } else {
       data = await Model.Rooms.create({
@@ -35,7 +35,7 @@ const createRoomService = async (host_ID, time, password, roomKey) => {
         Host_id: host_ID,
         Create_by: host_ID,
         Time_start: time,
-        Password: password ? hashPassword(password) : "",
+        Password: password ? password : "",
       });
     }
     if (data) return handleResult(200, "Create room successfully", data);
@@ -55,13 +55,14 @@ const getRoomKeyService = async ()=>{
     let roomKey;
     let room;
     do {
-      roomKey = generateRoomKeyService();
+      const newKey = generateRoomKeyService();
       room = await Model.Rooms.findOne({
         where: {
-          Room_key: roomKey,
+          Room_key: newKey,
         },
         raw: true,
       });
+      if(!room) roomKey = newKey;
     } while (room);
     return handleResult(200, "Tạo key thành công", roomKey);
   } catch (error) {

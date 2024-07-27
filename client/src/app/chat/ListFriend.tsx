@@ -1,20 +1,25 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Image, { StaticImageData } from "next/image";
 import { FaUserFriends } from "react-icons/fa";
 import logoNext from "@/app/favicon.ico"
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserData } from "@/types/type";
-import { useContext, useEffect } from "react";
+import { useContext, useState } from "react";
 import { AppContext } from "@/Context/Context";
 import { getLatestMessage } from "@/Services/message.api";
 import { TextInput, Tooltip } from "flowbite-react";
 import { TbMessageCirclePlus } from "react-icons/tb";
+import ModalFindFriend from "./ModalFindFriend";
+import { url_img_default } from "@/images/image";
 interface Props{
     friend: UserData | null;
     setFriend: React.Dispatch<React.SetStateAction<UserData | null >>
+    setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+    openModal:boolean;
 }
-export default function ListFriend({setFriend, friend}:Props) {
+export default function ListFriend({setFriend, friend , openModal, setOpenModal}:Props) {
     const {user_id} = useContext(AppContext);
+    //const [openModal, setOpenModal] = useState<boolean>(false);
     const {data, isLoading, error} = useQuery({
         queryKey:['list friend'],
         queryFn: ()=>getLatestMessage(user_id),
@@ -31,13 +36,22 @@ export default function ListFriend({setFriend, friend}:Props) {
         setFriend(data as UserData);
         localStorage.setItem('friend', JSON.stringify(data));
     }
+    const handleChangeFriend = (friend:any) =>{
+        const choosenFriend:any = {
+            id: friend?.Friend_ID,
+            display_name: friend["Friend.display_name"],
+            avatar: friend["Friend.avatar"]
+        }
+        localStorage.setItem("friend", JSON.stringify(choosenFriend));
+        setFriend(choosenFriend);
+    }
   return (
     <div className='hidden md:flex rounded-lg border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 flex-col flex-none w-72 px-1 py-4 overflow-y-auto'>
       <div className='w-full relative top-0 p-2 rounded-md dark:text-white text-black flex'>
         <div className="flex-1"><h1 className='text-2xl text-black dark:text-white flex'><FaUserFriends className="text-3xl me-2 relative"/> Bạn bè</h1></div>
         <div>
             <Tooltip content="Tin nhắn mới">
-                <TbMessageCirclePlus className="text-3xl relative me-auto cursor-pointer" />
+                <TbMessageCirclePlus onClick={()=>setOpenModal(true)} className="text-3xl relative me-auto cursor-pointer" />
             </Tooltip>
         </div>
       </div>
@@ -67,9 +81,9 @@ export default function ListFriend({setFriend, friend}:Props) {
                     <div className="flex items-center space-x-3">
                     <div className="shrink-0">
                         <Image
-                        alt="Neil image"
+                        alt="avatar"
                         height="32"
-                        src={item?.Send_by === user_id ? item?.receiver_avt as StaticImageData : item?.sender_avt as StaticImageData || logoNext}
+                        src={item?.Send_by === user_id ? item?.receiver_avt as StaticImageData : item?.sender_avt ? item?.sender_avt as StaticImageData :  url_img_default}
                         width="32"
                         className="rounded-full"
                         />
@@ -83,6 +97,7 @@ export default function ListFriend({setFriend, friend}:Props) {
             )
         })}
       </div>
+      <ModalFindFriend setFriend={handleChangeFriend} openModal={openModal} setOpenModal={setOpenModal}/>
     </div>
   )
 }

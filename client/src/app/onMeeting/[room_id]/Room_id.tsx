@@ -20,12 +20,13 @@ export default function RoomID({x, y, video, audio, stream}:Props) {
   useEffect(() => {
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
+      videoRef.current.muted = true;
     }
   }, [stream]);
 
   return (
     <motion.div
-      className="overflow-hidden fixed w-[22rem] h-[200px] bg-gray-700 rounded-xl flex justify-center items-center cursor-move"
+      className="overflow-hidden fixed z-40 w-[22rem] h-[200px] bg-gray-700 rounded-xl flex justify-center items-center cursor-move"
       drag
       initial={{ x: 3000, y: 1000 }}
       animate={{ x: propsX, y: propsY }}

@@ -2,7 +2,6 @@
 import { AuthLogout } from "@/Services/auth.api";
 import { createNotification } from "@/Services/notification.api";
 import { UserFindOne } from "@/Services/user.api";
-import { confirmDialogJS } from "@/Utils/beforeUnload";
 import { useToast } from "@/components/ui/use-toast";
 import { NotificationRequestType, UserData } from "@/types/type";
 import { useQueryClient } from "@tanstack/react-query";
@@ -176,6 +175,37 @@ export default function AppProvider({children}:{children: ReactNode}){
                     toast({
                         title: userJoin?.display_name + " đã tham gia phòng họp"
                     })
+                }
+            })
+            socketIo.on("room-chat",(user_id, message)=>{
+                if(pathname.includes("/onMeeting/")){
+                    console.log(user_id + " :" + message)
+                }
+            })
+            socketIo.on("on-Mic",(user_id)=>{
+                if(pathname.includes("/onMeeting/")){
+                    console.log(user_id + " bật mic")
+                    queryClient.invalidateQueries({queryKey:["user_join"]});
+                }
+            })
+            socketIo.on("off-Mic",(user_id)=>{
+                if(pathname.includes("/onMeeting/")){
+                    console.log(user_id + " tắt mic")
+                    queryClient.invalidateQueries({queryKey:["user_join"]});
+                }
+            })
+
+            socketIo.on("on-Cam",(user_id)=>{
+                if(pathname.includes("/onMeeting/")){
+                    console.log(user_id + " bật cam");
+                    queryClient.invalidateQueries({queryKey:["user_join"]});
+                }
+            })
+
+            socketIo.on("off-Cam",(user_id)=>{
+                if(pathname.includes("/onMeeting/")){
+                    console.log(user_id + " tắt cam");
+                    queryClient.invalidateQueries({queryKey:["user_join"]});
                 }
             })
 

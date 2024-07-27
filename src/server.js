@@ -83,6 +83,8 @@ io.on("connection", async (socket) => {
       }
     });
 
+    
+
     socket.on("join-in", async (roomKey, userId) => {
       console.log(chalk.bgGreen(`${userId} joined room: - ${roomKey}`));
       await socket.join(roomKey)
@@ -93,7 +95,24 @@ io.on("connection", async (socket) => {
       if(find_user_join.status !== 200){
         return;
       }
+      socket.on("room-chat", async (data) => {
+        const { room_id, user_id, message } = data;
+        console.log(chalk.bgCyan(room_id, " - ", user_id, ": ", message));
+        socket.to(roomKey).emit("room-chat", user_id,message);
+      });
       socket.to(roomKey).emit("user-joinIn", userData.data);
+      socket.on("onMic", (roomId, userId) => {
+        socket.to(roomId).emit("on-Mic", userId);
+      });
+      socket.on("offMic", (roomId, userId) => {
+        socket.to(roomId).emit("off-Mic", userId);
+      });
+      socket.on("onCam", (roomId, userId) => {
+        socket.to(roomId).emit("on-Cam", userId);
+      });
+      socket.on("offCam", (roomId, userId) => {
+        socket.to(roomId).emit("off-Cam", userId);
+      });
     });
 
     socket.on("user-left", async (userId, roomKey) => {
@@ -108,6 +127,7 @@ io.on("connection", async (socket) => {
 
     socket.on("friend_request", async (data) => {
       const addFriends = await addFriend(data.user_id, data.friend_id);
+      console.log(data);
       if (addFriends.status === 200) {
         const received_user = await socketIO.searchOne(data?.friend_id);
         const received_info = await getUsersByIdService(data?.user_id);

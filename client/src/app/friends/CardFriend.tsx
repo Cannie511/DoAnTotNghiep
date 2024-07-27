@@ -6,7 +6,7 @@ import Image, { StaticImageData } from 'next/image'
 import React, { useContext } from 'react'
 
 interface Props{
-    noti_id: number;
+    noti_id?: number;
     avatar: string|StaticImageData;
     display_name:string;
     id:number;
@@ -20,7 +20,7 @@ export default function CardFriend({noti_id, avatar, display_name, id, typeView}
     const handleAddFriend =()=>{
         queryClient.invalidateQueries({queryKey:['friend_request']});
         if(socket){
-            socket.emit("friend_request",{noti_id, user_id, friend_id:id});
+            socket.emit("friend_request",{user_id, friend_id:id});
         }
         toast({
             title: "Đã gửi lời mời kết bạn thành công"

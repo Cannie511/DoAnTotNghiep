@@ -6,9 +6,9 @@ const { handleError } = require("../Utils/Http");
 const createRoomController = async(req,res) =>{
     try
     {
-        const { user_id } = req.params;
+        const { user_id, time, password, roomKey } = req.body;
         if(!user_id) return res.status(422).json({message:"Không nhận được user_id"});
-        const data = await createRoomService(user_id);
+        const data = await createRoomService(user_id, time, password, roomKey);
         if (data) return res.status(data.status).json(data);
     }
     catch(error)

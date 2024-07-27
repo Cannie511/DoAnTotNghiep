@@ -35,6 +35,7 @@ export default function Chat() {
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const isScrollingRef = useRef<NodeJS.Timeout | null>(null);
     const messageBoxRef = useRef<HTMLDivElement>(null);
+    const [openModal, setOpenModal] = useState<boolean>(false);
     const [row, setRow] =useState<number>(1);
     const {register, handleSubmit, reset, formState:{errors}, setValue} = useForm<MessageInput>();
     const queryClient = useQueryClient();
@@ -47,8 +48,12 @@ export default function Chat() {
     const getMessage = async() =>{
         try {
             if(user_id && current_friend){
-                const messages = await GetMessage({user1:user_id, user2:current_friend?.id as number});
-                if(messages) setListMessage(messages.data.data.reverse())
+                const messages:any = await GetMessage({user1:user_id, user2:current_friend?.id as number});
+                if(messages?.data?.message === "Người dùng chưa từng có tin nhắn"){
+                    setListMessage([]);
+                }
+                else if(messages) setListMessage(messages.data.data.reverse())
+                 
             }
             else return;
         } catch (error) {
@@ -223,7 +228,7 @@ export default function Chat() {
     return (
         <div className='flex space-x-1 '>
             <Card className='w-6xl h-[51rem] flex-col flex-1'>
-                {(listMessage || !current_friend) && 
+                {(current_friend) && 
                 <div className='w-full flex dark:bg-slate-700 relative top-0 p-2 rounded-sm dark:text-white bg-slate-100 text-black items-center'>
                     <div className='flex flex-1'>
                         <Avatar size={'xs'} alt='AV' img={current_friend?.avatar as any || url_img_default} rounded status="online" statusPosition="top-right" />
@@ -244,26 +249,25 @@ export default function Chat() {
                 }
                 <div
                     ref={messageBoxRef}
-                    className='message-box h-[48rem] dark:bg-slate-600 w-full rounded-sm px-2 flex flex-col overflow-auto'
-                >
+                    className='message-box h-[48rem] dark:bg-slate-600 w-full rounded-sm px-2 flex flex-col overflow-auto'>   
+                    {!current_friend &&
+                        <div className='mx-auto mt-60 flex flex-col'>
+                            <span className='text-3xl'>Bạn chưa nhắn tin với ai</span>
+                            <Button className='mx-auto my-1' onClick={()=>setOpenModal(true)}>Bắt đầu trò chuyện</Button>
+                        </div>
+                    }
                     {listMessage && listMessage.map((message:MessageResponseType)=>{
                         return(
                             <Message key={message?.id} message={message.Message} createAt={message.createdAt} me={message.Send_by === user_id} status={friend_status} avatar={current_friend?.avatar}/>
                         )
                     })}
-                    {!listMessage && 
-                        <div className='mx-auto mt-60 flex flex-col'>
-                            <span className='text-3xl'>Bạn chưa nhắn tin với ai</span>
-                            <Button className='mx-auto my-1'>Trò chuyện ngay</Button>
-                        </div>
-                    }
                     {onTyping && current_friend &&
                         <div className='fixed px-5 bg-gray-300 bg-opacity-50 -m-2 translate-y-96 mt-[243px] md:w-1/3 w-1/2 rounded-sm'>
                             <span className='opacity-100'>{current_friend?.display_name} đang nhập . . .</span>
                         </div>
                     }
                 </div>
-                {(listMessage || !current_friend) && 
+                {(current_friend) && 
                 <form className='flex space-x-1 w-full mb-1' onSubmit={handleSubmit(onSubmit)}>
                     <Button size={'icon'} className='h-full bg-transparent shadow-none text-yellow-300 hover:bg-transparent'><BsEmojiSmile className='text-3xl' /></Button>
                     <Textarea onKeyDown={handleKeyDown} {...register("message",{required:true})} className='w-11/12 flex-1 no-resize' rows={row} placeholder="Tin nhắn..." />
@@ -271,7 +275,7 @@ export default function Chat() {
                 </form>
                 }
             </Card>
-            <ListFriend setFriend={setCurrentFriend} friend={current_friend}/>
+            <ListFriend openModal={openModal} setOpenModal={setOpenModal} setFriend={setCurrentFriend} friend={current_friend}/>
         </div>
     );
 }

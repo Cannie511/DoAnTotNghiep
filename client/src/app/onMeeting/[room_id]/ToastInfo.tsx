@@ -1,3 +1,4 @@
+'use client'
 import { formatRoomKey } from '@/Utils/formatDate';
 import { Clipboard, Toast } from 'flowbite-react'
 import { MdInfo } from "react-icons/md";

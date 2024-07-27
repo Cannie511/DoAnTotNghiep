@@ -79,3 +79,7 @@ export interface NotificationRequestType{
     type?:string;
     status?:number;
 }
+
+export interface ScheduleInput{
+    password:string;
+}

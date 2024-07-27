@@ -34,9 +34,9 @@ export default function SideBar() {
               <div className='w-5 h-5 flex items-center justify-center rounded-full bg-red-600 relative mt-1 ml-16 text-xs text-white'>{String(message_noti)}</div>
             }
           </NavLink>
-          <NavLink href="/blog" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+          {/* <NavLink href="/blog" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
            <FaRegNewspaper/> Bài đăng
-          </NavLink>
+          </NavLink> */}
           <NavLink href="/meeting" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
            <MdVideoCameraFront/> Phòng họp
           </NavLink>
@@ -48,7 +48,7 @@ export default function SideBar() {
             <NavLink href="/friends" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
               <BsPersonFillAdd/> Lời mời kết bạn
             </NavLink>
-            <NavLink href="/friends/list" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+            <NavLink href="/friend-list" className="sidebar-items flex rounded-lg p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
               <PiUserListFill/> Tất cả bạn bè
             </NavLink>
           </Sidebar.Collapse>
