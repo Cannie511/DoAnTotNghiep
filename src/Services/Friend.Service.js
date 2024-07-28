@@ -181,10 +181,46 @@ const agreeAddFriend = async (user_id, friend_ID, action) => {
   }
 };
 
+const suggestAddFriend = async (user_id)=>{
+  try {
+    const friends = await Model.USER_FRIEND.findAll({
+      attributes: ['Friend_ID'],
+      where: {
+        User_ID: user_id,
+      },
+      raw: true,
+    });
+
+    // Trích xuất danh sách Friend_ID từ kết quả
+    const friendIds = friends.map(friend => friend.Friend_ID);
+
+    // Tìm các người dùng không phải là bạn bè
+    const data = await Model.User.findAll({
+      attributes: ["email", "display_name", "avatar", "id"],
+      where: {
+        id: {
+          [Op.ne]: user_id,
+          [Op.notIn]: friendIds,  // Lọc ra các id không nằm trong danh sách friendIds
+        },
+      },
+      raw: true,
+    });
+    console.log("Kết quả truy vấn:", data);
+    if (data.length === 0) {
+      console.log("Không tìm thấy dữ liệu phù hợp.");
+      return handleResult(404, "No suggestions found", []);
+    }
+    return handleResult(200, "suggest", data);
+  } catch (error) {
+    return (err = handleError(error));
+  }
+}
 module.exports = {
   findUserByName,
   addFriend,
   deleteFriend,
   getAllFriend,
   agreeAddFriend,
+  suggestAddFriend,
 };
+
