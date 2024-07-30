@@ -98,8 +98,6 @@ const getSuggestAddFriendController = async(req,res)=>
       id: {
         [Op.notIn]: [
           Sequelize.literal(`
-            SELECT user_friend.User_ID FROM user_friend WHERE user_friend.Friend_ID = ${user_id}
-            UNION
             SELECT user_friend.Friend_ID FROM user_friend WHERE user_friend.User_ID = ${user_id}
           `)
         ],
