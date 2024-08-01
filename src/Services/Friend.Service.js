@@ -220,7 +220,7 @@ const suggestAddFriend = async (user_id)=>{
         }
       }, raw:true
     })
-    console.log("Kết quả truy vấn:", data);
+    // console.log("Kết quả truy vấn:", data);
     if (data.length === 0) {
       console.log("Không tìm thấy dữ liệu phù hợp.");
       return handleResult(422, "Không có bạn bè đề xuất", []);

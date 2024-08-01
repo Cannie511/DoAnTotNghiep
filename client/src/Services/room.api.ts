@@ -16,3 +16,7 @@ export const createRoom = async (user_id:number, time:string, password:string, r
 export const checkRoomPassword = async(room_id:number, password:string)=>{
     return await http.post('/api/room/checkRoomPassword', {room_id, password});
 }
+
+export const getAllMyRoom = async(user_id:number, page?:number)=>{
+    return await http.get(`/api/room/getAll/${user_id}?page=${page}`)
+}

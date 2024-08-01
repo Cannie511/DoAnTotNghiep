@@ -25,7 +25,7 @@ const pagination = async (table, attr = {}, page, where = {}, order={}, include=
     const totalPages = Math.ceil(totalRecords / LIMIT);
     const data = await Model[table].findAll({
       include,
-      attributes: attr ? attr : ["*"],
+      attributes: attr.length !== 0 ? attr : ["*"],
       limit: LIMIT,
       offset,
       where: where || {},

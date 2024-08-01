@@ -319,7 +319,7 @@ export default function MotionBackground() {
       {localScreen &&
         <div className='h-[98vh] w-[22rem] bg-gray-900 fixed top-2 right-2 space-y-2'>
           {
-            localScreen && peers && peers.length > 0 && peers.map((user) => (
+            localScreen && peers && peers.length > 0 && peers.filter(user => user.type !== "screen").map((user) => (
               <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} />
             ))
           }
@@ -328,7 +328,7 @@ export default function MotionBackground() {
       {remoteScreen &&
         <div className='h-[98vh] w-[22rem] bg-gray-900 fixed top-2 right-2 space-y-2 overflow-y-scroll'>
           {
-            remoteScreen && peers && peers.length > 0 && peers.map((user) => (
+            remoteScreen && peers && peers.length > 0 && peers.filter(user => user.type !== "screen").map((user) => (
               <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} />
             ))
           }

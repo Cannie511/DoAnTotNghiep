@@ -3,7 +3,7 @@ const {
   findUserByName,
   addFriend,
   deleteFriend,
-  suggestAddFriend
+  suggestAddFriend,
   getFriendNotInRoom,
 } = require("../Services/Friend.Service");
 const { handleError } = require("../Utils/Http");
@@ -95,13 +95,11 @@ const getFriendNotInRoomController = async(req, res)=>{
   }
 }
 
-
-const getSuggestAddFriendController = async(req,res)=>
-{
+const getSuggestAddFriendController = async (req, res) => {
   try {
     let { page } = req.query;
-    if(!page) page = 1;
-    const {user_id} = req.params;
+    if (!page) page = 1;
+    const { user_id } = req.params;
     // console.log(user_id);
     // const data =await suggestAddFriend(user_id);
     // return res.status(data.status).json(data);
@@ -110,41 +108,35 @@ const getSuggestAddFriendController = async(req,res)=>
         [Op.notIn]: [
           Sequelize.literal(`
             SELECT user_friend.Friend_ID FROM user_friend WHERE user_friend.User_ID = ${user_id}
-          `)
+          `),
         ],
-        [Op.ne]: user_id
-      }
+        [Op.ne]: user_id,
+      },
     };
-    const attr = [
-      "id",
-      "email",
-      "display_name",
-      "avatar",
-    ];
- 
+    const attr = ["id", "email", "display_name", "avatar"];
+
     const paginate = await pagination(
       "User",
       attr,
       page,
       whereCondition,
       [],
-      [],
+      []
     );
-   
+
     if (!user_id)
       return res.status(422).json({ message: "Không nhận được user_id" });
     if (paginate) return res.status(paginate.status).json(paginate);
-
   } catch (error) {
     const err = handleError(error);
     return res.status(err.status).json({ message: err.message });
   }
-}
+};
 module.exports = {
   findFriendController,
   addFriendController,
   deleteFriendController,
   getAllFriendController,
-  getSuggestAddFriendController
+  getSuggestAddFriendController,
   getFriendNotInRoomController,
 };

@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/use-toast';
 import SearchInput from './SearchInput';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { InviteMeeting } from './inviteMeeting';
+import MyRooms from './myRooms';
 
 export default function Meeting() {
     const { toast } = useToast();
@@ -151,7 +152,7 @@ export default function Meeting() {
                     <InviteMeeting/>
                 </TabsContent>
                 <TabsContent value="created">
-                    Phòng đã tạo
+                    <MyRooms/>
                 </TabsContent>
             </Tabs>
         </div>

@@ -2,6 +2,7 @@
 
 const { createRoomService, getRoomKeyService, findRoomService, checkRoomPasswordService } = require("../Services/Room.Service");
 const { handleError } = require("../Utils/Http");
+const pagination = require("../Utils/Pagination");
 
 const createRoomController = async(req,res) =>{
     try
@@ -53,9 +54,28 @@ const checkRoomPasswordController = async(req, res)=>{
     }
 }
 
+const getAllRoom = async(req, res)=>{
+    try {
+        let {page} = req.query;
+        if(!page) page = 1;
+        const {user_id} = req.params;
+        const whereCondition = {
+          Host_id: user_id,
+        };
+        const order = [["createdAt", "DESC"]];
+        if(!user_id) return res.status(422).json({ message: "Các trường là bắt buộc" });
+        const paginate = await pagination("Rooms", [], page, whereCondition, order, []);
+        if(paginate) return res.status(paginate.status).json(paginate);
+    } catch (error) {
+        const err = handleError(error);
+        return res.status(err.status).json({ message: err.message });
+    }
+}
+
 module.exports = {
   createRoomController,
   getRoomKeyController,
   findRoomController,
   checkRoomPasswordController,
+  getAllRoom,
 };
