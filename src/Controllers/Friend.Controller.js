@@ -3,6 +3,7 @@ const {
   findUserByName,
   addFriend,
   deleteFriend,
+  getFriendNotInRoom,
 } = require("../Services/Friend.Service");
 const { handleError } = require("../Utils/Http");
 const pagination = require("../Utils/Pagination");
@@ -33,9 +34,7 @@ const addFriendController = async (req, res) => {
 //Xóa kết bạn
 const deleteFriendController = async (req, res) => {
   try {
-    const { user_id } = req.body;
-    const { friend_id } = req.body;
-    console.log(friend_id);
+    const { user_id, friend_id } = req.params;
     if (!user_id)
       return res.status(422).json({ message: "Không nhận được user_id" });
     if (!friend_id)
@@ -44,7 +43,7 @@ const deleteFriendController = async (req, res) => {
     if (data) return res.status(data.status).json(data);
   } catch (error) {
     const err = handleError(error);
-    return res.status(er.status).json({ message: err.message });
+    return res.status(err.status).json({ message: err.message });
   }
 };
 
@@ -81,10 +80,23 @@ const getAllFriendController = async (req, res) => {
     return res.status(err.status).json({ message: err.message });
   }
 };
+//Lấy danh sách bạn bè không có trong phòng họp
+const getFriendNotInRoomController = async(req, res)=>{
+  try {
+    const {user_id, room_id} = req.params;
+    const list = await getFriendNotInRoom(user_id, room_id);
+    if(list) return res.status(list.status).json(list.data)
+  } catch (error) {
+    const err = handleError(error);
+    return res.status(err.status).json({ message: err.message });
+  }
+}
+
 
 module.exports = {
   findFriendController,
   addFriendController,
   deleteFriendController,
   getAllFriendController,
+  getFriendNotInRoomController,
 };

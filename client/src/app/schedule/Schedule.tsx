@@ -1,5 +1,5 @@
 'use client'
-import { calculateTimeDifference, combineDateTime, formatDate, formatRoomKey, getCurrentTime } from '@/Utils/formatDate';
+import { calculateTimeDifference, combineDateTime, formatDate, formatRoomKey } from '@/Utils/formatDate';
 import { Accordion, Button, Checkbox, Datepicker, Label, TextInput, Tooltip } from 'flowbite-react';
 import React, { useContext, useEffect, useState } from 'react';
 import TimeLine from './Timeline';

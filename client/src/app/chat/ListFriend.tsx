@@ -1,16 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import Image, { StaticImageData } from "next/image";
 import { FaUserFriends } from "react-icons/fa";
-import logoNext from "@/app/favicon.ico"
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserData } from "@/types/type";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "@/Context/Context";
 import { getLatestMessage } from "@/Services/message.api";
 import { TextInput, Tooltip } from "flowbite-react";
 import { TbMessageCirclePlus } from "react-icons/tb";
-import ModalFindFriend from "./ModalFindFriend";
+//import ModalFindFriend from "./ModalFindFriend";
 import { url_img_default } from "@/images/image";
+import dynamic from "next/dynamic";
+const ModalFindFriend = dynamic(()=>import("./ModalFindFriend"),{ ssr: false });
 interface Props{
     friend: UserData | null;
     setFriend: React.Dispatch<React.SetStateAction<UserData | null >>
@@ -19,12 +20,14 @@ interface Props{
 }
 export default function ListFriend({setFriend, friend , openModal, setOpenModal}:Props) {
     const {user_id} = useContext(AppContext);
-    //const [openModal, setOpenModal] = useState<boolean>(false);
+    const [searchValue, setSearchValue] = useState<string>('');
+    const [searchResult, setSearchResult] = useState([]);
     const {data, isLoading, error} = useQuery({
         queryKey:['list friend'],
         queryFn: ()=>getLatestMessage(user_id),
+        enabled:!!user_id
     })
-    const messageList = data?.data?.data;
+    let messageList = data?.data?.data;
     const {setForceLogout} = useContext(AppContext);
     if(error) setForceLogout(true);
     const handleFriend = (friend:any)=>{
@@ -45,6 +48,14 @@ export default function ListFriend({setFriend, friend , openModal, setOpenModal}
         localStorage.setItem("friend", JSON.stringify(choosenFriend));
         setFriend(choosenFriend);
     }
+    useEffect(()=>{
+        if(messageList){
+            const searchList = messageList.filter((x:any)=>x?.receiver_display_name.toLowerCase().includes(searchValue)||x?.sender_display_name.toLowerCase().includes(searchValue.toLowerCase()));
+            if(searchList) 
+                setSearchResult(searchList);
+        }
+        else return;
+    },[searchValue])
   return (
     <div className='hidden md:flex rounded-lg border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 flex-col flex-none w-72 px-1 py-4 overflow-y-auto'>
       <div className='w-full relative top-0 p-2 rounded-md dark:text-white text-black flex'>
@@ -55,7 +66,7 @@ export default function ListFriend({setFriend, friend , openModal, setOpenModal}
             </Tooltip>
         </div>
       </div>
-      <TextInput placeholder="Tìm kiếm" color="info"/>
+      <TextInput value={searchValue} onChange={(e)=>setSearchValue(e.target.value)} placeholder="Tìm kiếm" color="info"/>
       <div className='h-[43rem] w-full rounded-sm space-y-1 mt-2'>
         {isLoading && 
         <>
@@ -69,7 +80,34 @@ export default function ListFriend({setFriend, friend , openModal, setOpenModal}
                 </div>
             </div>
         </>}
-        {messageList && messageList.map((item:any)=>{
+        {searchResult && searchResult.map((item:any)=>{
+            return(
+                <div key={item?.id} className=
+                {friend?.id === item?.Send_by || friend?.id === item.Received_by ? 
+                    'cursor-pointer dark:hover:bg-gray-700 transition-all hover:bg-slate-100 flex rounded-lg border w-full border-gray-200 bg-gray-300 shadow-md dark:border-gray-700 dark:bg-gray-700 flex-col flex-none px-2 py-4':
+                    'cursor-pointer dark:hover:bg-gray-700 transition-all hover:bg-slate-100 flex rounded-lg border w-full border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 flex-col flex-none px-2 py-4'
+                }
+                    onClick={()=>handleFriend(item)}
+                >
+                    <div className="flex items-center space-x-3">
+                    <div className="shrink-0">
+                        <Image
+                        alt="avatar"
+                        height="32"
+                        src={item?.Send_by === user_id ? item?.receiver_avt as StaticImageData : item?.sender_avt ? item?.sender_avt as StaticImageData :  url_img_default}
+                        width="32"
+                        className="rounded-full"
+                        />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{item?.Send_by === user_id ? item?.receiver_display_name : item?.sender_display_name}</p>
+                        <p className="truncate text-sm text-gray-500 dark:text-gray-400">{item?.Send_by === user_id ? "Bạn:":""} {item?.Message}</p>
+                    </div>
+                    </div>
+                </div>
+            )
+        })}
+        {!searchValue && searchResult.length === 0 && messageList && messageList.map((item:any)=>{
             return (
                 <div key={item?.id} className=
                 {friend?.id === item?.Send_by || friend?.id === item.Received_by ? 

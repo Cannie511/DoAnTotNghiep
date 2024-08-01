@@ -29,11 +29,11 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      Invitation_ID: {
+      Send_by: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'INVITATION',
+          model: 'Users',
           key: 'id',
         },
         onUpdate: 'CASCADE',

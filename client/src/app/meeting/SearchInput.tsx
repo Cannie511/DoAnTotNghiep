@@ -3,11 +3,15 @@ import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '@/comp
 import { useToast } from '@/components/ui/use-toast';
 import { findRoom } from '@/Services/room.api';
 import { Button } from 'flowbite-react'
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useContext, useState } from 'react';
 import { IoSearch } from "react-icons/io5";
 import ModalPassword from './ModalPassword';
+import { AppContext } from '@/Context/Context';
+import CreateRoom from './createRoom';
+import '@/styles/login.css';
 
 export default function SearchInput() {
+    const {user_id} = useContext(AppContext);
     const [value,setValue] = useState<string>('');
     const [roomID, setRoomID] = useState<number>();
     const [isPassword, setIsPassword] = useState<boolean>(false);
@@ -18,9 +22,8 @@ export default function SearchInput() {
         if(value.length < 9) return;
         await findRoom(Number(value))
         .then((data:any)=>{
-            //console.log(data.data)
             setRoomID(data.data?.id);
-            if(data.data?.Password){
+            if(data.data?.Password && data?.data.Host_id !== user_id){
                 setIsPassword(true);
             }
             else{
@@ -44,8 +47,8 @@ export default function SearchInput() {
         
     }
   return (
-    <div className='m-2 w-full h-[20rem] flex items-center justify-center'>
-        <div className='w-[35rem] h-[10rem] flex flex-col space-y-3 bg-gray-200 items-center justify-center dark:bg-gray-700 rounded-md p-5 mt-20'>
+    <div className='m-2 w-full h-[20rem] mt-24 flex items-center justify-center'>
+        <div className='w-[35rem] flex flex-col space-y-3 bg-gray-200 items-center justify-center dark:bg-gray-700 rounded-md p-5 mt-20'>
             <h1 className='text-2xl'>Nhập mã phòng họp tại đây</h1>
             <div className='text-gray-400 text-lg'>Mã phòng gồm 9 số, ví dụ: 123-456-789</div>
             <form className='flex space-x-2' onSubmit={onSubmit}>
@@ -70,9 +73,14 @@ export default function SearchInput() {
                     <InputOTPSlot index={8} />
                 </InputOTPGroup>
                 </InputOTP>
-                <Button type='submit' size={"sm"}><IoSearch className='text-xl'/></Button>
+                <Button type='submit' className='w-10 h-10'><IoSearch className='text-xl'/></Button>
             </form>
+            <div className="line-container w-1/2 my-10">
+                hoặc
+            </div>
+            <CreateRoom/>
         </div>
+        
         <ModalPassword openModal={isPassword} setOpenModal={setIsPassword} room_id={roomID} room_key={Number(value)}/>
     </div>
   )

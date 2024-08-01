@@ -9,16 +9,11 @@ interface Props {
     id:number;
     remoteStream:MediaStream|null;
     display_name:string;
+    avatar: string;
 }
 
-export default function MediaDiv({id, remoteStream, display_name}:Props) {
+export default function MediaDivLarge({id, remoteStream, display_name ,avatar}:Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const {data:user} = useQuery({
-    queryKey:["user_media_div"],
-    queryFn:()=>UserFindOne(id),
-    enabled:!! id
-  });
-  const user_data = user;
   useEffect(() => {
     //console.log("remote: ", user_data)
     if (videoRef.current && remoteStream) {
@@ -27,28 +22,28 @@ export default function MediaDiv({id, remoteStream, display_name}:Props) {
   }, [remoteStream]);
 
   return (
-    <div className="overflow-hidden relative w-[22rem] h-[200px] bg-gray-700 rounded-xl flex justify-center items-center flex-col">
+    <div className="overflow-hidden relative w-full h-[87vh] bg-gray-700 rounded-xl flex justify-center items-center flex-col">
         {remoteStream ? (
           <>
             <video
-              className='mt-2 w-96 rounded-2xl'
+              className='mt-2 w-full rounded-2xl'
               ref={videoRef}
               autoPlay
               playsInline
             />
-            <div className='absolute mt-40 left-3'>{display_name}</div>
+            <div className='absolute top-[48rem] left-3 text-2xl'>{display_name}</div>
           </>
         ) : (
           <>
             <Avatar
-              size={"lg"}
-              img={user?.data?.data?.avatar||url_img_default}
+              size={"xl"}
+              img={avatar||url_img_default}
               rounded
               bordered
               color="success"
               placeholderInitials="Fr"
             />
-            <div className='mt-2'>{user?.data?.data?.displayName}</div>
+            <div className='mt-2 text-2xl'>{display_name}</div>
           </>
           
         )}

@@ -8,8 +8,8 @@ import { FaMicrophoneSlash } from "react-icons/fa";
 import { useToast } from '@/components/ui/use-toast';
 import SearchInput from './SearchInput';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import CreateRoom from './createRoom';
 import { InviteMeeting } from './inviteMeeting';
+
 export default function Meeting() {
     const { toast } = useToast();
     const videoRef = useRef<any>(null);
@@ -90,12 +90,12 @@ export default function Meeting() {
 
     return (
         <div className='flex'>
-            <Tabs defaultValue="inviteMeeting" className="w-full">
+            <Tabs defaultValue="room" className="w-full">
                 <TabsList className='w-full flex'>
-                     <TabsTrigger className='flex-1' value="inviteMeeting">Lời mời họp</TabsTrigger>
+                    <TabsTrigger className='flex-1' value="room">Phòng họp</TabsTrigger>
+                    <TabsTrigger className='flex-1' value="inviteMeeting">Lời mời họp</TabsTrigger>
                     <TabsTrigger className='flex-1' value="device">Thiết bị của bạn</TabsTrigger>
-                    <TabsTrigger className='flex-1' value="joinRoom">Tham gia phòng họp có sẵn</TabsTrigger>
-                    <TabsTrigger className='flex-1' value="createRoom">Tạo phòng họp của bạn</TabsTrigger>
+                    <TabsTrigger className='flex-1' value="created">Phòng đã tạo</TabsTrigger>
                 </TabsList>
                 <TabsContent value="device">
                     <div className='flex-1'>
@@ -144,14 +144,14 @@ export default function Meeting() {
                         
                     </div>
                 </TabsContent>
-                <TabsContent value="joinRoom">
+                <TabsContent value="room">
                     <SearchInput/>
-                </TabsContent>
-                <TabsContent value="createRoom">
-                    <CreateRoom/>
                 </TabsContent>
                 <TabsContent value="inviteMeeting">
                     <InviteMeeting/>
+                </TabsContent>
+                <TabsContent value="created">
+                    Phòng đã tạo
                 </TabsContent>
             </Tabs>
         </div>

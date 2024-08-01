@@ -39,8 +39,7 @@ export default function CreateRoom() {
         })
     }
   return (
-    <div className='w-full h-[20rem] flex items-center justify-center'>
-    <div className='w-[30rem] bg-gray-200 dark:bg-gray-700 rounded-md p-5 mt-20'>
+    <>
         <h1 className='text-2xl font-bold'>Tạo phòng họp mới</h1>
         <form className='w-full' onSubmit={handleSubmit(onSubmit)}>
             <div className='w-full'>
@@ -75,7 +74,6 @@ export default function CreateRoom() {
                 <Button className='w-full' type='submit'>Tạo phòng họp</Button>
             </div>
         </form>
-    </div>
-    </div>
+    </>
   )
 }

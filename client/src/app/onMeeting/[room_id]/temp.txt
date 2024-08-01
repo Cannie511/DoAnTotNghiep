@@ -70,55 +70,61 @@ const getVideoStream = async () => {
   // }, [video, audio]);
 
   // if(videoStream) {
-      //   userJoinList.forEach((user: any) => {
-      //     const call = peer.call(user?.User_ID.toString(), videoStream);
-      //     if(!video && !audio) return;
-      //     call.on('stream', (remoteStream: MediaStream) => {
-      //       setRemoteStream(remoteStream);
-      //     });
-      //   });
-      // }
-      // if(audioStream){
-      //   userJoinList.forEach((user: any) => {
-      //     const call = peer.call(user?.User_ID.toString(), audioStream);
-      //     if(!video && !audio) return;
-      //     call.on('stream', (remoteStream: MediaStream) => {
-      //       setRemoteStream(remoteStream);
-      //     });
-      //   });
-      // }
-      // if(videoStream && audioStream){
-      //   const combinedStream = new MediaStream([
-      //     ...(videoStream ? videoStream.getVideoTracks() : []), 
-      //     ...(audioStream ? audioStream.getAudioTracks() : [])
-      //   ]);
-      //   userJoinList.forEach((user: any) => {
-      //     const call = peer.call(user?.User_ID.toString(), combinedStream);
-      //     if(!video && !audio) return;
-      //     call.on('stream', (remoteStream: MediaStream) => {
-      //       setRemoteStream(remoteStream);
-      //     });
-      //   });
-      // }
+//   userJoinList.forEach((user: any) => {
+//     const call = peer.call(user?.User_ID.toString(), videoStream);
+//     if(!video && !audio) return;
+//     call.on('stream', (remoteStream: MediaStream) => {
+//       setRemoteStream(remoteStream);
+//     });
+//   });
+// }
+// if(audioStream){
+//   userJoinList.forEach((user: any) => {
+//     const call = peer.call(user?.User_ID.toString(), audioStream);
+//     if(!video && !audio) return;
+//     call.on('stream', (remoteStream: MediaStream) => {
+//       setRemoteStream(remoteStream);
+//     });
+//   });
+// }
+// if(videoStream && audioStream){
+//   const combinedStream = new MediaStream([
+//     ...(videoStream ? videoStream.getVideoTracks() : []), 
+//     ...(audioStream ? audioStream.getAudioTracks() : [])
+//   ]);
+//   userJoinList.forEach((user: any) => {
+//     const call = peer.call(user?.User_ID.toString(), combinedStream);
+//     if(!video && !audio) return;
+//     call.on('stream', (remoteStream: MediaStream) => {
+//       setRemoteStream(remoteStream);
+//     });
+//   });
+// }
 
-      // navigator.mediaDevices.getUserMedia({video:true, audio:true})
-      // .then(stream=>{
-      //     peer.on('call', function(call:any){
-      //       call.answer(stream)
-      //       call.on('stream', (remoteStream:MediaStream)=>{
-      //         setRemoteStreams(prevStreams => [...prevStreams, remoteStream]);
-      //       },(err:any)=>{
-      //           console.log('error',err)
-      //       })
-      //     })
-      // })
-      // peer.on('call', (call: any) => {
-      //   call.answer();
-      //   call.on('stream', (remoteStream: MediaStream) => {
-      //     setRemoteStream(remoteStream);
-      //   });
-      // });
+// navigator.mediaDevices.getUserMedia({video:true, audio:true})
+// .then(stream=>{
+//     peer.on('call', function(call:any){
+//       call.answer(stream)
+//       call.on('stream', (remoteStream:MediaStream)=>{
+//         setRemoteStreams(prevStreams => [...prevStreams, remoteStream]);
+//       },(err:any)=>{
+//           console.log('error',err)
+//       })
+//     })
+// })
+// peer.on('call', (call: any) => {
+//   call.answer();
+//   call.on('stream', (remoteStream: MediaStream) => {
+//     setRemoteStream(remoteStream);
+//   });
+// });
 
-      // return () => {
-      //   peer.destroy();
-      // };
+// return () => {
+//   peer.destroy();
+// };
+
+
+socket.on("user-leftRoom",(user:any)=>{
+        const tempPeers = peers.filter((x:PeerType)=>x.id !== user?.id);
+        setPeers(tempPeers)
+      })
