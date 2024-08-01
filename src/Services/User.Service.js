@@ -11,6 +11,7 @@ const getUsersByIdService = async (user_id) => {
       attributes: [
         "id",
         "email",
+        "avatar",
         "display_name",
         "language",
         "premium",

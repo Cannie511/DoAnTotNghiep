@@ -1,19 +1,27 @@
 'use client'
 import { useQuery } from '@tanstack/react-query';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AppContext } from '@/Context/Context';
 import { getFriend } from '@/Services/friend.api';
 import Image from 'next/image';
-import { FaUserFriends } from "react-icons/fa";
 import { url_img_default } from '@/images/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AiFillMessage } from "react-icons/ai";
 import { HiUserRemove } from "react-icons/hi";
 import { Tooltip } from 'flowbite-react';
 import { useRouter } from 'next/navigation';
+import ConfirmDeleteFriend from './ConfirmDeleteFriend';
+
+interface FriendType {
+  Friend_id: number;
+  display_name: string;
+}
+
 export default function FriendComponent() {
     const {user_id} = useContext(AppContext);
     const router = useRouter();
+    const [friendData, setFriendData] = useState<FriendType>({Friend_id: -1, display_name: ""});
+    const [openModal, setOpenModal] = useState<boolean>(false);
     const {data:list_friend, isLoading} = useQuery({
         queryKey:["list_friend_1"],
         queryFn:()=>getFriend(Number(user_id), 1),
@@ -29,9 +37,13 @@ export default function FriendComponent() {
       router.push("/chat")
     }
     const list_friend_accepted:any = list_friend?.data?.data;
+    const onConfirmDelete = ({Friend_id, display_name}:FriendType)=>{
+      setFriendData({Friend_id, display_name});
+      setOpenModal(true);
+    }
   return (
     <div>
-      <h1 className='text-2xl font-bold mt-3 flex'><FaUserFriends className="text-3xl me-2 relative "/> Danh sách bạn bè</h1>
+      
       <div className='space-y-2 mt-10'>
         {isLoading || !list_friend_accepted &&
           <>
@@ -43,7 +55,6 @@ export default function FriendComponent() {
         {list_friend_accepted && list_friend_accepted.map((item:any)=>{
           return(
             <div key={item?.id} 
-            
             className="
             cursor-pointer dark:hover:bg-gray-700 transition-all 
             hover:bg-slate-100 flex rounded-lg border w-[32rem] border-gray-200 
@@ -74,13 +85,17 @@ export default function FriendComponent() {
                     />
                 </Tooltip>
                 <Tooltip content="Xóa bạn bè">
-                    <HiUserRemove className='text-red-600 hover:text-red-400 transition-all text-3xl '/>
+                    <HiUserRemove className='text-red-600 hover:text-red-400 transition-all text-3xl ' 
+                    onClick={()=>onConfirmDelete({Friend_id: item?.Friend_ID, display_name: item["Friend.display_name"]})}/>
                 </Tooltip>
               </div>
             </div>
           )
         })}
       </div>
+      {friendData && friendData?.Friend_id !== -1 && 
+        <ConfirmDeleteFriend openModal={openModal} setOpenModal={setOpenModal} display_name={friendData?.display_name} friend_id={friendData?.Friend_id}/>
+      }
     </div>
   )
 }

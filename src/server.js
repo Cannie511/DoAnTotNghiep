@@ -12,6 +12,7 @@ const RoomRoute = require("./Routes/Room.api");
 const ScheduleRoute = require("./Routes/Schedule.api");
 const UserJoinRoute = require("./Routes/User_Join.api")
 const RoomMessageRoute = require("./Routes/Room_Message.api");
+const UserInvitationRoute = require("./Routes/User_Invitation.api");
 const db_connect = require("./Database/db.connect");
 const cors_config = require("./Middlewares/CORS");
 const { Server } = require("socket.io");
@@ -88,7 +89,7 @@ io.on("connection", async (socket) => {
     
 
     socket.on("join-in", async (roomKey, userId) => {
-      console.log(chalk.bgGreen(`${userId} joined room: - ${roomKey}`));
+      //console.log(chalk.bgGreen(`${userId} joined room: - ${roomKey}`));
       await socket.join(roomKey)
       const room = await findRoomService(roomKey);
       const user_join = new UserJoin(userId, room?.data?.id);
@@ -110,6 +111,15 @@ io.on("connection", async (socket) => {
         })
       });
       socket.to(roomKey).emit("user-joinIn", userData.data);
+      socket.on("share-screen", async (userId)=>{
+        const user = await getUsersByIdService(userId);
+        socket.to(roomKey).emit("share-screen", userId, user.data.display_name);
+      })
+      socket.on("stop-screen", async (userId)=>{
+        console.log("stop-screen-id: ",userId)
+        const user = await getUsersByIdService(userId);
+        socket.to(roomKey).emit("stop-screen", userId, user.data.display_name);
+      })
       socket.on("onMic", (roomId, userId) => {
         socket.to(roomId).emit("on-Mic", userId);
       });
@@ -136,7 +146,6 @@ io.on("connection", async (socket) => {
 
     socket.on("friend_request", async (data) => {
       const addFriends = await addFriend(data.user_id, data.friend_id);
-      console.log(data);
       if (addFriends.status === 200) {
         const received_user = await socketIO.searchOne(data?.friend_id);
         const received_info = await getUsersByIdService(data?.user_id);
@@ -177,6 +186,10 @@ io.on("connection", async (socket) => {
       }
     });
 
+    socket.on("invite_meeting", async (data) => {
+      
+    })
+
     socket.on("user_disconnected", async (data) => {
       const id = data.user_id;
       socket.broadcast.emit("offline", id);
@@ -198,6 +211,7 @@ app.use("/api", Authentication, ScheduleRoute);
 app.use("/api", Authentication, FriendRoute);
 app.use("/api", Authentication, UserJoinRoute);
 app.use("/api", Authentication, RoomMessageRoute);
+app.use("/api", Authentication, UserInvitationRoute);
 app.use((req, res) => {
   res.status(404).json({ status: 404, message: "404 NOT FOUND" });
 });

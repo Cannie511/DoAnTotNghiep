@@ -5,7 +5,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       INVITATION.belongsTo(models.User, { foreignKey: 'Send_by' });
-      INVITATION.hasMany(models.USER_INVITATION, { foreignKey: 'Invitation_ID' });
     }
   }
   INVITATION.init({

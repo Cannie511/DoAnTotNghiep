@@ -9,28 +9,54 @@ import { LuScreenShare } from "react-icons/lu";
 import { IoInformationOutline } from "react-icons/io5";
 import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import { FaMicrophoneSlash } from "react-icons/fa";
-import ConfirmDialog from './ConfirmDialog';
+import ConfirmDialog from './ConfirmDialog';    
 import { MdMessage } from "react-icons/md";
 import { RiChatOffFill } from "react-icons/ri";
+import { IoPersonAdd } from "react-icons/io5";
+import ModalInviteFriend from './ModalInviteFriend';
+import { AppContext } from '@/Context/Context';
 interface Props{
     room_key:string;
     setVideo: Dispatch<SetStateAction<boolean>>;
     setAudio: Dispatch<SetStateAction<boolean>>;
     audio: boolean;
     video: boolean;
-    audioStream: MediaStream | null;
     room_id:number;
     openChat: boolean;
     setOpenChat:Dispatch<SetStateAction<boolean>>; 
+    user_amount:number;
+    host_id: number;
+    setLocalScreen: (streamScreen: MediaStream) => void;
 }
-export default function ControllerBar({room_key, setVideo, setAudio, audio, video, audioStream, room_id, openChat, setOpenChat}:Props) {
+
+/**
+ * 
+ * @param room_key: key room
+ * @param room_id: id room
+ * @param user_amount: số lượng người tham gia
+ * @param host_id : id chủ phòng họp
+ * 
+ * @returns 
+ */
+
+export default function ControllerBar({room_key, setVideo, setAudio, audio, video, room_id, openChat, setOpenChat, user_amount, host_id, setLocalScreen}:Props) {
     const [openModal, setOpenModal] = useState<boolean>(false);
-    // useEffect(()=>{
-    //      window.addEventListener('beforeunload', ()=>setOpenModal(true));
-    //      return () => {
-    //         window.removeEventListener('beforeunload', ()=>setOpenModal(true));
-    //     };
-    // },[]);
+    const [openInviteFriend, setOpenInviteFriend] = useState<boolean>(false);
+    const {user_id} = useContext(AppContext);
+
+    async function startCapture() {  
+        try {
+            const videoStreamTrack = await navigator.mediaDevices.getDisplayMedia({
+                video: {
+                    cursor: "always"
+                } as MediaTrackConstraints,
+                audio: true
+            });
+            setLocalScreen(videoStreamTrack)
+        } catch (err) {
+            console.error(`Error: ${err}`);
+        }
+    }
     return (
         <>
             <div className='w-fit fixed top-[90vh] left-1/2 transform -translate-x-1/2 bg-gray-800 rounded-full p-3 flex justify-center items-center space-x-4'>
@@ -40,8 +66,19 @@ export default function ControllerBar({room_key, setVideo, setAudio, audio, vide
                 <Tooltip content="Tùy chọn khác">
                     <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'><SlOptions className='text-xl'/></Button>
                 </Tooltip>
+                {user_id === host_id && 
+                    <Tooltip content="Mời tham gia">
+                        <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'
+                            onClick={()=>setOpenInviteFriend(true)}
+                        >
+                            <IoPersonAdd className='text-xl'/>
+                            {user_amount}
+                        </Button>
+                    </Tooltip>
+                }
+
                 <Tooltip content="Chia sẻ màn hình">
-                    <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
+                    <Button onClick={startCapture} color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
                         <LuScreenShare className='text-xl'/>
                     </Button>
                 </Tooltip>
@@ -68,6 +105,7 @@ export default function ControllerBar({room_key, setVideo, setAudio, audio, vide
                 </Tooltip>
             </div>
             <ConfirmDialog id={room_id} openModal={openModal} setOpenModal={setOpenModal}/>
+            <ModalInviteFriend room_id={room_id} openModal={openInviteFriend} setOpenModal={setOpenInviteFriend}/>
         </>
   )
 }

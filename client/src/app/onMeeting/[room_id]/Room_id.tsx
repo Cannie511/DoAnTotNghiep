@@ -3,7 +3,7 @@ import { AppContext } from "@/Context/Context";
 import { url_img_default } from "@/images/image";
 import { Avatar } from "flowbite-react";
 import { motion } from "framer-motion"
-import { MutableRefObject, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 
 interface Props{
   x:number;
@@ -38,12 +38,15 @@ export default function RoomID({x, y, video, audio, stream}:Props) {
       }}
     >
       {(video || (video && audio)) ? (
-        <video
-          className='mt-2 w-96 rounded-2xl'
-          ref={videoRef}
-          autoPlay
-          playsInline
-        />
+        <>
+          <video
+            className='mt-2 w-96 rounded-2xl'
+            ref={videoRef}
+            autoPlay
+            playsInline
+          />
+        </>
+        
       ) : (
         <Avatar
           size={"lg"}
@@ -51,6 +54,7 @@ export default function RoomID({x, y, video, audio, stream}:Props) {
           rounded
           bordered
           color="success"
+          placeholderInitials="Fr"
         />
       )}
     </motion.div>

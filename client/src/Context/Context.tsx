@@ -229,26 +229,17 @@ export default function AppProvider({children}:{children: ReactNode}){
     }, [user_id, pathname]);
 
     useEffect(()=>{
-        // if(user_id){
-        //     const peer = new Peer(user_id.toString(), {
-        //         host: 'localhost',
-        //         port: 1234,
-        //         path: '/peer-server'
-        //     });
-        //     setPeer(peer);
-        // }
-    },[user_id])
-
-    useEffect(()=>{
-        router.prefetch('/user');
-        router.prefetch('/profile');
-        router.prefetch('/chat');
-        router.prefetch('/login');
-        router.prefetch('/register');
-        router.prefetch('/');
-        router.prefetch('/local_');
-        router.prefetch('/schedule');
-        router.prefetch('/onMeeting/:room_id');
+        // router.prefetch('/user');
+        // router.prefetch('/profile');
+        // router.prefetch('/chat');
+        // router.prefetch('/login');
+        // router.prefetch('/register');
+        // router.prefetch('/');
+        // router.prefetch('/local_');
+        // router.prefetch('/schedule');
+        // router.prefetch('/friends');
+        // router.prefetch('/onMeeting/:room_id');
+        router.prefetch('/meeting');
     },[router])
     return (
         <AppContext.Provider value={{display_name, setName, 

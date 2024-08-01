@@ -1,5 +1,5 @@
 const Model = require("../models");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 
 const { handleError, handleResult } = require("../Utils/Http");
 //tìm bạn với name(done)
@@ -12,7 +12,6 @@ const findUserByName = async (user_name) => {
         "display_name",
         "language",
         "premium",
-
         "createdAt",
       ],
       where: {
@@ -32,24 +31,41 @@ const findUserByName = async (user_name) => {
   }
 };
 
-//thêm bạn(done)
-const addFriend = async (user_id, friend) => {
+const addFriend = async (user_id, friend_id) => {
   try {
     const userExists = await Model.User.findOne({ where: { id: user_id } });
-    const friendExists = await Model.User.findOne({ where: { id: friend } });
-
-    if (!userExists || !friendExists) {
-      return handleResult(400, "User or friend does not exist");
+    const friendExists = await Model.User.findOne({ where: { id: friend_id } });
+    const user_friend = await Model.USER_FRIEND.findOne({
+      where: {
+        [Op.or]: [
+          {
+            User_ID: user_id,
+            Friend_ID: friend_id,
+            status: 0,
+          },
+          {
+            User_ID: friend_id,
+            Friend_ID: user_id,
+            status: 0,
+          },
+        ],
+      }, raw:true
+    });
+    if (user_friend){
+      return handleResult(201, "Bạn đã gửi lời mời rồi!");
     }
+      if (!userExists || !friendExists) {
+        return handleResult(400, "User or friend does not exist");
+      }
     const user = await Model.USER_FRIEND.bulkCreate(
       [
         {
           User_ID: user_id,
-          Friend_ID: friend,
+          Friend_ID: friend_id,
           status: 0,
         },
         {
-          User_ID: friend,
+          User_ID: friend_id,
           Friend_ID: user_id,
           status: 0,
         },
@@ -201,20 +217,50 @@ const suggestAddFriend = async (user_id)=>{
         id: {
           [Op.ne]: user_id,
           [Op.notIn]: friendIds,  // Lọc ra các id không nằm trong danh sách friendIds
-        },
-      },
-      raw: true,
-    });
+        }
+      }, raw:true
+    })
     console.log("Kết quả truy vấn:", data);
     if (data.length === 0) {
       console.log("Không tìm thấy dữ liệu phù hợp.");
-      return handleResult(404, "No suggestions found", []);
+      return handleResult(422, "Không có bạn bè đề xuất", []);
     }
     return handleResult(200, "suggest", data);
   } catch (error) {
     return (err = handleError(error));
   }
 }
+
+ const getFriendNotInRoom = async (user_id, room_id) => {
+  try {
+    const friend_not_in_room = await Model.USER_FRIEND.findAll({
+      include: [
+        {
+          model: Model.User,
+          as: "Friend",
+          attributes: ["display_name", "avatar", "email"],
+        },
+      ],
+      where: {
+        User_ID: user_id,
+        Friend_ID: {
+          [Op.notIn]: Model.Sequelize.literal(`(
+            SELECT User_ID 
+            FROM user_joinins 
+            WHERE Room_ID = ${room_id}
+          )`),
+        },
+      },
+      raw: true,
+    });
+    if(friend_not_in_room.length === 0) return handleResult(200, "Không còn bạn bè chưa tham gia" )
+    else if(friend_not_in_room.length > 0) return handleResult(200, "Lấy bạn bè không có trong phòng thành công" ,friend_not_in_room )
+    else return handleResult(422, "Lấy bạn bè không có trong phòng thất bại")
+  } catch (error) {
+    return handleError(error)
+  }
+};
+
 module.exports = {
   findUserByName,
   addFriend,
@@ -222,5 +268,6 @@ module.exports = {
   getAllFriend,
   agreeAddFriend,
   suggestAddFriend,
+  getFriendNotInRoom,
 };
 

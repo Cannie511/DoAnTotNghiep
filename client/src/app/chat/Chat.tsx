@@ -20,6 +20,7 @@ import { getActiveStatus } from '@/Services/socket.api';
 import { IoCall } from "react-icons/io5";
 import { HiMiniVideoCamera } from "react-icons/hi2";
 import { SlOptionsVertical } from "react-icons/sl";
+
 interface MessageInput {
   message: string;
 }
@@ -37,7 +38,7 @@ export default function Chat() {
     const messageBoxRef = useRef<HTMLDivElement>(null);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [row, setRow] =useState<number>(1);
-    const {register, handleSubmit, reset, formState:{errors}, setValue} = useForm<MessageInput>();
+    const {register, handleSubmit, reset, setValue} = useForm<MessageInput>();
     const queryClient = useQueryClient();
     const {data} = useQuery({
         queryKey:['active_sts'],
@@ -107,7 +108,7 @@ export default function Chat() {
         setValue('message', newValue);
         textarea.selectionStart = textarea.selectionEnd = selectionStart + 1;
     }
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleAnyKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         typing();
         if (event.key === 'Enter' && !event.altKey && !event.shiftKey){
             event.preventDefault();
@@ -147,7 +148,7 @@ export default function Chat() {
     };
     const typing = useCallback(() => {
         if (!isTyping) {
-        setIsTyping(true);
+            setIsTyping(true);
             if (socket && current_friend) {
                 socket.emit("onTyping", current_friend.id, current_friend.display_name);
             }
@@ -231,7 +232,7 @@ export default function Chat() {
                 {(current_friend) && 
                 <div className='w-full flex dark:bg-slate-700 relative top-0 p-2 rounded-sm dark:text-white bg-slate-100 text-black items-center'>
                     <div className='flex flex-1'>
-                        <Avatar size={'xs'} alt='AV' img={current_friend?.avatar as any || url_img_default} rounded status="online" statusPosition="top-right" />
+                        <Avatar size={'xs'} alt='AV' img={current_friend?.avatar as any || url_img_default} rounded statusPosition="top-right" />
                         <strong className='ml-2'>{current_friend ? current_friend?.display_name : <Skeleton className="h-4 w-[250px]" />}</strong>
                     </div>
                     <div className='flex items-center'>
@@ -270,7 +271,7 @@ export default function Chat() {
                 {(current_friend) && 
                 <form className='flex space-x-1 w-full mb-1' onSubmit={handleSubmit(onSubmit)}>
                     <Button size={'icon'} className='h-full bg-transparent shadow-none text-yellow-300 hover:bg-transparent'><BsEmojiSmile className='text-3xl' /></Button>
-                    <Textarea onKeyDown={handleKeyDown} {...register("message",{required:true})} className='w-11/12 flex-1 no-resize' rows={row} placeholder="Tin nhắn..." />
+                    <Textarea onKeyDown={handleAnyKeyDown} {...register("message",{required:true})} className='w-11/12 flex-1 no-resize' rows={row} placeholder="Tin nhắn..." />
                     <Button size={'icon'} type='submit' className='h-full'><HiPaperAirplane className='text-2xl' /></Button>
                 </form>
                 }
