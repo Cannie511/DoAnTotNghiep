@@ -14,7 +14,7 @@ class UserJoin {
           include: [
             {
               model: Model.User,
-              attributes: ["display_name", "avatar"],
+              attributes: ["display_name", "avatar", "email"],
             },
           ],
           where: {
@@ -37,7 +37,7 @@ class UserJoin {
           include: [
             {
               model: Model.User,
-              attributes: ["display_name", "avatar"],
+              attributes: ["display_name", "avatar", "email"],
             },
           ],
           where: {

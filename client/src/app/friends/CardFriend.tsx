@@ -36,6 +36,7 @@ export default function CardFriend({noti_id, avatar, display_name, id, typeView}
             status: 0
         })
         .then((data)=>{
+            queryClient.invalidateQueries({queryKey:['List user']});
             queryClient.invalidateQueries({queryKey:['friend_request']});
             if(socket){
                 socket.emit("friend_request",{user_id, friend_id:id});

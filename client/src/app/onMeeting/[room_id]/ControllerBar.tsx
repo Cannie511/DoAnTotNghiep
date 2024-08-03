@@ -15,6 +15,8 @@ import { RiChatOffFill } from "react-icons/ri";
 import { IoPersonAdd } from "react-icons/io5";
 import ModalInviteFriend from './ModalInviteFriend';
 import { AppContext } from '@/Context/Context';
+import { FaUserFriends } from "react-icons/fa";
+
 interface Props{
     room_key:string;
     setVideo: Dispatch<SetStateAction<boolean>>;
@@ -27,6 +29,10 @@ interface Props{
     user_amount:number;
     host_id: number;
     setLocalScreen: (streamScreen: MediaStream) => void;
+    localScreen: MediaStream | null;
+    remoteScreen: MediaStream | null;
+    userJoinList:Array<any>;
+    removeUser: (user_id:number)=>void;
 }
 
 /**
@@ -39,7 +45,7 @@ interface Props{
  * @returns 
  */
 
-export default function ControllerBar({room_key, setVideo, setAudio, audio, video, room_id, openChat, setOpenChat, user_amount, host_id, setLocalScreen}:Props) {
+export default function ControllerBar({room_key, setVideo, setAudio, audio, video, room_id, openChat, setOpenChat, user_amount, host_id, setLocalScreen, localScreen,remoteScreen, userJoinList, removeUser}:Props) {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openInviteFriend, setOpenInviteFriend] = useState<boolean>(false);
     const {user_id} = useContext(AppContext);
@@ -66,7 +72,7 @@ export default function ControllerBar({room_key, setVideo, setAudio, audio, vide
                 <Tooltip content="Tùy chọn khác">
                     <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'><SlOptions className='text-xl'/></Button>
                 </Tooltip>
-                {user_id === host_id && 
+                {user_id === host_id ? 
                     <Tooltip content="Mời tham gia">
                         <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'
                             onClick={()=>setOpenInviteFriend(true)}
@@ -75,10 +81,19 @@ export default function ControllerBar({room_key, setVideo, setAudio, audio, vide
                             {user_amount}
                         </Button>
                     </Tooltip>
+                    :
+                    <Tooltip content="Danh sách người tham gia">
+                        <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'
+                            onClick={()=>setOpenInviteFriend(true)}
+                        >
+                            <FaUserFriends className='text-xl'/>
+                            {user_amount}
+                        </Button>
+                    </Tooltip>
                 }
 
-                <Tooltip content="Chia sẻ màn hình">
-                    <Button onClick={startCapture} color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
+                <Tooltip className='text-center' content={(remoteScreen || localScreen) ? "Bạn không thể chia sẻ màn hình khi có người đang chia sẻ":"Chia sẻ màn hình"}>
+                    <Button onClick={startCapture} disabled={(remoteScreen || localScreen) ? true : false} color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
                         <LuScreenShare className='text-xl'/>
                     </Button>
                 </Tooltip>
@@ -105,7 +120,7 @@ export default function ControllerBar({room_key, setVideo, setAudio, audio, vide
                 </Tooltip>
             </div>
             <ConfirmDialog id={room_id} openModal={openModal} setOpenModal={setOpenModal}/>
-            <ModalInviteFriend room_id={room_id} openModal={openInviteFriend} setOpenModal={setOpenInviteFriend}/>
+            <ModalInviteFriend host_id={host_id} room_id={room_id} userJoinList={userJoinList} openModal={openInviteFriend} setOpenModal={setOpenInviteFriend} removeUser={removeUser}/>
         </>
   )
 }

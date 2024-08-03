@@ -43,7 +43,6 @@ export default function FriendComponent() {
     }
   return (
     <div>
-      
       <div className='space-y-2 mt-10'>
         {isLoading || !list_friend_accepted &&
           <>

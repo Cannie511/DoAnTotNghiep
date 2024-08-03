@@ -83,6 +83,7 @@ const getAllFriendController = async (req, res) => {
     return res.status(err.status).json({ message: err.message });
   }
 };
+
 //Lấy danh sách bạn bè không có trong phòng họp
 const getFriendNotInRoomController = async(req, res)=>{
   try {
@@ -100,9 +101,6 @@ const getSuggestAddFriendController = async (req, res) => {
     let { page } = req.query;
     if (!page) page = 1;
     const { user_id } = req.params;
-    // console.log(user_id);
-    // const data =await suggestAddFriend(user_id);
-    // return res.status(data.status).json(data);
     const whereCondition = {
       id: {
         [Op.notIn]: [

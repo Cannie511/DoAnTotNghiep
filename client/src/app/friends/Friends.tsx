@@ -1,15 +1,16 @@
 'use client'
 import { useQuery } from '@tanstack/react-query';
-import { getUsers } from '@/Services/auth.api';
 import { useContext } from 'react';
 import { AppContext } from '@/Context/Context';
 import { getFriendRequest, getNotification } from '@/Services/notification.api';
 import FriendView from './FriendView';
+import { getSuggestFriend } from '@/Services/friend.api';
 export default function Friends() {
     const {user_id} = useContext(AppContext);
     const {data:listUser, isLoading, error:err_user} = useQuery({
         queryKey:['List user'],
-        queryFn: ()=>getUsers(1),
+        queryFn: ()=>getSuggestFriend(Number(user_id),1),
+        enabled:!!user_id
     })
     const {data:friendRequest, isLoading:loading_fr_req, error:err_fr_req} = useQuery({
         queryKey:['friend_request'],
@@ -21,10 +22,9 @@ export default function Friends() {
         queryFn: ()=>getNotification({user_id, type:"friend", status:0}),
         enabled: !!user_id  
     })
-    const listFriend = listUser?.data.data.filter((x:any)=>x.id!==user_id);
+    const listFriend = listUser?.data?.data;
     const acceptedList:any = friend_noti?.data;
     const friendReq:any = friendRequest?.data;
-    console.log("friend: ", friendReq)
   return (
     <>
         <FriendView header='Lời mời kết bạn' dataList={acceptedList} isLoading={isLoading} btn_content={"Xác nhận"} typeView='confirm'/>

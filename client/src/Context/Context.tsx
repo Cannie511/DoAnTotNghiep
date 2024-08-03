@@ -5,12 +5,13 @@ import { UserFindOne } from "@/Services/user.api";
 import { useToast } from "@/components/ui/use-toast";
 import { NotificationRequestType, UserData } from "@/types/type";
 import { useQueryClient } from "@tanstack/react-query";
+import { Button, Toast } from "flowbite-react";
 import { StaticImageData } from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import Peer from "peerjs";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import io, { Socket } from 'socket.io-client';
-
+import { FaSignOutAlt } from "react-icons/fa";
 interface AppContextType {
     display_name: string | null;
     setName: React.Dispatch<React.SetStateAction<string | null>>;
@@ -56,9 +57,9 @@ export const useSocket = () => {
 export default function AppProvider({children}:{children: ReactNode}){
     const router = useRouter();
     const {toast} = useToast();
+    const [showToast, setShowToast] = useState(false);
     const pathname = usePathname();
     const [display_name, setName] = useState<string|null>('');
-    const [peer, setPeer] = useState<Peer | null>(null);
     const [isLoading, setLoading] = useState<boolean>(false);
     const [user_data, setUser_data] = useState<UserData|null>(null);
     const [forceLogout, setForceLogout] = useState<boolean>(false);
@@ -240,7 +241,7 @@ export default function AppProvider({children}:{children: ReactNode}){
         // router.prefetch('/friends');
         // router.prefetch('/onMeeting/:room_id');
         router.prefetch('/meeting');
-    },[router])
+    },[router, user_id])
     return (
         <AppContext.Provider value={{display_name, setName, 
             isLoading, setLoading, 
@@ -248,8 +249,17 @@ export default function AppProvider({children}:{children: ReactNode}){
             forceLogout, setForceLogout, 
             user_id, linked_account, 
             email, avatar, socket,
-            current_friend, setCurrentFriend, peer}}>
+            current_friend, setCurrentFriend}}>
             {children}
+            {showToast && 
+                <Toast className="flex flex-col items-center justify-center fixed right-2 bottom-2">
+                    <Toast.Toggle onDismiss={() => setShowToast(false)} />
+                    <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full  bg-red-700 text-red-500 dark:bg-red-800">
+                        <FaSignOutAlt/>
+                    </div>
+                    <div className="mt-3 font-bold text-xl text-center">Bạn đã bị chủ phòng mời ra khỏi phòng</div>
+                </Toast>
+            }
         </AppContext.Provider>
     )
 }

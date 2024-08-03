@@ -53,9 +53,6 @@ export default function MyRooms() {
                         <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                             <div className="grid w-full max-w-64">
                             <div className="relative">
-                                <label htmlFor="npm-install" className="sr-only">
-                                Label
-                                </label>
                                 <input
                                 id="npm-install"
                                 type="text"

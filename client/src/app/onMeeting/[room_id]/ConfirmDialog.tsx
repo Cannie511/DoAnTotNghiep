@@ -12,6 +12,10 @@ interface Props{
     id:number;
 }
 
+/**\
+ * @param id : room_id != room_key
+ */
+
 export default function ConfirmDialog({openModal, setOpenModal, id}:Props) {
     const { user_id, socket} = useContext(AppContext);
     const {room_id} = useParams();
@@ -23,7 +27,7 @@ export default function ConfirmDialog({openModal, setOpenModal, id}:Props) {
             if(user_id && id)
             await leftRoom(Number(user_id), id)
             .then((data)=>{
-                socket.emit("user-left", user_id,room_id);
+                socket.emit("user-left", user_id, room_id);
                 setOpenModal(false);
                 window.close();
             })

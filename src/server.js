@@ -10,7 +10,7 @@ const SocketRoute = require("./Routes/Socket.api");
 const NotificationRoute = require("./Routes/Notification.api");
 const RoomRoute = require("./Routes/Room.api");
 const ScheduleRoute = require("./Routes/Schedule.api");
-const UserJoinRoute = require("./Routes/User_Join.api")
+const UserJoinRoute = require("./Routes/User_Join.api");
 const RoomMessageRoute = require("./Routes/Room_Message.api");
 const UserInvitationRoute = require("./Routes/User_Invitation.api");
 const db_connect = require("./Database/db.connect");
@@ -86,40 +86,39 @@ io.on("connection", async (socket) => {
       }
     });
 
-    
-
     socket.on("join-in", async (roomKey, userId) => {
       //console.log(chalk.bgGreen(`${userId} joined room: - ${roomKey}`));
-      await socket.join(roomKey)
+      await socket.join(roomKey);
       const room = await findRoomService(roomKey);
       const user_join = new UserJoin(userId, room?.data?.id);
-      const find_user_join =  await user_join.findOne();
+      const find_user_join = await user_join.findOne();
       const userData = await getUsersByIdService(userId);
-      if(find_user_join.status !== 200){
+      if (find_user_join.status !== 200) {
         return;
       }
       socket.on("room-chat", async (data) => {
         const { room_id, user_id, message } = data;
         console.log(chalk.bgCyan(room_id, " - ", user_id, ": ", message));
         const room_message = new RoomMessage(room_id, user_id, message);
-        await room_message.create()
-        .then((data)=>{
-          socket.to(roomKey).emit("room-chat", user_id, message);
-        })
-        .catch((err)=>{
-          return handleError(err)
-        })
+        await room_message
+          .create()
+          .then((data) => {
+            socket.to(roomKey).emit("room-chat", user_id, message);
+          })
+          .catch((err) => {
+            return handleError(err);
+          });
       });
       socket.to(roomKey).emit("user-joinIn", userData.data);
-      socket.on("share-screen", async (userId)=>{
+      socket.on("share-screen", async (userId) => {
         const user = await getUsersByIdService(userId);
         socket.to(roomKey).emit("share-screen", userId, user.data.display_name);
-      })
-      socket.on("stop-screen", async (userId)=>{
-        console.log("stop-screen-id: ",userId)
+      });
+      socket.on("stop-screen", async (userId) => {
+        console.log("stop-screen-id: ", userId);
         const user = await getUsersByIdService(userId);
         socket.to(roomKey).emit("stop-screen", userId, user.data.display_name);
-      })
+      });
       socket.on("onMic", (roomId, userId) => {
         socket.to(roomId).emit("on-Mic", userId);
       });
@@ -132,8 +131,12 @@ io.on("connection", async (socket) => {
       socket.on("offCam", (roomId, userId) => {
         socket.to(roomId).emit("off-Cam", userId);
       });
-    });
 
+      socket.on("kick-out", async (user_id_kicked) => {
+        const received_user = await socketIO.searchOne(user_id_kicked);
+        io.to(received_user?.data.socket_id).emit("kick-out");
+      });
+    });
     socket.on("user-left", async (userId, roomKey) => {
       const room = await findRoomService(roomKey);
       const userData = await getUsersByIdService(userId);
@@ -186,9 +189,7 @@ io.on("connection", async (socket) => {
       }
     });
 
-    socket.on("invite_meeting", async (data) => {
-      
-    })
+    socket.on("invite_meeting", async (data) => {});
 
     socket.on("user_disconnected", async (data) => {
       const id = data.user_id;
@@ -216,10 +217,8 @@ app.use((req, res) => {
   res.status(404).json({ status: 404, message: "404 NOT FOUND" });
 });
 
-server
-  .listen(port, () => {
-    console.log(
-      `[Đồ án tốt nghiệp] is running on port ${port}, domain: http://localhost:${port}`
-    );
-  })
-
+server.listen(port, () => {
+  console.log(
+    `[Đồ án tốt nghiệp] is running on port ${port}, domain: http://localhost:${port}`
+  );
+});

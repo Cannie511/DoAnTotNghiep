@@ -10,13 +10,14 @@ import { AppContext } from '@/Context/Context';
 import { findRoom } from '@/Services/room.api';
 import ToastInfo from './ToastInfo';
 import Peer from 'peerjs';
-import { joinRoom, userJoin } from '@/Services/user_join.api';
+import { joinRoom, leftRoom, userJoin } from '@/Services/user_join.api';
 import MediaDiv from './mediaDiv';
 import RoomChat from './roomChat';
 import { Avatar } from 'flowbite-react';
 import { url_img_default } from '@/images/image';
 import { UserFindOne } from '@/Services/user.api';
 import MediaDivLarge from './MediaSizeLarge';
+import ModalKickOut from './ModalKickout';
 
 interface PeerType {
   id: number;
@@ -35,17 +36,19 @@ export default function MotionBackground() {
   const motionDiv = useRef(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [openChat, setOpenChat] = useState<boolean>(false);
+  const [openModalKickOut, setOpenModalKickOut] = useState<boolean>(false);
   const localVideoRef = useRef<HTMLVideoElement>(null);
+  const [videoStream, setVideoStream] = useState<MediaStream|null>(null);
   const [video, setVideo] = useState<boolean>(true);
   const [audio, setAudio] = useState<boolean>(true);
-  const [localScreen, setLocalScreen] = useState<MediaStream|null>(null);
-  const [remoteScreen, setRemoteScreen] = useState<MediaStream|null>(null);
+  const [peers, setPeers] = useState<PeerType[]>([]);
   const localScreenRef = useRef<HTMLVideoElement>(null);
   const remoteScreenRef = useRef<HTMLVideoElement>(null); 
-  const [peers, setPeers] = useState<PeerType[]>([]);
+  const peerScreenRef = useRef<Peer | null>();
   const peerRef = useRef<Peer | null>(null);
   const peersRef = useRef<Set<string>>(new Set());
-  const peerScreenRef = useRef<Peer | null>();
+  const [localScreen, setLocalScreen] = useState<MediaStream|null>(null);
+  const [remoteScreen, setRemoteScreen] = useState<MediaStream|null>(null);
   const { data: checkHost, error: errHost } = useQuery({
     queryKey: ["check_host"],
     queryFn: () => findRoom(Number(room_id)),
@@ -66,6 +69,18 @@ export default function MotionBackground() {
   });
 
   const userJoinRoom = joinInRoom?.data;
+  const removeUser = (id:number) =>{
+    peersRef.current.delete(id.toString())
+    setPeers(prevPeers => prevPeers.filter(peer => peer.id !== id));
+  }
+
+  useEffect(()=>{
+    console.log("video: ", videoStream?.getVideoTracks()[0]);
+    console.log("audio: ", videoStream?.getAudioTracks()[0])
+    if(!video){
+
+    }
+  },[videoStream])
 
   useEffect(() => {
     if (userJoinRoom) {
@@ -109,12 +124,14 @@ export default function MotionBackground() {
   if (user_id && socket) {
     const initPeer = async () => {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setVideoStream(stream)
       const peer = new Peer(user_id.toString(), {
         host: 'localhost',
         port: 1234,
         path: '/peer-server'
       });
 
+      //Đặt ref để gọi ở những nơi khác
       peerRef.current = peer;
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
@@ -126,7 +143,6 @@ export default function MotionBackground() {
       });
       // Xử lý cuộc gọi đến
       peer.on("call", (call) => {
-        console.log("type: ", call.metadata?.type);
         call.answer(stream);
         call.on("stream", async (remoteStream) => {
           console.log("stream", peer.call)
@@ -151,6 +167,7 @@ export default function MotionBackground() {
         });
       });
 
+      //Lắng nghe sự kiện dừng share màn hình
       socket.on("stop-screen",(user_id:number, display_name:string)=>{
         console.log(display_name + " đã dừng share màn hình " );
         setRemoteScreen(null);
@@ -159,9 +176,16 @@ export default function MotionBackground() {
         }
         setPeers(prevPeers => prevPeers.filter(peer => peer.type !== "screen"));
       })
-      
+
+      socket.on("kick-out",async()=>{
+        if(socket){
+            setOpenModalKickOut(true);
+        }
+      })
+
+      //Xử lý người dùng tham gia
       socket.on("user-joinIn", async (user: any) => {
-        console.log("User joined: ", user?.id);
+        console.log("User joined: ", peersRef.current.has(user?.id));
         if (!peersRef.current.has(user?.id) ) {
           const call = await peer.call(user?.id.toString(), stream);
           call?.on("stream", (remoteStream) => {
@@ -179,7 +203,7 @@ export default function MotionBackground() {
       
       // Xử lý người dùng rời khỏi phòng
       socket.on("user-leftRoom", (user: any) => {
-        console.log("User left: ", user?.id);
+        console.log("user: ",peersRef.current.has(user?.id));
         peersRef.current.delete(user?.id);
         setPeers(prevPeers => prevPeers.filter(peer => peer.id !== user?.id));
       });
@@ -237,8 +261,25 @@ export default function MotionBackground() {
       }
     }
   },[remoteScreen])
-  
+  useEffect(()=>{
+      window.addEventListener('unload', ()=>{
+        if(socket) socket.emit("user-left", user_id, room_id);
+      });
+      return () => {
+        window.removeEventListener('unload',()=>{
+          if(socket) socket.emit("user-left", user_id, room_id);
+        });
+      };
+  },[])
   const shareScreen = async (streamScreen:MediaStream) =>{
+    if(remoteScreen){
+      toast({
+        title:"Thông báo!!!",
+        description:"Bạn không thể chia sẻ khi có người khác đang chia sẻ màn hình",
+        variant:"destructive"
+      })
+      return;
+    }
     setLocalScreen(streamScreen);
     const peerScreen = new Peer("sc-" + user_id.toString(), {
         host: 'localhost',
@@ -344,11 +385,16 @@ export default function MotionBackground() {
           room_key={formatRoomKey(room_id.toString())}
           room_id={roomData?.id}
           setOpenChat={setOpenChat} openChat={openChat}
+          userJoinList={userJoinList}
           user_amount={userJoinList?.length + 1}
+          localScreen={localScreen}
+          remoteScreen={remoteScreen}
           setLocalScreen={shareScreen}
+          removeUser={removeUser}
         />
       }
       {+user_id === roomData?.Host_id && <ToastInfo room_id={Number(room_id)} />} 
+      <ModalKickOut openModal={openModalKickOut} setOpenModal={setOpenModalKickOut} id={Number(roomData?.id)}/>
     </div>
   );
 }
