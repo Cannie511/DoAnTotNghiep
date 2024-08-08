@@ -55,7 +55,14 @@ export default function ControllerBar(
     const [openInviteFriend, setOpenInviteFriend] = useState<boolean>(false);
     const [onRecord, setOnRecord] = useState<boolean>(false);
     const {user_id} = useContext(AppContext);
-
+    const recording = () =>{
+        setOnRecord(true);
+        startRecord();
+    }
+    const stopRecording = ()=>{
+        setOnRecord(false);
+        stopRecord()
+    }
     async function startCapture() {  
         try {
             const videoStreamTrack = await navigator.mediaDevices.getDisplayMedia({
@@ -97,12 +104,20 @@ export default function ControllerBar(
                         </Button>
                     </Tooltip>
                 }
-
-                <Tooltip className='text-center' content="Ghi hình cuộc họp">
-                    <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
-                        <PiRecordFill className='text-xl'/>
-                    </Button>
-                </Tooltip>
+                {!onRecord ?
+                    <Tooltip className='text-center' content="Ghi hình cuộc họp">
+                        <Button onClick={recording} color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
+                            <PiRecordFill className='text-xl'/>
+                        </Button>
+                    </Tooltip>
+                    :
+                    <Tooltip className='text-center' content="Dừng ghi hình">
+                        <Button onClick={stopRecording} color={"failure"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
+                            <PiRecordFill className='text-xl'/>
+                        </Button>
+                    </Tooltip>
+                }
+                
                 <Tooltip className='text-center' content={(remoteScreen || localScreen) ? "Bạn không thể chia sẻ màn hình khi có người đang chia sẻ":"Chia sẻ màn hình"}>
                     <Button onClick={startCapture} disabled={(remoteScreen || localScreen) ? true : false} color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
                         <LuScreenShare className='text-xl'/>

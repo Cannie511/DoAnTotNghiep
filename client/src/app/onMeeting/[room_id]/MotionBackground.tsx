@@ -78,66 +78,8 @@ export default function MotionBackground() {
   }
 
   const recorderMeeting = async () => {
-    if (!streamRef.current) {
-      console.error("No local stream available");
-      return;
-    }
-    toast({
-      title:"Thông báo:",
-      description:"Bạn đang ghi hình cuộc họp này"
-    })
-    const combinedStream = new MediaStream([...streamRef.current.getTracks()]);
-
-    peers.forEach((peer) => {
-      peer.stream.getTracks().forEach((track) => {
-        combinedStream.addTrack(track);
-      });
-    });
-
-    if (localScreen) {
-      localScreen.getTracks().forEach((track) => {
-        combinedStream.addTrack(track);
-      });
-    }
-
-    if (remoteScreen) {
-      remoteScreen.getTracks().forEach((track) => {
-        combinedStream.addTrack(track);
-      });
-    }
-
-    if (combinedStream.getTracks().length === 0) {
-      console.error("No tracks available for recording");
-      return;
-    }
-
-    // Tạo MediaRecorder và lưu trữ vào mediaRecorderRef
-    const mediaRecorder = new MediaRecorder(combinedStream);
-    mediaRecorderRef.current = mediaRecorder;
-
-    let recordedChunks: BlobPart[] = [];
-
-    mediaRecorder.ondataavailable = function (event) {
-      if (event.data.size > 0) {
-        recordedChunks.push(event.data);
-      }
-    };
-
-    mediaRecorder.onstop = function () {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'meeting-recording.webm';
-      document.body.appendChild(a);
-      a.click();
-
-      URL.revokeObjectURL(url);
-    };
-
-    mediaRecorder.start();
-  };
+    
+  };  
 
   const stopRecording = () => {
     if (mediaRecorderRef.current) {
@@ -146,6 +88,7 @@ export default function MotionBackground() {
       console.error("No recording in progress");
     }
   };
+
 
   const shareScreen = async (streamScreen:MediaStream) =>{
     if(remoteScreen){
