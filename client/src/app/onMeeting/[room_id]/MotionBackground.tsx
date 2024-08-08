@@ -10,7 +10,7 @@ import { AppContext } from '@/Context/Context';
 import { findRoom } from '@/Services/room.api';
 import ToastInfo from './ToastInfo';
 import Peer from 'peerjs';
-import { joinRoom, leftRoom, userJoin } from '@/Services/user_join.api';
+import { joinRoom, userJoin } from '@/Services/user_join.api';
 import MediaDiv from './mediaDiv';
 import RoomChat from './roomChat';
 import { Avatar } from 'flowbite-react';
@@ -37,18 +37,21 @@ export default function MotionBackground() {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [openChat, setOpenChat] = useState<boolean>(false);
   const [openModalKickOut, setOpenModalKickOut] = useState<boolean>(false);
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const [videoStream, setVideoStream] = useState<MediaStream|null>(null);
+  const localVideoRef = useRef<HTMLVideoElement|null>(null);
   const [video, setVideo] = useState<boolean>(true);
   const [audio, setAudio] = useState<boolean>(true);
   const [peers, setPeers] = useState<PeerType[]>([]);
+  const [localScreen, setLocalScreen] = useState<MediaStream|null>(null);
+  const [remoteScreen, setRemoteScreen] = useState<MediaStream|null>(null);
+  const [videoStream, setVideoStream] = useState<MediaStream|null>(null);
   const localScreenRef = useRef<HTMLVideoElement>(null);
   const remoteScreenRef = useRef<HTMLVideoElement>(null); 
   const peerScreenRef = useRef<Peer | null>();
   const peerRef = useRef<Peer | null>(null);
   const peersRef = useRef<Set<string>>(new Set());
-  const [localScreen, setLocalScreen] = useState<MediaStream|null>(null);
-  const [remoteScreen, setRemoteScreen] = useState<MediaStream|null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
   const { data: checkHost, error: errHost } = useQuery({
     queryKey: ["check_host"],
     queryFn: () => findRoom(Number(room_id)),
@@ -74,13 +77,96 @@ export default function MotionBackground() {
     setPeers(prevPeers => prevPeers.filter(peer => peer.id !== id));
   }
 
-  useEffect(()=>{
-    console.log("video: ", videoStream?.getVideoTracks()[0]);
-    console.log("audio: ", videoStream?.getAudioTracks()[0])
-    if(!video){
-
+  const recorderMeeting = async () => {
+    if (!streamRef.current) {
+      console.error("No local stream available");
+      return;
     }
-  },[videoStream])
+    toast({
+      title:"Thông báo:",
+      description:"Bạn đang ghi hình cuộc họp này"
+    })
+    const combinedStream = new MediaStream([...streamRef.current.getTracks()]);
+
+    peers.forEach((peer) => {
+      peer.stream.getTracks().forEach((track) => {
+        combinedStream.addTrack(track);
+      });
+    });
+
+    if (localScreen) {
+      localScreen.getTracks().forEach((track) => {
+        combinedStream.addTrack(track);
+      });
+    }
+
+    if (remoteScreen) {
+      remoteScreen.getTracks().forEach((track) => {
+        combinedStream.addTrack(track);
+      });
+    }
+
+    if (combinedStream.getTracks().length === 0) {
+      console.error("No tracks available for recording");
+      return;
+    }
+
+    // Tạo MediaRecorder và lưu trữ vào mediaRecorderRef
+    const mediaRecorder = new MediaRecorder(combinedStream);
+    mediaRecorderRef.current = mediaRecorder;
+
+    let recordedChunks: BlobPart[] = [];
+
+    mediaRecorder.ondataavailable = function (event) {
+      if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = function () {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'meeting-recording.webm';
+      document.body.appendChild(a);
+      a.click();
+
+      URL.revokeObjectURL(url);
+    };
+
+    mediaRecorder.start();
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+    } else {
+      console.error("No recording in progress");
+    }
+  };
+
+  const shareScreen = async (streamScreen:MediaStream) =>{
+    if(remoteScreen){
+      toast({
+        title:"Thông báo!!!",
+        description:"Bạn không thể chia sẻ khi có người khác đang chia sẻ màn hình",
+        variant:"destructive"
+      })
+      return;
+    }
+    setLocalScreen(streamScreen);
+    const peerScreen = new Peer("sc-" + user_id.toString(), {
+      host: 'localhost',
+      port: 1234,
+      path: '/peer-server'
+    })
+    peerScreenRef.current = peerScreen;
+    peers.forEach(async(item)=>{
+      const call = await peerScreen.call(item?.id.toString(), streamScreen);
+    }) 
+  }
 
   useEffect(() => {
     if (userJoinRoom) {
@@ -121,106 +207,109 @@ export default function MotionBackground() {
   }, [motionDiv]);
 
   useEffect(() => {
-  if (user_id && socket) {
-    const initPeer = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      setVideoStream(stream)
-      const peer = new Peer(user_id.toString(), {
-        host: 'localhost',
-        port: 1234,
-        path: '/peer-server'
-      });
+    if (user_id && socket) {
+      const initPeer = async () => {
+        if (!streamRef.current) {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+          streamRef.current = stream;
+        }
 
-      //Đặt ref để gọi ở những nơi khác
-      peerRef.current = peer;
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
-        localVideoRef.current.muted = true;
-      }
+        const peer = new Peer(user_id.toString(), {
+          host: 'localhost',
+          port: 1234,
+          path: '/peer-server',
+        });
 
-      peer.on('open', (id) => {
-        //console.log('Peer ID: ', id);
-      });
-      // Xử lý cuộc gọi đến
-      peer.on("call", (call) => {
-        call.answer(stream);
-        call.on("stream", async (remoteStream) => {
-          console.log("stream", peer.call)
-          if(call.peer[0] === "s" && call.peer[1] === "c"){
-            const id = call.peer.split("-")[1];
-            const user_data = await UserFindOne(Number(id));
-            setPeers(prevPeers => [
-              ...prevPeers,
-              { id: Number(call.peer), display_name: user_data.data.data.display_name, avatar: user_data.data.data.avatar, stream: remoteStream, type: "screen" }
-            ]);
-            peersRef.current.add(call.peer);
-            return;
-          }
-          const user_data = await UserFindOne(Number(call.peer));
-          if (user_data && !peersRef.current.has(call.peer)) {
-            setPeers(prevPeers => [
-              ...prevPeers,
-              { id: Number(call.peer), display_name: user_data.data.data.display_name, avatar: user_data.data.data.avatar, stream: remoteStream, type: "user" }
-            ]);
-            peersRef.current.add(call.peer);
+        peerRef.current = peer;
+        if (localVideoRef.current && streamRef.current) {
+          localVideoRef.current.srcObject = streamRef.current;
+          localVideoRef.current.muted = true;
+        }
+
+        peer.on('open', (id) => {
+          // console.log('Peer ID: ', id);
+        });
+
+        peer.on("call", (call) => {
+          if (streamRef.current) {
+            call.answer(streamRef.current);
+            call.on("stream", async (remoteStream) => {
+              if (call.peer.startsWith("sc-")) {
+                const id = call.peer.split("-")[1];
+                const user_data = await UserFindOne(Number(id));
+                setPeers(prevPeers => [
+                  ...prevPeers,
+                  { id: Number(call.peer), display_name: user_data.data.data.display_name, avatar: user_data.data.data.avatar, stream: remoteStream, type: "screen" },
+                ]);
+                peersRef.current.add(call.peer);
+                return;
+              }
+              const user_data = await UserFindOne(Number(call.peer));
+              if (user_data && !peersRef.current.has(call.peer)) {
+                setPeers(prevPeers => [
+                  ...prevPeers,
+                  { id: Number(call.peer), display_name: user_data.data.data.display_name, avatar: user_data.data.data.avatar, stream: remoteStream, type: "user" },
+                ]);
+                peersRef.current.add(call.peer);
+              }
+            });
           }
         });
-      });
 
-      //Lắng nghe sự kiện dừng share màn hình
-      socket.on("stop-screen",(user_id:number, display_name:string)=>{
-        console.log(display_name + " đã dừng share màn hình " );
-        setRemoteScreen(null);
-        if(peersRef.current){
-          peersRef.current.delete("sc-"+user_id);
-        }
-        setPeers(prevPeers => prevPeers.filter(peer => peer.type !== "screen"));
-      })
+        socket.on("stop-screen", (user_id: number, display_name: string) => {
+          setRemoteScreen(null);
+          peersRef.current.delete("sc-" + user_id);
+          setPeers(prevPeers => prevPeers.filter(peer => peer.type !== "screen"));
+          toast({
+            title:display_name + " đã dừng chia sẻ màn hình"
+          })
+        });
 
-      socket.on("kick-out",async()=>{
-        if(socket){
+        socket.on("kick-out", () => {
+          if (socket) {
             setOpenModalKickOut(true);
-        }
-      })
-
-      //Xử lý người dùng tham gia
-      socket.on("user-joinIn", async (user: any) => {
-        console.log("User joined: ", peersRef.current.has(user?.id));
-        if (!peersRef.current.has(user?.id) ) {
-          const call = await peer.call(user?.id.toString(), stream);
-          call?.on("stream", (remoteStream) => {
-            if (!peersRef.current.has(user?.id)) {
-              queryClient.invalidateQueries({ queryKey: ["user_media_div"] });
-              setPeers(prevPeers => [...prevPeers, { id: user?.id, display_name: user?.display_name, avatar: user?.avatar, stream: remoteStream, type: "user" }]);
-              peersRef.current.add(user?.id);
-            }
-          });
-          if(peerScreenRef.current && localScreen){
-            const sharedScreen = peerScreenRef.current?.call(user?.id.toString(), localScreen);
           }
-        }
-      });
-      
-      // Xử lý người dùng rời khỏi phòng
-      socket.on("user-leftRoom", (user: any) => {
-        console.log("user: ",peersRef.current.has(user?.id));
-        peersRef.current.delete(user?.id);
-        setPeers(prevPeers => prevPeers.filter(peer => peer.id !== user?.id));
-      });
+        });
 
-      return () => {
-        peer.destroy();
-        socket.off("user-joinIn");
-        socket.off("user-leftRoom");
-        socket.off("share-screen");
+        socket.on("user-joinIn", async (user: any) => {
+          console.log("User joined: ", peersRef.current.has(user?.id));
+          if (!peersRef.current.has(user?.id) && streamRef.current) {
+            const call = await peer.call(user?.id.toString(), streamRef.current);
+            call?.on("stream", (remoteStream) => {
+              if (!peersRef.current.has(user?.id)) {
+                queryClient.invalidateQueries({ queryKey: ["user_media_div"] });
+                setPeers(prevPeers => [
+                  ...prevPeers,
+                  { id: user?.id, display_name: user?.display_name, avatar: user?.avatar, stream: remoteStream, type: "user" },
+                ]);
+                peersRef.current.add(user?.id);
+              }
+            });
+            if (peerScreenRef.current && localScreen) {
+              const sharedScreen = peerScreenRef.current?.call(user?.id.toString(), localScreen);
+            }
+          }
+        });
+
+        socket.on("user-leftRoom", (user: any) => {
+          peersRef.current.delete(user?.id);
+          setPeers(prevPeers => prevPeers.filter(peer => peer.id !== user?.id));
+        });
+
+        return () => {
+          socket.emit("user-left", user_id, room_id);
+          peer.destroy();
+          socket.off("user-joinIn");
+          socket.off("user-leftRoom");
+          socket.off("share-screen");
+        };
       };
-    };
 
-    initPeer().catch(error => {
-      console.error("Error accessing media devices.", error);
-    });
-  }
-}, [user_id, socket, localScreen]);
+      initPeer().catch(error => {
+        console.error("Error accessing media devices.", error);
+      });
+    }
+  }, [user_id, socket, localScreen]);
 
   useEffect(()=>{
     if(peers.length > 0){
@@ -252,7 +341,7 @@ export default function MotionBackground() {
       });
     }
 
-  }, [localScreen, peers, socket, toast]);
+  }, [localScreen, socket]);
   
   useEffect(()=>{
     if(remoteScreen) {
@@ -261,41 +350,75 @@ export default function MotionBackground() {
       }
     }
   },[remoteScreen])
-  useEffect(()=>{
-      window.addEventListener('unload', ()=>{
-        if(socket) socket.emit("user-left", user_id, room_id);
-      });
-      return () => {
-        window.removeEventListener('unload',()=>{
-          if(socket) socket.emit("user-left", user_id, room_id);
+  useEffect(() => {
+    if (streamRef.current) {
+      if (!video) {
+        if(socket){
+          socket.emit("offCam", room_id, user_id);
+        }
+        streamRef.current.getVideoTracks().forEach(track => {
+          track.enabled = false;
+          track.stop();
         });
-      };
-  },[])
-  const shareScreen = async (streamScreen:MediaStream) =>{
-    if(remoteScreen){
-      toast({
-        title:"Thông báo!!!",
-        description:"Bạn không thể chia sẻ khi có người khác đang chia sẻ màn hình",
-        variant:"destructive"
-      })
-      return;
+      } else {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+          .then(async (newStream) => {
+            streamRef.current = newStream;
+            if(socket){
+              socket.emit("onCam", room_id, user_id);
+            }
+            setVideoStream(newStream)
+            if (localVideoRef.current) {
+              localVideoRef.current.srcObject = streamRef.current;
+              localVideoRef.current.muted = true;
+            }
+            if (streamRef.current && peerRef.current) {
+              Object.values(peerRef.current.connections).forEach((connectionArray: any) => {
+                connectionArray.forEach((connection: any) => {
+                  connection.peerConnection.getSenders().forEach((sender: any) => {
+                    if (sender.track && sender.track.kind === 'video') {
+                      // console.log()
+                      sender.replaceTrack(newStream.getVideoTracks()[0]);
+                    }
+                  });
+                });
+              });
+            }
+          })
+          .catch((error) => {
+            console.error('Failed to get local stream:', error);
+          });
+      }
     }
-    setLocalScreen(streamScreen);
-    const peerScreen = new Peer("sc-" + user_id.toString(), {
-        host: 'localhost',
-        port: 1234,
-        path: '/peer-server'
-      })
-      peerScreenRef.current = peerScreen;
-      peers.forEach(async(item)=>{
-        const call = await peerScreen.call(item?.id.toString(), streamScreen);
-      }) 
-  }
+  }, [video, socket, peers]);
+
+   useEffect(() => {
+    if(socket){
+      socket.on("off-Cam",(userId:number)=>{
+        setPeers(prevPeers => prevPeers.map(peer => {
+          if (peer.id === userId && peer.stream) {
+            peer.stream.getVideoTracks().forEach(track => track.enabled = false);
+          }
+          return peer;
+        }));
+      });
+
+      socket.on("on-Cam",(userId:number)=>{
+        setPeers(prevPeers => prevPeers.map(peer => {
+          if (peer.id === userId && peer.stream) {
+            peer.stream.getVideoTracks().forEach(track => track.enabled = true);
+          }
+          return peer;
+        }));
+      });
+    }
+  }, [socket]);
+  
   return (
     <div ref={motionDiv} className="p-3 w-full h-[100vh] overflow-hidden text-white bg-black">
       <RoomChat openChat={openChat} setOpen={setOpenChat} room_id={roomData?.id} />
       <motion.div
-        className="overflow-hidden fixed z-40 w-[22rem] h-[200px] bg-gray-700 rounded-xl flex justify-center items-center cursor-move"
+        className="overflow-hidden fixed z-40 w-[22rem] h-[200px] border border-white bg-gray-700 rounded-xl flex justify-center items-center cursor-move"
         drag
         initial={{ x: 3000, y: 1000 }}
         animate={{ x: size.width - 372, y: size.height - 222 }}
@@ -309,7 +432,7 @@ export default function MotionBackground() {
         {(video || (video && audio)) ? (
           <>
             <video
-              className='mt-2 w-96 rounded-2xl'
+              className='mt-2 w-96 rounded-2xl transform -scale-x-100'
               ref={localVideoRef}
               autoPlay
               playsInline
@@ -352,7 +475,7 @@ export default function MotionBackground() {
         }
         {
           !remoteScreen && !localScreen && peers && peers.length > 1 && peers.filter(user => user.type !== "screen").map((user) => (
-            <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} />
+            <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} avatar={user?.avatar}/>
           ))
         }
         
@@ -361,7 +484,7 @@ export default function MotionBackground() {
         <div className='h-[98vh] w-[22rem] bg-gray-900 fixed top-2 right-2 space-y-2'>
           {
             localScreen && peers && peers.length > 0 && peers.filter(user => user.type !== "screen").map((user) => (
-              <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} />
+              <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} avatar={user?.avatar}/>
             ))
           }
         </div>
@@ -370,7 +493,7 @@ export default function MotionBackground() {
         <div className='h-[98vh] w-[22rem] bg-gray-900 fixed top-2 right-2 space-y-2 overflow-y-scroll'>
           {
             remoteScreen && peers && peers.length > 0 && peers.filter(user => user.type !== "screen").map((user) => (
-              <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} />
+              <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} avatar={user?.avatar}/>
             ))
           }
         </div>
@@ -391,6 +514,8 @@ export default function MotionBackground() {
           remoteScreen={remoteScreen}
           setLocalScreen={shareScreen}
           removeUser={removeUser}
+          startRecord={recorderMeeting}
+          stopRecord={stopRecording}
         />
       }
       {+user_id === roomData?.Host_id && <ToastInfo room_id={Number(room_id)} />} 

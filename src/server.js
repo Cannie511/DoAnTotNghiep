@@ -189,7 +189,14 @@ io.on("connection", async (socket) => {
       }
     });
 
-    socket.on("invite_meeting", async (data) => {});
+    socket.on("invite_meeting", (listInvite) => {
+      listInvite.forEach(async(user_id) => {
+        const received_user = await socketIO.searchOne(user_id);
+        if(received_user.status === 200)
+        io.to(received_user?.data.socket_id).emit("meeting_invitation");
+        else return;
+      });
+    });
 
     socket.on("user_disconnected", async (data) => {
       const id = data.user_id;

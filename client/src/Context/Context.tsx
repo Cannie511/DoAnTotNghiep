@@ -12,6 +12,7 @@ import Peer from "peerjs";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import io, { Socket } from 'socket.io-client';
 import { FaSignOutAlt } from "react-icons/fa";
+import { ToastAction } from "@/components/ui/toast";
 interface AppContextType {
     display_name: string | null;
     setName: React.Dispatch<React.SetStateAction<string | null>>;
@@ -184,32 +185,6 @@ export default function AppProvider({children}:{children: ReactNode}){
                     queryClient.invalidateQueries({queryKey:['room_message_list']})
                 }
             })
-            socketIo.on("on-Mic",(user_id)=>{
-                if(pathname.includes("/onMeeting/")){
-                    console.log(user_id + " bật mic")
-                    queryClient.invalidateQueries({queryKey:["user_join"]});
-                }
-            })
-            socketIo.on("off-Mic",(user_id)=>{
-                if(pathname.includes("/onMeeting/")){
-                    console.log(user_id + " tắt mic")
-                    queryClient.invalidateQueries({queryKey:["user_join"]});
-                }
-            })
-
-            socketIo.on("on-Cam",(user_id)=>{
-                if(pathname.includes("/onMeeting/")){
-                    console.log(user_id + " bật cam");
-                    queryClient.invalidateQueries({queryKey:["user_join"]});
-                }
-            })
-
-            socketIo.on("off-Cam",(user_id)=>{
-                if(pathname.includes("/onMeeting/")){
-                    console.log(user_id + " tắt cam");
-                    queryClient.invalidateQueries({queryKey:["user_join"]});
-                }
-            })
 
             socketIo.on("user-leftRoom",(userJoin:any)=>{
                 if(pathname.includes("/onMeeting/")){
@@ -219,7 +194,15 @@ export default function AppProvider({children}:{children: ReactNode}){
                     })
                 }
             })
-        
+            
+            socketIo.on("meeting_invitation",()=>{
+                queryClient.invalidateQueries({queryKey:['list_invite']})
+                toast({
+                    title:"Cuộc họp mới",
+                    description: "Bạn có lời mời họp mới"
+                })
+            })
+
             window.addEventListener('beforeunload', async () => {
                 socketIo.emit('user_disconnected', { user_id });
             });

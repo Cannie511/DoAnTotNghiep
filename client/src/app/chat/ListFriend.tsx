@@ -8,7 +8,6 @@ import { AppContext } from "@/Context/Context";
 import { getLatestMessage } from "@/Services/message.api";
 import { TextInput, Tooltip } from "flowbite-react";
 import { TbMessageCirclePlus } from "react-icons/tb";
-//import ModalFindFriend from "./ModalFindFriend";
 import { url_img_default } from "@/images/image";
 import dynamic from "next/dynamic";
 const ModalFindFriend = dynamic(()=>import("./ModalFindFriend"),{ ssr: false });

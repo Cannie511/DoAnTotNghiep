@@ -226,7 +226,7 @@ const updatePasswordService = async (user_id, old_password, new_password) => {
   }
 };
 
-const findUserService = async (emailValue) => {
+const findUserService = async (value) => {
   try {
     const listUser = await Model.User.findAll({
       attributes: [
@@ -239,7 +239,7 @@ const findUserService = async (emailValue) => {
       ],
       where: {
         email: {
-          [Op.like]: `%${emailValue}%`,
+          [Op.like]: `%${value}%`,
         },
         linked_account: "verify",
       },
@@ -276,7 +276,43 @@ const deleteUserService = async (user_id) => {
   }
 };
 
-
+const findUserByNameOrEmailService = async (value, user_id) => {
+  try {
+    const listUser = await Model.User.findAll({
+      attributes: [
+        "id",
+        "email",
+        "display_name",
+        "language",
+        "avatar",
+        "premium",
+        "linked_account",
+      ],
+      where: {
+        id: {
+          [Op.ne]: user_id
+        },
+        [Op.or]: [
+          {
+            email: {
+              [Op.like]: `%${value}%`,
+            },
+          },
+          {
+            display_name: {
+              [Op.like]: `%${value}%`,
+            },
+          },
+        ],
+      },
+      raw: true,
+    });
+    if (listUser.length > 0) return handleResult(200, "search user", listUser);
+    else return handleResult(422, "Không tìm thấy");
+  } catch (error) {
+    return handleError(error);
+  }
+};
 
 const updatePremiumService = async(user_id) => {
   try{
@@ -310,5 +346,6 @@ module.exports = {
   checkPassService,
   findUserService,
   updatePasswordWithoutOldPasswordService,
-  updatePremiumService
+  updatePremiumService,
+  findUserByNameOrEmailService,
 };

@@ -16,6 +16,7 @@ import { IoPersonAdd } from "react-icons/io5";
 import ModalInviteFriend from './ModalInviteFriend';
 import { AppContext } from '@/Context/Context';
 import { FaUserFriends } from "react-icons/fa";
+import { PiRecordFill } from "react-icons/pi";
 
 interface Props{
     room_key:string;
@@ -33,6 +34,8 @@ interface Props{
     remoteScreen: MediaStream | null;
     userJoinList:Array<any>;
     removeUser: (user_id:number)=>void;
+    startRecord: ()=>void;
+    stopRecord:()=>void;
 }
 
 /**
@@ -45,9 +48,12 @@ interface Props{
  * @returns 
  */
 
-export default function ControllerBar({room_key, setVideo, setAudio, audio, video, room_id, openChat, setOpenChat, user_amount, host_id, setLocalScreen, localScreen,remoteScreen, userJoinList, removeUser}:Props) {
+export default function ControllerBar(
+    {room_key, setVideo, setAudio, audio, video, room_id, openChat, setOpenChat, user_amount, host_id, setLocalScreen, localScreen,remoteScreen, userJoinList, removeUser, startRecord, stopRecord}
+    :Props) {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openInviteFriend, setOpenInviteFriend] = useState<boolean>(false);
+    const [onRecord, setOnRecord] = useState<boolean>(false);
     const {user_id} = useContext(AppContext);
 
     async function startCapture() {  
@@ -69,9 +75,9 @@ export default function ControllerBar({room_key, setVideo, setAudio, audio, vide
                 <Tooltip content={"ID phòng: "+room_key}>
                     <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'><IoInformationOutline className='text-xl'/></Button>
                 </Tooltip>
-                <Tooltip content="Tùy chọn khác">
+                {/* <Tooltip content="Tùy chọn khác">
                     <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'><SlOptions className='text-xl'/></Button>
-                </Tooltip>
+                </Tooltip> */}
                 {user_id === host_id ? 
                     <Tooltip content="Mời tham gia">
                         <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'
@@ -92,6 +98,11 @@ export default function ControllerBar({room_key, setVideo, setAudio, audio, vide
                     </Tooltip>
                 }
 
+                <Tooltip className='text-center' content="Ghi hình cuộc họp">
+                    <Button color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
+                        <PiRecordFill className='text-xl'/>
+                    </Button>
+                </Tooltip>
                 <Tooltip className='text-center' content={(remoteScreen || localScreen) ? "Bạn không thể chia sẻ màn hình khi có người đang chia sẻ":"Chia sẻ màn hình"}>
                     <Button onClick={startCapture} disabled={(remoteScreen || localScreen) ? true : false} color={"light"} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
                         <LuScreenShare className='text-xl'/>
@@ -103,13 +114,13 @@ export default function ControllerBar({room_key, setVideo, setAudio, audio, vide
                     </Button>
                 </Tooltip>
                 <Tooltip content={audio ? "Microphone đang bật":"Microphone đang tắt"}>
-                    <Button color={audio ? "failure":"light"} onClick={audio ? ()=>setAudio(false) : ()=>setAudio(true)} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
-                        {audio ? <FaMicrophoneSlash className='text-xl'/> :<FaMicrophone className='text-xl'/>}
+                    <Button color={!audio ? "failure":"light"} onClick={audio ? ()=>setAudio(false) : ()=>setAudio(true)} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
+                        {audio ? <FaMicrophone className='text-xl'/> :<FaMicrophoneSlash className='text-xl'/>}
                     </Button>
                 </Tooltip>
                 <Tooltip content={video ? "Máy ảnh đang bật":"Máy ảnh đang tắt"}>
-                    <Button color={video ? "failure":"light"} onClick={video ? ()=>setVideo(false) : ()=>setVideo(true)} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
-                       {video ? <HiMiniVideoCameraSlash className='text-xl'/> : <HiMiniVideoCamera className='text-xl'/>}
+                    <Button color={!video ? "failure":"light"} onClick={video ? ()=>setVideo(false) : ()=>setVideo(true)} className='w-10 h-10 rounded-full flex justify-center items-center p-0'>
+                       {video ? <HiMiniVideoCamera className='text-xl'/> : <HiMiniVideoCameraSlash className='text-xl'/>}
                     </Button>
                 </Tooltip>
                 

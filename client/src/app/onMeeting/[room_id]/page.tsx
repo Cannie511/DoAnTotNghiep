@@ -1,8 +1,8 @@
 
-import { findRoom } from "@/Services/room.api";
 import MotionBackground from "./MotionBackground";
-import type { Metadata, ResolvingMetadata } from 'next'
+import type { Metadata } from 'next'
 import { formatRoomKey } from "@/Utils/formatDate";
+import IndexPage from "../test";
  
 type Props = {
   params: { room_id: string }
@@ -19,6 +19,7 @@ export async function generateMetadata(
 const Room_id = () =>{
     return(
       <MotionBackground/>
+      //<IndexPage/>
     )
 }
 export default Room_id;
