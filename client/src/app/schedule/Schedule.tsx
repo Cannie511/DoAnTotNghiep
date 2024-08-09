@@ -103,7 +103,7 @@ export default function Schedule() {
                                     <Label htmlFor="roomKey" color="gray" value="ID phòng họp" />
                                 </div>
                                 <div className="flex items-center">
-                                    <TextInput id="roomKey" placeholder="123-456-789" defaultValue={formatRoomKey(room_key || "")} color="gray" />
+                                    <TextInput id="roomKey" disabled placeholder="123-456-789" defaultValue={formatRoomKey(room_key || "")} color="gray" />
                                     <Tooltip content="Tạo mã mới">
                                         <MdChangeCircle className='text-4xl ml-2 hover:text-gray-500 transition-all cursor-pointer' onClick={genKey}/>
                                     </Tooltip>

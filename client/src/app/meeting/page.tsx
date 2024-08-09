@@ -5,7 +5,7 @@ const Meeting = dynamic(()=>import("./Meeting"),{
   loading: ()=><Skeleton className="w-full h-[80vh]"/>
 })
 export const metadata: Metadata = {
-  title:'Cuộc họp',
+  title:'Phòng họp',
   description:'Meeting Page'
 }
 

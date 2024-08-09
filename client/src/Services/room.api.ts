@@ -20,3 +20,7 @@ export const checkRoomPassword = async(room_id:number, password:string)=>{
 export const getAllMyRoom = async(user_id:number, page?:number)=>{
     return await http.get(`/api/room/getAll/${user_id}?page=${page}`)
 }
+
+export const deleteRoom = async(room_id:number)=>{
+    return await http.delete(`/api/room/delete/${room_id}`);
+}

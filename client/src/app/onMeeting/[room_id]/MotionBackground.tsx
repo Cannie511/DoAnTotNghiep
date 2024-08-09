@@ -78,7 +78,73 @@ export default function MotionBackground() {
   }
 
   const recorderMeeting = async () => {
-    
+    try {
+    const screenStream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      audio: true,
+    });
+
+    // Tạo một AudioContext để kết hợp các nguồn âm thanh
+    const audioContext = new AudioContext();
+    const destination = audioContext.createMediaStreamDestination();
+
+    // Lấy audio track từ màn hình
+    const screenAudioTracks = screenStream.getAudioTracks();
+    screenAudioTracks.forEach(track => {
+      const source = audioContext.createMediaStreamSource(new MediaStream([track]));
+      source.connect(destination);
+    });
+
+    // Lấy audio track từ các peer và thêm vào destination
+    if (streamRef.current) {
+      streamRef.current.getAudioTracks().forEach(track => {
+        const source = audioContext.createMediaStreamSource(new MediaStream([track]));
+        source.connect(destination);
+      });
+    }
+
+    peers.forEach(peer => {
+      peer.stream.getAudioTracks().forEach(track => {
+        const source = audioContext.createMediaStreamSource(new MediaStream([track]));
+        source.connect(destination);
+      });
+    });
+
+    // Thêm audio từ destination vào screenStream
+    destination.stream.getTracks().forEach(track => {
+      screenStream.addTrack(track);
+    });
+
+    // Tạo MediaRecorder với luồng kết hợp video và âm thanh
+    const mediaRecorder = new MediaRecorder(screenStream);
+    mediaRecorderRef.current = mediaRecorder;
+
+    let recordedChunks: BlobPart[] = [];
+
+    mediaRecorder.ondataavailable = function (event) {
+      if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = function () {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'meeting-recording.webm';
+      document.body.appendChild(a);
+      a.click();
+
+      URL.revokeObjectURL(url);
+    };
+
+    mediaRecorder.start();
+  } catch (error) {
+    console.error("Error accessing display media", error);
+  }
   };  
 
   const stopRecording = () => {

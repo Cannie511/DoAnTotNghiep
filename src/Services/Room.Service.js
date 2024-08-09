@@ -112,9 +112,32 @@ const checkRoomPasswordService = async(room_id, password)=>{
   }
 }
 
+const deleteRoomService = async(room_id)=>{
+  try {
+    const findRoom = await Model.Rooms.findOne({
+      where:{
+        id: room_id
+      }, raw: true
+    })
+    if(findRoom){
+      const room = await Model.Rooms.destroy({
+        where: {
+          id: room_id,
+        },
+      });
+      if(+room === 1) return handleResult(200, "Xóa phòng thành công");
+      return handleResult(422, "Xóa phòng thất bại")
+    }
+    else return handleResult(422, "Không tìm thấy phòng");
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
 module.exports = {
   createRoomService,
   getRoomKeyService,
   findRoomService,
   checkRoomPasswordService,
+  deleteRoomService,
 };

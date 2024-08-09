@@ -1,6 +1,6 @@
 
 
-const { createRoomService, getRoomKeyService, findRoomService, checkRoomPasswordService } = require("../Services/Room.Service");
+const { createRoomService, getRoomKeyService, findRoomService, checkRoomPasswordService, deleteRoomService } = require("../Services/Room.Service");
 const { handleError } = require("../Utils/Http");
 const pagination = require("../Utils/Pagination");
 
@@ -72,10 +72,23 @@ const getAllRoom = async(req, res)=>{
     }
 }
 
+const deleteRoomController = async(req, res)=>{
+    try {
+        const {room_id} = req.params;
+        if(!room_id) return res.status(422).json({message: "Không nhận được mã phòng"});
+        const roomController = await deleteRoomService(room_id);
+        if(roomController) return res.status(roomController.status).json(roomController.message);
+    } catch (error) {
+        const err = handleError(error);
+        return res.status(err.status).json({ message: err.message });
+    }
+}
+
 module.exports = {
   createRoomController,
   getRoomKeyController,
   findRoomController,
   checkRoomPasswordController,
   getAllRoom,
+  deleteRoomController,
 };
