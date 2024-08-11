@@ -7,3 +7,7 @@ export const createUserInvitation = async(list_user_id:Array<number>, send_by:nu
 export const getUserInvitation = async(user_id:number) =>{
     return await http.get(`/api/user_invitation/${user_id}`);
 }
+
+export const deleteUserInvitation = async(invitation_id:number) => {
+    return await http.delete(`/api/user_invitation/${invitation_id}`);
+}

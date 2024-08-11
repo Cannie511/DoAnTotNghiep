@@ -314,6 +314,34 @@ const findUserByNameOrEmailService = async (value, user_id) => {
   }
 };
 
+const updateUserDisplaynameService = async(user_id, new_name) =>{
+  try {
+    const isExist = await Model.User.findOne({
+      where: {
+        id: user_id,
+      },
+    });
+    if (isExist) {
+      const updateName = await Model.User.update(
+        {
+          display_name: new_name,
+        },
+        {
+          where: {
+            id: user_id,
+          },
+        }
+      );
+      if (+updateName === 1)
+        return handleResult(200, "Thay đổi tên thành công");
+      return handleResult(422, "Thay đổi tên thất bại");
+    }
+    return handleResult(422, "Không tìm thấy người dùng");
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
 const updatePremiumService = async(user_id) => {
   try{
       const data = await Model.User.update(
@@ -348,4 +376,5 @@ module.exports = {
   updatePasswordWithoutOldPasswordService,
   updatePremiumService,
   findUserByNameOrEmailService,
+  updateUserDisplaynameService,
 };

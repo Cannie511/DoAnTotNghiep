@@ -20,18 +20,19 @@ export const InviteMeeting = () =>{
             <div className="w-full flex justify-center items-center">
                 <h1 className="mx-auto mt-2 text-2xl font-bold">Lời mời tham gia cuộc họp</h1>
             </div>
-            <div className="mt-5 flex">
-                { list_invitation && list_invitation.length === 0 &&
-                    <Card className="w-[27rem] mx-auto mt-5 flex items-center justify-center text-4xl text-center font-bold">
-                        <div className="flex justify-center">
-                            <HiOutlineEmojiSad className="text-5xl text-yellow-400"/>
-                        </div>
-                        Bạn chưa có lời mời họp nào!
-                    </Card>
-                }
+            { list_invitation && list_invitation.length === 0 &&
+                <Card className="w-[27rem] mx-auto mt-5 flex items-center justify-center text-4xl text-center font-bold">
+                    <div className="flex justify-center">
+                        <HiOutlineEmojiSad className="text-5xl text-yellow-400"/>
+                    </div>
+                    Bạn chưa có lời mời họp nào!
+                </Card>
+            }
+            <div className="mt-5 grid grid-flow-row grid-cols-2 ">
+                
                 {list_invitation && list_invitation.map((item:any)=>{
                     return(
-                        <ToastMeeting avatar={item["sender.avatar"]} display_name={item["sender.display_name"]} key={item.id} room_key={item["Room.Room_key"]} time_start={item["Room.Time_start"]}/>
+                        <ToastMeeting avatar={item["sender.avatar"]} id={item?.id} send_by={item?.Send_by} display_name={item["sender.display_name"]} key={item.id} room_key={item["Room.Room_key"]} time_start={item["Room.Time_start"]}/>
                     )
                 })}
             </div>

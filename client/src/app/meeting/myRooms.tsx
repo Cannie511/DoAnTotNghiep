@@ -1,13 +1,13 @@
 'use client'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AppContext } from '@/Context/Context'
-import { deleteRoom, getAllMyRoom } from '@/Services/room.api'
+import { deleteRoom, getAllMyRoom, updatePasswordRoom } from '@/Services/room.api'
 import { formatDateMessage, formatRoomKey } from '@/Utils/formatDate'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { Clipboard, Pagination, Table, TextInput, Tooltip } from 'flowbite-react'
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FaDoorOpen } from "react-icons/fa";
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { IoEyeSharp } from "react-icons/io5";
 import { MdOutlinePassword } from "react-icons/md";
 import { FaEyeSlash } from "react-icons/fa";
@@ -22,24 +22,18 @@ export default function MyRooms() {
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [isPending, setPending] = useState<boolean>(false);
     const [editingRoom, setEditingRoom] = useState<number>(-1);
+    const [password, setPassword] = useState<string>('');
     const [room_id, setRoom_id] = useState<number>(-1);
-    const passwordRef = useRef<HTMLInputElement>(null);
-    const queryClient = useQueryClient();
     
     const {toast} = useToast();
     const [page, setPage] = useState<number>(1);
     const onPageChange = (page: number) => setPage(page);
-    const {data:myRoomLs, isLoading} = useQuery({
+    const {data:myRoomLs, isLoading, refetch} = useQuery({
         queryKey:['my_room_ls'],
         queryFn:()=>getAllMyRoom(Number(user_id),page),
         enabled: !!user_id
     })
     const dataList:[] = myRoomLs?.data?.data;
-    useEffect(()=>{
-        if(passwordRef.current){
-            passwordRef.current.focus();
-        }
-    },[])
     const onConfirm = (id:number) =>{
         setRoom_id(id);
         setOpenModal(true);
@@ -54,7 +48,7 @@ export default function MyRooms() {
                 description:"Bạn đã xóa phòng thành công!"
             })
             setOpenModal(false)
-            queryClient.invalidateQueries({queryKey:["my_room_ls"]})
+            refetch();
         })
         .catch((err)=>{
            toast({
@@ -66,8 +60,35 @@ export default function MyRooms() {
             setPending(false)
         })
     }
-    const onChangePassword = async() =>{
-        setEditingRoom(-1)
+    const openEditingInput = (id:number, password:string) =>{
+        setEditingRoom(id);
+        setPassword(password);
+    }
+    const onChangePassword = async(id:number) =>{
+        await updatePasswordRoom(id, password)
+        .then(()=>{
+            toast({
+                title:"Thông báo",
+                description:"Thay đổi mật khẩu phòng thành công"
+            })
+            refetch();
+            setEditingRoom(-1);
+            setPassword('');
+        })
+        .catch((err)=>{
+            toast({
+                title:"Lỗi: " + err.message,
+                variant:"destructive"
+            })
+        })
+    }
+    const onCancel = () =>{
+        setEditingRoom(-1);
+        setPassword('');
+    }
+    const onJoinRoom = (room_key:number)=>{
+        const url = `/onMeeting/${room_key}`;
+        window.open(url, '_blank');
     }
   return (
     <>
@@ -127,7 +148,7 @@ export default function MyRooms() {
                             
                         </Table.Cell>
                         <Table.Cell>
-                            {editingRoom === room?.id ? <TextInput placeholder='Mật khẩu . . .' className='w-36' ref={passwordRef} value={room?.Password} /> :
+                            {editingRoom === room?.id ? <TextInput placeholder='Mật khẩu . . .' className='w-36' onChange={(e)=>setPassword(e.target.value)} value={password} /> :
                                 showPassword ? room?.Password : <span className='font-bold text-xl'>**********</span>
                             }
                         </Table.Cell>
@@ -137,25 +158,25 @@ export default function MyRooms() {
                         {editingRoom === +room?.id  ?
                             <>
                                 <Tooltip content="Lưu mật khẩu">
-                                    <div onClick={onChangePassword} className='w-8 h-8 rounded-full bg-green-600 text-white transition-all hover:bg-opacity-50 hover:text-white cursor-pointer flex items-center justify-center'>
+                                    <div onClick={()=>onChangePassword(room?.id)} className='w-8 h-8 rounded-full bg-green-600 text-white transition-all hover:bg-opacity-50 hover:text-white cursor-pointer flex items-center justify-center'>
                                         <FaCheck className='text-xl'/>
                                     </div>
                                 </Tooltip>
                                 <Tooltip content="Hủy">
-                                    <div onClick={onChangePassword} className='w-8 h-8 rounded-full bg-red-600 text-white transition-all hover:bg-opacity-50 hover:text-white cursor-pointer flex items-center justify-center'>
+                                    <div onClick={onCancel} className='w-8 h-8 rounded-full bg-red-600 text-white transition-all hover:bg-opacity-50 hover:text-white cursor-pointer flex items-center justify-center'>
                                         <IoIosClose className='text-4xl'/>
                                     </div>
                                 </Tooltip>
                             </>
                             :
                             <Tooltip content="Thay đổi mật khẩu">
-                                <div onClick={()=>setEditingRoom(room?.id)} className='w-10 h-10 rounded-full bg-none text-blue-500 transition-all hover:bg-white hover:bg-opacity-50 hover:text-white cursor-pointer flex items-center justify-center'>
+                                <div onClick={()=>openEditingInput(room?.id, room?.Password)} className='w-10 h-10 rounded-full bg-none text-blue-500 transition-all hover:bg-white hover:bg-opacity-50 hover:text-white cursor-pointer flex items-center justify-center'>
                                     <MdOutlinePassword className='text-3xl'/>
                                 </div>
                             </Tooltip>
                         }
                         <Tooltip content="Tham gia phòng">
-                            <div className='w-10 h-10 rounded-full bg-none text-yellow-300 transition-all hover:bg-white hover:bg-opacity-50 hover:text-white cursor-pointer flex items-center justify-center'>
+                            <div onClick={()=>onJoinRoom(room?.Room_key)} className='w-10 h-10 rounded-full bg-none text-yellow-300 transition-all hover:bg-white hover:bg-opacity-50 hover:text-white cursor-pointer flex items-center justify-center'>
                                 <FaDoorOpen className='text-3xl'/>
                             </div>
                         </Tooltip>

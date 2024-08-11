@@ -12,7 +12,7 @@ router.get("/user_invitation/:user_id", async (req, res) => {
   return await controller.findAll();
 });
 
-router.delete("/user_invitation/:user_id/:room_id/:send_by", async (req, res) => {
+router.delete("/user_invitation/:invitation_id", async (req, res) => {
   const controller = new UserInvitationController(req, res);
   return await controller.delete();
 });

@@ -11,18 +11,31 @@ class NotificationService {
   }
   create = async () => {
     try {
-      const data = await Model.Notification.create(
-        {
+      const findNoti = await Model.Notification.findOne({
+        where: {
           user_id: this.user_id,
           message: this.message,
           send_by: this.send_by,
           type: this.type,
           status: this.status,
         },
-        { raw: true }
-      );
-      if (data) return handleResult(200, "Tạo thông báo thành công", data);
-      else return handleResult(422, "Tạo thông báo thất bại");
+        raw: true,
+      });
+      if(!findNoti){
+        const data = await Model.Notification.create(
+          {
+            user_id: this.user_id,
+            message: this.message,
+            send_by: this.send_by,
+            type: this.type,
+            status: this.status,
+          },
+          { raw: true }
+        );
+        if (data) return handleResult(200, "Tạo thông báo thành công", data);
+        else return handleResult(422, "Tạo thông báo thất bại");
+      }
+      else return handleResult(422, "Thông báo đã tồn tại!");
     } catch (error) {
       return handleError(error);
     }
@@ -48,25 +61,6 @@ class NotificationService {
     }
   };
 
-  update = async (noti_id) => {
-    try {
-      const data = await Model.Notification.update(
-        {
-          status: 1,
-        },
-        {
-          where: {
-            id: noti_id,
-          },
-          raw: true,
-        }
-      );
-      if (data) return handleResult(200, "Cập nhật báo thành công", data);
-      else return handleResult(422, "Cập nhật thông báo thất bại");
-    } catch (error) {
-      return handleError(error);
-    }
-  };
   getAll = async()=>{
     try {
       const data = await Model.Notification.findAll({

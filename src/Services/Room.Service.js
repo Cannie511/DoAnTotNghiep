@@ -112,6 +112,37 @@ const checkRoomPasswordService = async(room_id, password)=>{
   }
 }
 
+const updatePasswordRoomService = async (room_id, password) => {
+  try {
+    const findRoom = await Model.Rooms.findOne({
+      where: {
+        id: room_id,
+      },
+      raw: true,
+    });
+    if (findRoom) {
+      const room = await Model.Rooms.update(
+        {
+          Password: password,
+        },
+        {
+          where: {
+            id: room_id,
+          }
+        }
+      );
+      console.log(+room)
+      if(+room === 1){
+        return handleResult(200, "Thay đổi mật khẩu thành công")
+      }
+      return handleResult(422, "Thay đổi mật khẩu thất bại");
+    }
+    return handleResult(422, "Không tìm thấy phòng")
+  } catch (error) {
+    return handleError(error)
+  }
+};
+
 const deleteRoomService = async(room_id)=>{
   try {
     const findRoom = await Model.Rooms.findOne({
@@ -140,4 +171,5 @@ module.exports = {
   findRoomService,
   checkRoomPasswordService,
   deleteRoomService,
+  updatePasswordRoomService,
 };

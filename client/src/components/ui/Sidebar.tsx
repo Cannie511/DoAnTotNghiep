@@ -30,26 +30,26 @@ export default function SideBar() {
     <Sidebar className="h-screen fixed transition-all sm:translate-x-0 -translate-x-full" aria-label="Sidebar with content separator example">
       <Sidebar.Items className="mt-20">
         <Sidebar.ItemGroup className="space-y-8 ">
-          <NavLink href="/profile" className="items-center sidebar-items text-xl font-bold text-start flex rounded-lg p-3 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+          <NavLink href="/profile" className="items-center sidebar-items text-lg font-bold text-start flex rounded-lg p-3 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
             <MdManageAccounts/> Tài khoản
           </NavLink>
-          <NavLink href="/chat" className=" items-center sidebar-items flex rounded-lg p-3 text-xl font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+          <NavLink href="/chat" className=" items-center sidebar-items flex rounded-lg p-3 text-lg font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
             <IoChatbubbleEllipses/> Trò chuyện 
             {message_noti && 
-              <div className='w-5 h-5 flex items-center justify-center rounded-full bg-red-600 relative mt-1 ml-16 text-xs text-white'>{String(message_noti)}</div>
+              <div className='w-5 h-5 flex items-center justify-center rounded-full bg-red-600 absolute mt-1 ml-40 text-xs text-white'>{String(message_noti)}</div>
             }
           </NavLink>
-          <NavLink href="/meeting" className="items-center sidebar-items flex rounded-lg p-3 text-xl font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+          <NavLink href="/meeting" className="items-center sidebar-items flex rounded-lg p-3 text-lg font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
            <MdVideoCameraFront/> Phòng họp
           </NavLink>
-          <NavLink href="/schedule" className="items-center sidebar-items flex rounded-lg p-3 text-xl font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+          <NavLink href="/schedule" className="items-center sidebar-items flex rounded-lg p-3 text-lg font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
            <FaCalendarAlt/> Lịch trình
           </NavLink>
           <Sidebar.Collapse icon={FaUserFriends} label="Bạn bè">
-            <NavLink href="/friends" className="items-center sidebar-items flex rounded-lg p-3 text-xl font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+            <NavLink href="/friends" className="items-center sidebar-items flex rounded-lg p-3 text-lg font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
               <BsPersonFillAdd/> Lời mời kết bạn
             </NavLink>
-            <NavLink href="/friend-list" className="items-center sidebar-items flex rounded-lg p-3 text-xl font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+            <NavLink href="/friend-list" className="items-center sidebar-items flex rounded-lg p-3 text-lg font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
               <PiUserListFill/> Tất cả bạn bè
             </NavLink>
           </Sidebar.Collapse>

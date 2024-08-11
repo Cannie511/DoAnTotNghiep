@@ -21,6 +21,10 @@ export const getAllMyRoom = async(user_id:number, page?:number)=>{
     return await http.get(`/api/room/getAll/${user_id}?page=${page}`)
 }
 
+export const updatePasswordRoom = async(room_id:number, password:string)=>{
+    return await http.put('/api/room/updatePassword', {room_id, password});
+}
+
 export const deleteRoom = async(room_id:number)=>{
     return await http.delete(`/api/room/delete/${room_id}`);
 }

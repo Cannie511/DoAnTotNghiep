@@ -16,11 +16,6 @@ export default function FriendView({dataList,isLoading, header, btn_content, typ
     <>
         <h1 className='text-2xl font-bold mt-3'>{header}</h1>
         <div className='flex flex-wrap my-2'>
-            {dataList && dataList.map((item:any)=>{
-                return(
-                    <CardFriend typeView={typeView} key={item?.id} noti_id={item?.id} avatar={item?.avatar||url_img_default} id={item?.send_by||item?.id} display_name={item?.display_name}/>
-                )
-            })} 
             {isLoading &&
                 <>
                     <SkeletonFriendComponent/>
@@ -28,6 +23,11 @@ export default function FriendView({dataList,isLoading, header, btn_content, typ
                     <SkeletonFriendComponent/>
                 </>
             }
+            {!isLoading && dataList && dataList.map((item:any)=>{
+                return(
+                    <CardFriend typeView={typeView} key={item?.id} noti_id={item?.id} avatar={item?.avatar||url_img_default} id={item?.send_by||item?.id} display_name={item?.display_name}/>
+                )
+            })} 
         </div>
         <Button className='w-full border-none my-2' color={"gray"}>Xem thêm</Button>
         <hr />

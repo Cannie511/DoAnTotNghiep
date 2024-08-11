@@ -28,6 +28,9 @@ export default function CardFriend({noti_id, avatar, display_name, id, typeView}
     const queryClient = useQueryClient();
     const {toast} = useToast();
     const handleAddFriend = async()=>{
+        if(socket){
+            socket.emit("friend_request",{user_id, friend_id:id});
+        }
         await createNotification({
             user_id: Number(id),
             message:" đã gửi lời mời kết bạn ",
@@ -38,9 +41,7 @@ export default function CardFriend({noti_id, avatar, display_name, id, typeView}
         .then((data)=>{
             queryClient.invalidateQueries({queryKey:['List user']});
             queryClient.invalidateQueries({queryKey:['friend_request']});
-            if(socket){
-                socket.emit("friend_request",{user_id, friend_id:id});
-            }
+           
             toast({
                 title: "Đã gửi lời mời kết bạn thành công"
             });

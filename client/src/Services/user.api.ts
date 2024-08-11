@@ -16,3 +16,7 @@ export const UserFindOne = async (user_id:number)=>{
 export const UserFindByNameOrEmail = async(searchValue:string, user_id:number)=>{
     return await http.post(`api/users/findByNameOrEmail/${user_id}`, {searchValue});
 }
+
+export const UserUpdateDisplayName = async(user_id:number, new_name:string)=>{
+    return await http.put('/api/users/displayname',{user_id, new_name});
+}

@@ -33,7 +33,7 @@ const pagination = async (table, attr = {}, page, where = {}, order={}, include=
       raw: true,
     });
 
-    if (data && totalPages) {
+    if ((data && totalPages) || (data.length === 0 && totalPages === 0)) {
       return {
         status: 200,
         message: "get data successfully",

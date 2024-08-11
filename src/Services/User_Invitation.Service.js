@@ -70,17 +70,16 @@ class UserInvitationService {
         }
     }
 
-    delete = async() =>{
+    delete = async(id) =>{
       try {
-        const user_invitation = Model.USER_INVITATION.destroy({
+        const user_invitation = await Model.USER_INVITATION.destroy({
           where :{
-            User_ID: this.user_id,
-            Room_ID: this.room_id,
-            Send_by: this.send_by
+            id: id
           }, raw:true
         })
-        if(user_invitation === 1) return handleResult(200, "Xóa người dùng khỏi phòng thành công");
-        else return handleResult(422, "Xóa người dùng khỏi phòng thất bại")
+        console.log(user_invitation)
+        if(+user_invitation === 1) return handleResult(200, "Xóa lời mời thành công");
+        else return handleResult(422, "Xóa lời mời thất bại")
       } catch (error) {
         return handleError(error);
       } 

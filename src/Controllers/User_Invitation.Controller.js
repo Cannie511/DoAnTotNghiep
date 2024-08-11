@@ -44,10 +44,10 @@ class UserInvitationController{
 
     delete = async() => {
         try {
-            const {user_id, room_id, send_by} = this.req.params;
-            if (!user_id || !room_id || !send_by) return this.res.status(422).json({message: "Các trường là bắt buộc"});
-            const user_invitation_service = new UserInvitationService(user_id, room_id ,send_by);
-            const data = await user_invitation_service.delete();
+            const {invitation_id} = this.req.params;
+            if (!invitation_id) return this.res.status(422).json({message: "Các trường là bắt buộc"});
+            const user_invitation_service = new UserInvitationService();
+            const data = await user_invitation_service.delete(invitation_id);
             if(data) return this.res.status(data.status).json(data.data);
         } catch (error) {
             const err = handleError(error);

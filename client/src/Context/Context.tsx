@@ -181,8 +181,16 @@ export default function AppProvider({children}:{children: ReactNode}){
             })
             socketIo.on("room-chat",(user_id, message)=>{
                 if(pathname.includes("/onMeeting/")){
-                    console.log(user_id + " :" + message)
                     queryClient.invalidateQueries({queryKey:['room_message_list']})
+                }
+            })
+
+            socketIo.on("reject_meeting",(display_name, message)=>{
+                if(pathname.includes("/onMeeting/")){
+                    toast({
+                        title:display_name+ " đã từ chối tham gia phòng họp ",
+                        description: "Lý do: " + message
+                    })
                 }
             })
 

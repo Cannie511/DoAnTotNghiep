@@ -61,7 +61,6 @@ const GoogleLoginService = async(token) =>{
         const updateGoogleAccount = await Model.User.update(
           {
             email: data?.email,
-            display_name: data?.name,
             language: account_user?.language,
             premium: account_user?.premium,
             linked_account: "google",
@@ -91,7 +90,7 @@ const GoogleLoginService = async(token) =>{
             data: {
               id: account_user?.id,
               email: data?.email,
-              display_name: data?.name,
+              display_name: account_user?.display_name,
               language: account_user?.language,
               premium: account_user?.premium,
               linked_account: "google",
@@ -111,7 +110,6 @@ const GoogleLoginService = async(token) =>{
           "google",
           data?.picture
         );
-        console.log(res);
         if(res.status===200){
           const access_token = await createKey({
             id: res?.data.data.id,
@@ -127,7 +125,7 @@ const GoogleLoginService = async(token) =>{
         } 
       }
     }
-    else return handleResult(401, "Unauthorized");
+    else return handleResult(403, "Unauthorized");
   } catch (error) {
     return handleError(error);
   }

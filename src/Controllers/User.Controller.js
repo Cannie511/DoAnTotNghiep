@@ -8,7 +8,8 @@ const {
   findUserService,
   updatePasswordWithoutOldPasswordService,
   updatePremiumService,
-  findUserByNameOrEmailService
+  findUserByNameOrEmailService,
+  updateUserDisplaynameService
 } = require("../Services/User.Service");
 const { hashPassword } = require("../Utils/HashPassword");
 const { handleError } = require("../Utils/Http");
@@ -172,6 +173,18 @@ const findUserByNameOrEmailController = async (req, res) => {
   }
 };
 
+const updateDisplayNameController = async(req, res)=>{
+  try {
+    const {user_id, new_name} = req.body;
+    if(!user_id || !new_name) return res.status(422).json({message:"Các trường là bắt buộc"});
+    const userService = await updateUserDisplaynameService(user_id, new_name);
+    if(userService) return res.status(userService.status).json(userService);
+  } catch (error) {
+    const err = handleError(error);
+    return res.status(err.status).json({ message: err.message });
+  }
+}
+
 const updatePremiumController = async (req, res)=>
   {
     try {
@@ -195,5 +208,6 @@ module.exports = {
   findUserEmail,
   updatePasswordWithoutOldPasswordController,
   updatePremiumController,
+  updateDisplayNameController,
   findUserByNameOrEmailController,
 };

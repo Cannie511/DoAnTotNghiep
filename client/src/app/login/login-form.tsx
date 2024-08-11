@@ -126,7 +126,7 @@ export default function LoginForm() {
                                 const token:string|undefined = credentialResponse?.credential;
                                 await AuthLoginGoogle(token)
                                 .then(async (data)=>{
-                                    //console.log('google: ',data)
+
                                     setName(data?.data?.data?.data?.display_name)
                                     localStorage.setItem('user_data',JSON.stringify(data.data.data.data));
                                     await axios.post('/api/auth',{access_token: data.data.data.access_token.token})
