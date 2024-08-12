@@ -1,7 +1,7 @@
 'use client'
-import srcAvatar from "@/app/favicon.ico";
+
 import Image from "next/image";
-import { Card } from "flowbite-react";
+import { Avatar, Card } from "flowbite-react";
 import { useContext, useState } from "react";
 import { AppContext } from "@/Context/Context";
 import { FaUserFriends } from "react-icons/fa";
@@ -13,8 +13,9 @@ import ModalInput from "@/components/ModalInput";
 import ModalUpdateName from "./ModalUpdateName";
 import { useQuery } from "@tanstack/react-query";
 import { UserFindOne } from "@/Services/user.api";
+import { url_img_default } from "@/images/image";
 export default function ProfileUser() {
-  const {display_name, user_id, linked_account, avatar} = useContext(AppContext);
+  const {user_id, linked_account} = useContext(AppContext);
   const [openModal, showModal] = useState<boolean>(false);
   const [openModalName, showModalName] = useState<boolean>(false);
   const {data:user, isLoading} = useQuery({
@@ -39,16 +40,17 @@ export default function ProfileUser() {
     <>
      <Card className="">
       <div className="flex flex-row items-center">
-        <Image
-          alt="Freet Image"
-          height="96"
-          src={avatar || srcAvatar}
-          width="96"
-          className="rounded-full shadow-lg"
+       <div className="w-60">
+         <Avatar
+          img={user_data?.avatar||url_img_default}
+          rounded
+          size={"xl"}
+          className="transition-transform duration-300 ease-in-out transform hover:scale-110"
         />
-        <div className="ml-3 w-full">
+       </div>
+        <div className="ml-3 w-full space-y-3">
           <div className="flex">
-              <div className="flex-1"><span className="text-2xl text-gray-900 dark:text-white">{display_name}</span></div>
+              <div className="flex-1"><span className="text-3xl text-gray-900 font-bold dark:text-white">{user_data?.display_name}</span></div>
               <div className="flex-1 text-end">
                 <Button variant="outline" onClick={()=>showModalName(true)}>
                   chỉnh sửa
@@ -90,10 +92,9 @@ export default function ProfileUser() {
             <div className="col-1 text-end"><Button size={'sm'} onClick={()=>showModal(true)}>Đổi mật khẩu</Button></div>
           </div>
         }
-        
       </Card>
       <ModalInput openModal={openModal} setOpenModal={showModal}/>
-      <ModalUpdateName openModal={openModalName} setOpenModal={showModalName}/>
+      <ModalUpdateName avatar={user_data?.avatar} openModal={openModalName} setOpenModal={showModalName}/>
       </>      
     }
     </>

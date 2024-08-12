@@ -6,7 +6,7 @@ import { UserData } from "@/types/type";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "@/Context/Context";
 import { getLatestMessage } from "@/Services/message.api";
-import { TextInput, Tooltip } from "flowbite-react";
+import { Avatar, TextInput, Tooltip } from "flowbite-react";
 import { TbMessageCirclePlus } from "react-icons/tb";
 import { url_img_default } from "@/images/image";
 import dynamic from "next/dynamic";
@@ -117,11 +117,11 @@ export default function ListFriend({setFriend, friend , openModal, setOpenModal}
                 >
                     <div className="flex items-center space-x-3">
                     <div className="shrink-0">
-                        <Image
+                        <Avatar
                         alt="avatar"
-                        height="32"
-                        src={item?.Send_by === user_id ? item?.receiver_avt as StaticImageData : item?.sender_avt ? item?.sender_avt as StaticImageData :  url_img_default}
-                        width="32"
+                        rounded
+                        size={"sm"}
+                        img={item?.Send_by === user_id ? item?.receiver_avt : item?.sender_avt ? item?.sender_avt :  url_img_default}
                         className="rounded-full"
                         />
                     </div>

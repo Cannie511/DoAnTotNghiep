@@ -27,6 +27,7 @@ const nextConfig = {
       "lh3.googleusercontent.com",
       "scontent.fsgn2-3.fna.fbcdn.net",
       "www.kindpng.com",
+      "res.cloudinary.com",
     ],
   },
   swcMinify: true,

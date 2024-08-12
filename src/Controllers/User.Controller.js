@@ -9,7 +9,8 @@ const {
   updatePasswordWithoutOldPasswordService,
   updatePremiumService,
   findUserByNameOrEmailService,
-  updateUserDisplaynameService
+  updateUserDisplaynameService,
+  updateAvatarService
 } = require("../Services/User.Service");
 const { hashPassword } = require("../Utils/HashPassword");
 const { handleError } = require("../Utils/Http");
@@ -18,8 +19,7 @@ const pagination = require("../Utils/Pagination");
 const getUserByIdController = async (req, res) => {
   try {
     const { user_id } = req.params;
-    const data = await getUsersByIdService(user_id);
-    console.log(data);
+    const data = await getUsersByIdService(user_id);  
     return res.status(data.status).json(data);
   } catch (error) {
     return err = handleError(error)
@@ -175,10 +175,30 @@ const findUserByNameOrEmailController = async (req, res) => {
 
 const updateDisplayNameController = async(req, res)=>{
   try {
-    const {user_id, new_name} = req.body;
-    if(!user_id || !new_name) return res.status(422).json({message:"Các trường là bắt buộc"});
-    const userService = await updateUserDisplaynameService(user_id, new_name);
-    if(userService) return res.status(userService.status).json(userService);
+    const avatar = req.file;
+    const { user_id, new_name } = req.body;
+    if(avatar){
+      console.log(avatar?.path);
+      const userServiceAvatar = await updateAvatarService(user_id, avatar?.path);
+      const userServiceName = await updateUserDisplaynameService(user_id, new_name);
+      if (userServiceAvatar.status === 200 && userServiceName.status === 200)
+        return res
+          .status(userServiceAvatar.status)
+          .json({
+            message: "Cập nhật thông tin thành công",
+            new_avatar: avatar?.path,
+          });
+      else if(userServiceAvatar.status !== 200){
+        return res.status(userServiceAvatar.status).json({message:"Upload ảnh thất bại"});
+      }
+      else return res.status(userServiceName.status).json({message:"Đổi tên thất bại"});
+    }
+    else{
+      if (!user_id || !new_name)
+        return res.status(422).json({ message: "Các trường là bắt buộc" });
+      const userService = await updateUserDisplaynameService(user_id, new_name);
+      if (userService) return res.status(userService.status).json(userService);
+    }
   } catch (error) {
     const err = handleError(error);
     return res.status(err.status).json({ message: err.message });

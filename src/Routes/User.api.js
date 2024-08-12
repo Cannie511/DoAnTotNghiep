@@ -3,13 +3,13 @@ const {
   getUserController,
   addUserController,
   deleteUserController,
-  updateUserController,
   getUserByIdController,
   updatePasswordController,
   checkPasswordController,
   findUserByNameOrEmailController,
   updateDisplayNameController,
 } = require("../Controllers/User.Controller");
+const uploadCloud = require('../Middlewares/cloudinary')
 const router = express.Router();
 
 router.get("/users/:user_id", async (req, res) => getUserByIdController(req, res));
@@ -21,6 +21,6 @@ router.put("/users/password/:user_id", async (req, res) =>updatePasswordControll
 router.delete("/users/:user_id", async (req, res) =>deleteUserController(req, res));
 router.post("/users/premium", async(req,res) => updatePremiumController(req,res));
 router.post("/users/findByNameOrEmail/:user_id", async(req, res)=>findUserByNameOrEmailController(req, res));
-router.put("/users/displayname", async(req, res)=>updateDisplayNameController(req, res));
+router.put("/users/displayname", uploadCloud.single('avatar'),async(req, res)=>updateDisplayNameController(req, res));
 
 module.exports = router;

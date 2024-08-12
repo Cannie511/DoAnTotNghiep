@@ -314,6 +314,34 @@ const findUserByNameOrEmailService = async (value, user_id) => {
   }
 };
 
+const updateAvatarService = async(user_id, avatar_url) =>{
+  try {
+    const isExist = await Model.User.findOne({
+      where: {
+        id: user_id,
+      },
+    });
+    if (isExist) {
+      const updateName = await Model.User.update(
+        {
+          avatar: avatar_url,
+        },
+        {
+          where: {
+            id: user_id,
+          },
+        }
+      );
+      if (+updateName === 1)
+        return handleResult(200, "Thay đổi ảnh thành công");
+      return handleResult(422, "Thay đổi ảnh thất bại");
+    }
+    return handleResult(422, "Không tìm thấy người dùng");
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
 const updateUserDisplaynameService = async(user_id, new_name) =>{
   try {
     const isExist = await Model.User.findOne({
@@ -321,6 +349,7 @@ const updateUserDisplaynameService = async(user_id, new_name) =>{
         id: user_id,
       },
     });
+    if(new_name === isExist.display_name) return handleResult(200, "Thay đổi tên thành công");
     if (isExist) {
       const updateName = await Model.User.update(
         {
@@ -377,4 +406,5 @@ module.exports = {
   updatePremiumService,
   findUserByNameOrEmailService,
   updateUserDisplaynameService,
+  updateAvatarService,
 };

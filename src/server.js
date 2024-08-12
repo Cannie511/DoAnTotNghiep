@@ -17,6 +17,7 @@ const db_connect = require("./Database/db.connect");
 const cors_config = require("./Middlewares/CORS");
 const { createServer } = require("node:http");
 const initializeSocket = require("./socketServer");
+const uploadCloud = require('./Middlewares/cloudinary')
 require("dotenv").config();
 const server = createServer(app);
 
@@ -30,7 +31,12 @@ app.use(cookieParser());
 
 const port = process.env.PORT || 5000;
 
-
+app.post("/test", uploadCloud.single('avatar'), (req,res)=>{
+  const data = req.file;
+  console.log(data);
+  if (data) res.status(200).json({ file: data });
+  else res.status(400).json({ message: "no file found" });
+})
 
 app.use("/auth", AuthRoute);
 app.use("/api", Authentication, UserRoute);

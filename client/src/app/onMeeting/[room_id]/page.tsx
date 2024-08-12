@@ -2,7 +2,6 @@
 import MotionBackground from "./MotionBackground";
 import type { Metadata } from 'next'
 import { formatRoomKey } from "@/Utils/formatDate";
-import IndexPage from "../test";
  
 type Props = {
   params: { room_id: string }

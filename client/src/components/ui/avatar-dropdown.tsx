@@ -9,9 +9,11 @@ import { useContext } from 'react'
 import { AppContext } from '@/Context/Context'
 import { AuthLogout } from '@/Services/auth.api'
 import { useToast } from './use-toast'
+import { Avatar } from 'flowbite-react'
+import { url_img_default } from '@/images/image'
 
 interface Props {
-    srcImg: StaticImageData;
+    srcImg: StaticImageData | string;
 }
 
 export default function AvatarDropdown({srcImg}:Props) {
@@ -49,7 +51,7 @@ export default function AvatarDropdown({srcImg}:Props) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-            <Image className='rounded-full' src={avatar as StaticImageData || srcImg} width={32} height={32} alt=''/>
+            <Avatar className='rounded-full' rounded img={avatar || url_img_default} size={"sm"} alt=''/>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
