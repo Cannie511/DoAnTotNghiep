@@ -32,3 +32,16 @@ checkPassword(<password của user>, <đoạn password đã hash trong database>
 JWT: createKey(<data của người dùng, không bỏ mật khẩu vào nha ní>)
 checkKey(<token của user>)
 hàm login đã tự động set cookie cho client nên không cần code thêm.
+
+######
+Front-end
+Nextjs 14.2
+Install package: 
+1. cd ./client
+2.  npm i
+3. npm run dev
+
+######
+Peerjs Server:
+1. cd ./client
+2. peerjs --port 1234 path /peerjs-server
