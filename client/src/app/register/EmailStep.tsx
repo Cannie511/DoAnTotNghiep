@@ -5,6 +5,7 @@ import React, { Dispatch, SetStateAction, useContext, useLayoutEffect, useState 
 import { GrFormNext } from "react-icons/gr";
 import '@/styles/login.css'
 import { AuthEmail, AuthGetVerifyCode } from '@/Services/auth.api';
+import { validateEmail } from '@/Utils/validateEmail';
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -21,13 +22,21 @@ export default function EmailStep({setStep}:Props) {
     },[])
     const handleCheckStep = async ()=>{
         try {
+            
             if(isLoading) return;
             setLoading(true);
             if(!username){
                 setValidateUsername(true);
                 setErrorMessage('Tên đăng nhập không được để trống');
+                return
             }
             else {
+                if(!validateEmail(username?.toString())) 
+                {
+                    setValidateUsername(true);
+                    setErrorMessage('Email sai định dạng');
+                    return;
+                }
                 await AuthEmail(username)
                 .then((data)=>{
                     setValidateUsername(true);

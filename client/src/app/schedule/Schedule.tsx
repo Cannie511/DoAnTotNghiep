@@ -93,7 +93,7 @@ export default function Schedule() {
     }
     return (
         <div>
-            <Accordion className='w-2/4'>
+            <Accordion className='md:w-2/4'>
                 <Accordion.Panel>
                     <Accordion.Title>Lên lịch cuộc họp</Accordion.Title>
                     <Accordion.Content>

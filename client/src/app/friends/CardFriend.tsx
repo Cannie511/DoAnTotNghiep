@@ -86,16 +86,13 @@ export default function CardFriend({noti_id, avatar, display_name, id, typeView,
         queryClient.invalidateQueries({queryKey:["friend_noti"]});
     }
   return (
-    <div className='w-51 shadow-md dark:bg-slate-800 h-[22rem] rounded-xl overflow-hidden m-2'>
-        <div className='h-[12rem] w-full overflow-hidden'>
+    <div className='md:w-52 w-36  shadow-md dark:bg-slate-800 h-fit rounded-xl overflow-hidden m-2'>
+        <div className='md:h-[12rem] w-full overflow-hidden'>
             <Image src={avatar} height={192} width={208} alt="avatar"/>
         </div>
         <div className='font-semibold p-2 truncate'>
             {display_name}
             <br/>
-            <small>
-                0 bạn chung
-            </small>
         </div>
         <div className='p-2 space-y-1'>
             <Button className='w-full' color={"blue"} size="sm" onClick={

@@ -47,11 +47,11 @@ export default function SearchInput() {
         
     }
   return (
-    <div className='m-2 w-full h-[20rem] mt-24 flex items-center justify-center'>
-        <div className='w-[35rem] flex flex-col space-y-3 bg-gray-200 items-center justify-center dark:bg-gray-700 rounded-md p-5 mt-20'>
+    <div className='md:m-2 w-full h-[20rem] mt-24 flex items-center justify-center'>
+        <div className='md:w-[35rem] w-[24rem] flex flex-col space-y-3 bg-gray-200 items-center justify-center dark:bg-gray-700 rounded-md p-5 md:mt-32'>
             <h1 className='text-2xl'>Nhập mã phòng họp tại đây</h1>
             <div className='text-gray-400 text-lg'>Mã phòng gồm 9 số, ví dụ: 123-456-789</div>
-            <form className='flex space-x-2' onSubmit={onSubmit}>
+            <form className='hidden md:flex space-x-2 flex-col md:flex-row' onSubmit={onSubmit}>
                 <InputOTP maxLength={9}
                 value={value}
                 onChange={(value) => setValue(value)}>
@@ -74,6 +74,24 @@ export default function SearchInput() {
                 </InputOTPGroup>
                 </InputOTP>
                 <Button type='submit' className='w-10 h-10'><IoSearch className='text-xl'/></Button>
+            </form>
+            <form className='flex md:hidden space-y-2 flex-col md:flex-row' onSubmit={onSubmit}>
+                <InputOTP maxLength={9}
+                value={value}
+                onChange={(value) => setValue(value)}>
+                <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                    <InputOTPSlot index={6} />
+                    <InputOTPSlot index={7} />
+                    <InputOTPSlot index={8} />
+                </InputOTPGroup>
+                </InputOTP>
+                <Button type='submit' className='w-full h-10'>Tìm phòng <IoSearch className='text-xl ml-2'/></Button>
             </form>
             <div className="line-container w-1/2 my-10">
                 hoặc

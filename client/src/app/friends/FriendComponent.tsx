@@ -43,7 +43,7 @@ export default function FriendComponent() {
     }
   return (
     <div className=''>
-      <div className='space-y-2 mt-10 mx-auto w-fit'>
+      <div className='space-y-2 w-full mt-10 mx-auto w-fit'>
         {isLoading || !list_friend_accepted &&
           <>
             <Skeleton className='w-full h-20'/>
@@ -56,7 +56,7 @@ export default function FriendComponent() {
             <div key={item?.id} 
             className="
             cursor-pointer  dark:hover:bg-gray-700 transition-all 
-            hover:bg-slate-100 flex rounded-lg border w-[42rem] border-gray-200 
+            hover:bg-slate-100 flex rounded-lg border w-full md:w-[42rem] border-gray-200 
             bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 
               p-4 items-center">
               <div className='flex-auto flex items-center'>
@@ -71,7 +71,7 @@ export default function FriendComponent() {
                       />
                   </div>
                   <div className="min-w-0 flex-1">
-                      <p className="truncate text-lg text-gray-900 dark:text-white">{item["Friend.display_name"]}</p>
+                      <p className="truncate text-lg text-gray-900 dark:text-white"><strong>{item["Friend.display_name"]}</strong></p>
                       <p className="truncate text-sm text-gray-500 dark:text-gray-400">{item["Friend.email"]}</p>
                   </div>
                   </div>

@@ -4,7 +4,6 @@ import '@/styles/Sidebar.css';
 import { MdManageAccounts, MdVideoCameraFront } from "react-icons/md";
 import { IoChatbubbleEllipses } from "react-icons/io5";
 import { FaCalendarAlt } from "react-icons/fa";
-import { FaRegNewspaper } from "react-icons/fa6";
 import { FaUserFriends } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import { countNotification } from "@/Services/notification.api";
@@ -12,6 +11,7 @@ import { useContext } from "react";
 import { AppContext } from "@/Context/Context";
 import { BsPersonFillAdd } from "react-icons/bs";
 import { PiUserListFill } from "react-icons/pi";
+import { GrHomeRounded } from "react-icons/gr";
 interface Item {
   id:number;
   lable:string;
@@ -30,6 +30,9 @@ export default function SideBar() {
     <Sidebar className="h-screen fixed transition-all sm:translate-x-0 -translate-x-full" aria-label="Sidebar with content separator example">
       <Sidebar.Items className="mt-20">
         <Sidebar.ItemGroup className="space-y-8 ">
+          <NavLink href="/local_" className="items-center sidebar-items text-lg font-bold text-start flex rounded-lg p-3 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
+            <GrHomeRounded/> Trang chủ
+          </NavLink>
           <NavLink href="/profile" className="items-center sidebar-items text-lg font-bold text-start flex rounded-lg p-3 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
             <MdManageAccounts/> Tài khoản
           </NavLink>

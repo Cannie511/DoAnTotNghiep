@@ -8,3 +8,7 @@ export const createSchedule = async (user_id:number, time:string, password:strin
 export const getSchedule = async (user_id:number, timeDiff:number)=>{
     return await http.post<BasicResponse>(`/api/schedule/getSchedule`,{user_id, timeDiff});
 }
+
+export const deleteSchedule = async (schedule_id:number)=>{
+    return await http.post<BasicResponse>(`/api/schedule/delete/${schedule_id}`);
+}

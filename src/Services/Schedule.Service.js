@@ -62,7 +62,31 @@ const getScheduleService = async (user_id, timeDiff) =>{
   }
 }
 
+const deleteScheduleService = async(id) =>{
+  try {
+    const data = await Model.SCHEDULE.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (data) {
+      const deleteSchedule = await Model.SCHEDULE.destroy({
+        where: {
+          id: id,
+        },
+      });
+      if (+deleteSchedule === 1)
+        return handleResult(200, "Xóa lịch thành công");
+      else return handleResult(422, "Xóa lịch thất bại");
+    }
+    return handleResult(422, "Không tìm thấy lịch");
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
 module.exports = {
   createScheduleService,
   getScheduleService,
+  deleteScheduleService,
 };

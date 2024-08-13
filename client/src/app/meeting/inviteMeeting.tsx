@@ -28,8 +28,7 @@ export const InviteMeeting = () =>{
                     Bạn chưa có lời mời họp nào!
                 </Card>
             }
-            <div className="mt-5 grid grid-flow-row grid-cols-2 ">
-                
+            <div className="mt-5 grid grid-flow-row md:grid-cols-2 grid-cols-1">
                 {list_invitation && list_invitation.map((item:any)=>{
                     return(
                         <ToastMeeting avatar={item["sender.avatar"]} id={item?.id} send_by={item?.Send_by} display_name={item["sender.display_name"]} key={item.id} room_key={item["Room.Room_key"]} time_start={item["Room.Time_start"]}/>

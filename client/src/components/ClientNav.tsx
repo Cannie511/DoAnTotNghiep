@@ -23,8 +23,8 @@ export default function ClientNav({
           <>
             <Navbar/>
             <SideBar/>
-            <div className="md:p-4 sm:ml-64">
-              <div className="md:p-4 rounded-lg dark:border-gray-700 mt-16">
+            <div className="md:p-4 sm:ml-64 mt-24 md:mt-0">
+              <div className="md:p-4 rounded-lg dark:border-gray-700 mt-16 px-1">
                 {children}
               </div>
             </div>

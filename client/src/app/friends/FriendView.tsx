@@ -31,8 +31,8 @@ export default function FriendView({dataList,isLoading, header, btn_content, typ
                 )
             })} 
         </div>
-        <Button className='w-full border-none my-2' color={"gray"}>Xem thêm</Button>
-        <hr />
+        {/* <Button className='w-full border-none my-2' color={"gray"}>Xem thêm</Button> 
+        <hr />*/}
     </>
   )
 }

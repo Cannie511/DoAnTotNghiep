@@ -39,19 +39,19 @@ export default function ProfileUser() {
       </Card> :
     <>
      <Card className="">
-      <div className="flex flex-row items-center">
-       <div className="w-60">
-         <Avatar
-          img={user_data?.avatar||url_img_default}
-          rounded
-          size={"xl"}
-          className="transition-transform duration-300 ease-in-out transform hover:scale-110"
-        />
-       </div>
-        <div className="ml-3 w-full space-y-3">
+      <div className="flex flex-col md:flex-row items-center">
+        <div className="w-60">
+          <Avatar
+            img={user_data?.avatar||url_img_default}
+            rounded
+            size={"xl"}
+            className="transition-transform duration-300 ease-in-out transform hover:scale-110"
+          />
+        </div>
+        <div className="ml-3 md:mt-0 mt-2 w-full space-y-3">
           <div className="flex">
               <div className="flex-1"><span className="text-3xl text-gray-900 font-bold dark:text-white">{user_data?.display_name}</span></div>
-              <div className="flex-1 text-end">
+              <div className="flex-1 text-end md:block hidden">
                 <Button variant="outline" onClick={()=>showModalName(true)}>
                   chỉnh sửa
                   <MdModeEdit className="ms-1"/>
@@ -61,6 +61,10 @@ export default function ProfileUser() {
           <div className="mt-1"><span className=" flex text-sm text-gray-500 dark:text-gray-400"><FaUserFriends className="text-lg me-1"/> Bạn bè: 0</span></div>
           <div><span className="text-sm text-gray-500 dark:text-gray-400">Gói tài khoản: <strong>{user_data?.premium === 0 || !user_data?.premium ? 'Tài khoản cơ bản':'Tài khoản Premium'}</strong></span></div>
         </div>
+        <Button variant="outline" className="mt-3 md:hidden flex w-full" onClick={()=>showModalName(true)}>
+          chỉnh sửa
+          <MdModeEdit className="ms-1"/>
+        </Button>
       </div>
       </Card>
       <Card className="mt-2">
