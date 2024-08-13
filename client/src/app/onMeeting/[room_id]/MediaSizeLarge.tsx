@@ -9,11 +9,13 @@ interface Props {
     remoteStream:MediaStream|null;
     display_name:string;
     avatar: string;
+    host_id:number;
 }
 
-export default function MediaDivLarge({id, remoteStream, display_name ,avatar}:Props) {
+export default function MediaDivLarge({id, remoteStream, display_name ,avatar, host_id}:Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [video, setVideo] = useState<boolean>();
+  const [audio, setAudio] = useState<boolean>();
   const { socket } = useContext(AppContext);
   useEffect(() => {
     if (videoRef.current && remoteStream) {
@@ -54,6 +56,14 @@ export default function MediaDivLarge({id, remoteStream, display_name ,avatar}:P
           }
         } 
       })
+
+      socket.on("off-Mic",(userId:number)=>{
+        if(+userId === +id){
+          console.log("cam: ", userId + " đã tắt mic")
+          console.log(remoteStream?.getAudioTracks()[0])
+          console.log("host: ",host_id)
+        }
+      })
       return () => {
         socket.off("off-Cam");
         socket.off("on-Cam");
@@ -63,6 +73,12 @@ export default function MediaDivLarge({id, remoteStream, display_name ,avatar}:P
 
   return (
     <div className="overflow-hidden relative w-full h-[87vh] bg-gray-700 rounded-xl flex justify-center items-center flex-col">
+        <audio
+          className='absolute opacity-0 -z-10'
+          ref={videoRef}
+          autoPlay
+          playsInline
+        />
         {remoteStream && video ? (
           <>
             <video
@@ -71,7 +87,7 @@ export default function MediaDivLarge({id, remoteStream, display_name ,avatar}:P
               autoPlay
               playsInline
             />
-            <div className='absolute top-[48rem] left-3 text-2xl'>{display_name}</div>
+            <div className='absolute top-[48rem] left-3 text-2xl'>{display_name} {id === host_id && "[ Chủ phòng ]"}</div>
           </>
         ) : (
           <>
@@ -81,13 +97,14 @@ export default function MediaDivLarge({id, remoteStream, display_name ,avatar}:P
               rounded
               bordered
               color="success"
+              className='relative z-30'
               placeholderInitials="Fr"
             />
-            <div className='mt-2 text-2xl'>{display_name}</div>
+           
+            <div className='mt-2 text-2xl'>{display_name} {id === host_id && "[Chủ phòng]"}</div>
           </>
           
         )}
-        
     </div>
   )
 }

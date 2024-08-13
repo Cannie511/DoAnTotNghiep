@@ -64,7 +64,7 @@ const getAllFriendController = async (req, res) => {
       {
         model: Model.User,
         as: "Friend",
-        attributes: ["display_name", "avatar"],
+        attributes: ["display_name", "avatar", "email"],
       },
     ];
     const paginate = await pagination(

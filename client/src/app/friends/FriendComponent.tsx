@@ -8,7 +8,7 @@ import { url_img_default } from '@/images/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AiFillMessage } from "react-icons/ai";
 import { HiUserRemove } from "react-icons/hi";
-import { Tooltip } from 'flowbite-react';
+import { Avatar, Tooltip } from 'flowbite-react';
 import { useRouter } from 'next/navigation';
 import ConfirmDeleteFriend from './ConfirmDeleteFriend';
 
@@ -42,37 +42,37 @@ export default function FriendComponent() {
       setOpenModal(true);
     }
   return (
-    <div>
-      <div className='space-y-2 mt-10'>
+    <div className=''>
+      <div className='space-y-2 mt-10 mx-auto w-fit'>
         {isLoading || !list_friend_accepted &&
           <>
-            <Skeleton className='w-[32rem] h-20'/>
-            <Skeleton className='w-[32rem] h-20'/>
-            <Skeleton className='w-[32rem] h-20'/>
+            <Skeleton className='w-full h-20'/>
+            <Skeleton className='w-full h-20'/>
+            <Skeleton className='w-full h-20'/>
           </>
         }
         {list_friend_accepted && list_friend_accepted.map((item:any)=>{
           return(
             <div key={item?.id} 
             className="
-            cursor-pointer dark:hover:bg-gray-700 transition-all 
-            hover:bg-slate-100 flex rounded-lg border w-[32rem] border-gray-200 
+            cursor-pointer  dark:hover:bg-gray-700 transition-all 
+            hover:bg-slate-100 flex rounded-lg border w-[42rem] border-gray-200 
             bg-white shadow-md dark:border-gray-700 dark:bg-gray-800 
               p-4 items-center">
-              <div className='flex-auto'>
+              <div className='flex-auto flex items-center'>
                   <div className="flex items-center space-x-3">
                   <div className="shrink-0">
-                      <Image
+                      <Avatar
+                      size={"md"}
                       alt="Neil image"
-                      height="50"
-                      src={item["Friend.avatar"].toString() || url_img_default}
-                      width="50"
+                      rounded
+                      img={item["Friend.avatar"].toString() || url_img_default}
                       className="rounded-full"
                       />
                   </div>
                   <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{item["Friend.display_name"]}</p>
-                      <p className="truncate text-sm text-gray-500 dark:text-gray-400">0 bạn bè</p>
+                      <p className="truncate text-lg text-gray-900 dark:text-white">{item["Friend.display_name"]}</p>
+                      <p className="truncate text-sm text-gray-500 dark:text-gray-400">{item["Friend.email"]}</p>
                   </div>
                   </div>
               </div>

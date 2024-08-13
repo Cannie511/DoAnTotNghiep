@@ -7,7 +7,7 @@ import { getFriendNotInRoom } from '@/Services/friend.api';
 import { UserFindByNameOrEmail } from '@/Services/user.api';
 import { createUserInvitation } from '@/Services/user_invitation.api';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Modal, Tabs, TextInput } from 'flowbite-react'
+import { Avatar, Button, Modal, Tabs, TextInput } from 'flowbite-react'
 import Image from 'next/image';
 import React, { ChangeEvent, Dispatch, SetStateAction, useContext, useState } from 'react'
 import { FaSearch } from "react-icons/fa";
@@ -113,11 +113,11 @@ export default function InviteFriendForm({setOpenModal, room_id}:Props) {
                         <div className='flex-auto'>
                             <div className="flex items-center space-x-3">
                             <div className="shrink-0">
-                                <Image
+                                <Avatar
                                 alt="Neil image"
-                                height="32"
-                                src={item["Friend.avatar"].toString() || url_img_default}
-                                width="32"
+                                rounded
+                                img={item["Friend.avatar"].toString() || url_img_default}
+                                size={"sm"}
                                 className="rounded-full"
                                 />
                             </div>
@@ -145,11 +145,11 @@ export default function InviteFriendForm({setOpenModal, room_id}:Props) {
                         <div className='flex-auto'>
                             <div className="flex items-center space-x-3">
                             <div className="shrink-0">
-                                <Image
+                                <Avatar
                                 alt="Neil image"
-                                height="32"
-                                src={item?.avatar.toString() || url_img_default}
-                                width="32"
+                                size={"sm"}
+                                rounded
+                                img={item?.avatar.toString() || url_img_default}
                                 className="rounded-full"
                                 />
                             </div>

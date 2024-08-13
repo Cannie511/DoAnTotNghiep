@@ -1,5 +1,5 @@
 'use client'
-import { Button, TextInput, Tooltip } from 'flowbite-react';
+import { Avatar, Button, TextInput, Tooltip } from 'flowbite-react';
 import { FaSearch } from "react-icons/fa";
 import React, { useContext, useEffect } from 'react'
 import Image from 'next/image';
@@ -61,12 +61,11 @@ export default function UserInRoom({listUserInRoom,room_id,host_id,removeUser}:P
                     <div className='flex-auto'>
                         <div className="flex items-center space-x-3">
                         <div className="shrink-0">
-                            <Image
-                                alt="Neil image"
-                                height="32"
-                                src={item["User.avatar"].toString() || url_img_default}
-                                width="32"
-                                className="rounded-full"
+                            <Avatar
+                                size={"sm"}
+                                alt="avatar"
+                                img={item["User.avatar"].toString() || url_img_default}
+                                rounded
                             />
                         </div>
                         <div className="min-w-0 flex-1">

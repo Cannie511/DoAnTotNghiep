@@ -43,7 +43,7 @@ export default function SideBar() {
            <MdVideoCameraFront/> Phòng họp
           </NavLink>
           <NavLink href="/schedule" className="items-center sidebar-items flex rounded-lg p-3 text-lg font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
-           <FaCalendarAlt/> Lịch trình
+           <FaCalendarAlt/> Lịch họp
           </NavLink>
           <Sidebar.Collapse icon={FaUserFriends} label="Bạn bè">
             <NavLink href="/friends" className="items-center sidebar-items flex rounded-lg p-3 text-lg font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">

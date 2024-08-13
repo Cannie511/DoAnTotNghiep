@@ -9,9 +9,10 @@ interface Props {
     remoteStream:MediaStream|null;
     display_name:string;
     avatar: string;
+    host_id:number
 }
 
-export default function MediaDiv({id, remoteStream, display_name ,avatar}:Props) {
+export default function MediaDiv({id, remoteStream, display_name ,avatar, host_id}:Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [video, setVideo] = useState<boolean>();
   const { socket } = useContext(AppContext);
@@ -54,6 +55,21 @@ export default function MediaDiv({id, remoteStream, display_name ,avatar}:Props)
           }
         } 
       })
+
+      socket.on("off-Mic",(userId:number)=>{
+        if(+userId === +id){
+          console.log("cam: ", userId + " đã tắt mic")
+          console.log(remoteStream?.getAudioTracks()[0])
+          // if(remoteStream)
+          // {
+          //   const videoTrack = remoteStream.getVideoTracks()[0];
+          //   videoTrack.enabled = false;
+          //   if (videoRef.current) {
+          //     videoRef.current.srcObject = remoteStream;
+          //   }
+          // }
+        } 
+      })
       return () => {
         socket.off("off-Cam");
         socket.off("on-Cam");
@@ -71,7 +87,7 @@ export default function MediaDiv({id, remoteStream, display_name ,avatar}:Props)
               autoPlay
               playsInline
             />
-            <div className='absolute mt-40 left-3'>{display_name}</div>
+            <div className='absolute mt-40 left-3'>{display_name} {id === host_id && "[Chủ phòng]"}</div>
           </>
         ) : (
           <>
@@ -83,7 +99,8 @@ export default function MediaDiv({id, remoteStream, display_name ,avatar}:Props)
               color="success"
               placeholderInitials="Fr"
             />
-            <div className='mt-2'>{display_name}</div>
+             
+            <div className='mt-2'>{display_name} {id === host_id && "[Chủ phòng]"}</div>
           </>
           
         )}

@@ -18,6 +18,7 @@ import { url_img_default } from '@/images/image';
 import { UserFindOne } from '@/Services/user.api';
 import MediaDivLarge from './MediaSizeLarge';
 import ModalKickOut from './ModalKickout';
+import { BsMicMuteFill } from "react-icons/bs";
 
 interface PeerType {
   id: number;
@@ -29,7 +30,7 @@ interface PeerType {
 
 export default function MotionBackground() {
   const { room_id } = useParams();
-  const { user_id, socket } = useContext(AppContext);
+  const { user_id, socket, avatar } = useContext(AppContext);
   const queryClient = useQueryClient();
   const router = useRouter();
   const { toast } = useToast();
@@ -155,7 +156,6 @@ export default function MotionBackground() {
     }
   };
 
-
   const shareScreen = async (streamScreen:MediaStream) =>{
     if(remoteScreen){
       toast({
@@ -234,10 +234,6 @@ export default function MotionBackground() {
           localVideoRef.current.srcObject = streamRef.current;
           localVideoRef.current.muted = true;
         }
-
-        peer.on('open', (id) => {
-          // console.log('Peer ID: ', id);
-        });
 
         peer.on("call", (call) => {
           if (streamRef.current) {
@@ -370,7 +366,7 @@ export default function MotionBackground() {
           track.stop();
         });
       } else {
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        navigator.mediaDevices.getUserMedia({ video: true, audio: audio })
           .then(async (newStream) => {
             streamRef.current = newStream;
             if(socket){
@@ -423,6 +419,40 @@ export default function MotionBackground() {
     }
   }, [socket]);
   
+  useEffect(() => {
+    try {
+      if (streamRef.current) {
+      if (!audio) {
+        if(socket){
+            socket.emit("offMic", room_id, user_id);
+          }
+        streamRef.current.getAudioTracks()[0].enabled = false;
+      } else {
+         if(socket){
+              socket.emit("onMic", room_id, user_id);
+            }
+        streamRef.current.getAudioTracks()[0].enabled = true;
+      }
+      if (streamRef.current && peerRef.current) {
+        Object.values(peerRef.current.connections).forEach((connectionArray: any) => {
+          connectionArray.forEach((connection: any) => {
+            connection.peerConnection.getSenders().forEach((sender: any) => {
+              if (sender.track && sender.track.kind === 'audio') {
+                if(streamRef.current)
+                sender.replaceTrack(streamRef.current.getAudioTracks()[0]);
+              }
+            });
+          });
+        });
+      }
+    }
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+    
+  }, [audio, video, room_id, socket, user_id , peers]);
+
   return (
     <div ref={motionDiv} className="p-3 w-full h-[100vh] overflow-hidden text-white bg-black">
       <RoomChat openChat={openChat} setOpen={setOpenChat} room_id={roomData?.id} />
@@ -446,17 +476,20 @@ export default function MotionBackground() {
               autoPlay
               playsInline
             />
-            <div className='absolute mt-40 left-3'>Tôi</div>
+            <div className='absolute mt-40 left-3 flex items-center'>Tôi {!audio && <BsMicMuteFill className='ml-3'/>}</div>
           </>
         ) : (
-          <Avatar
-            size={"lg"}
-            img={url_img_default}
-            rounded
-            bordered
-            color="success"
-            placeholderInitials="Fr"
-          />
+          <>
+            <Avatar
+              size={"lg"}
+              img={avatar || url_img_default}
+              rounded
+              bordered
+              color="success"
+              placeholderInitials="Fr"
+            />
+            <div className='absolute mt-40 left-3'>{!audio && <BsMicMuteFill/>}</div>
+          </>
         )}
       </motion.div>
       {localScreen && 
@@ -466,6 +499,7 @@ export default function MotionBackground() {
               autoPlay
               playsInline
           />
+          <div className='absolute top-[48rem] left-3 text-2xl'>Màn hình của tôi</div>
         </div>
       }
       {remoteScreen && 
@@ -475,16 +509,17 @@ export default function MotionBackground() {
               autoPlay
               playsInline
           />
+          <div className='absolute top-[48rem] left-3 text-2xl'>Màn hình của {peers.find(x=>x.type === "screen")?.display_name}</div>
         </div>
       }
       <div className='flex space-x-2'>
         {
           !remoteScreen && !localScreen && peers && peers.length === 1 && peers[0].type !== "screen" &&
-            <MediaDivLarge key={peers[0].id} id={peers[0].id} remoteStream={peers[0].stream} avatar={peers[0]?.avatar} display_name={peers[0]?.display_name} />
+            <MediaDivLarge host_id={roomData?.Host_id} key={peers[0].id} id={peers[0].id} remoteStream={peers[0].stream} avatar={peers[0]?.avatar} display_name={peers[0]?.display_name} />
         }
         {
           !remoteScreen && !localScreen && peers && peers.length > 1 && peers.filter(user => user.type !== "screen").map((user) => (
-            <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} avatar={user?.avatar}/>
+            <MediaDiv host_id={roomData?.Host_id} key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} avatar={user?.avatar}/>
           ))
         }
         
@@ -493,7 +528,7 @@ export default function MotionBackground() {
         <div className='h-[98vh] w-[22rem] bg-gray-900 fixed top-2 right-2 space-y-2'>
           {
             localScreen && peers && peers.length > 0 && peers.filter(user => user.type !== "screen").map((user) => (
-              <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} avatar={user?.avatar}/>
+              <MediaDiv host_id={roomData?.Host_id} key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} avatar={user?.avatar}/>
             ))
           }
         </div>
@@ -502,7 +537,7 @@ export default function MotionBackground() {
         <div className='h-[98vh] w-[22rem] bg-gray-900 fixed top-2 right-2 space-y-2 overflow-y-scroll'>
           {
             remoteScreen && peers && peers.length > 0 && peers.filter(user => user.type !== "screen").map((user) => (
-              <MediaDiv key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} avatar={user?.avatar}/>
+              <MediaDiv host_id={roomData?.Host_id} key={user.id} id={user.id} remoteStream={user.stream} display_name={user?.display_name} avatar={user?.avatar}/>
             ))
           }
         </div>

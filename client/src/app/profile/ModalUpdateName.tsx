@@ -89,11 +89,11 @@ const ModalUpdateName = ({openModal, setOpenModal, avatar}:Props) => {
           <div className="space-y-6">
             <h3 className="text-xl font-medium text-gray-900 dark:text-white">Thay đổi thông tin cá nhân</h3>
             <div className='flex items-center space-x-2'>
-                <Avatar alt='avatar' className='w-72' bordered rounded size={"lg"} img={previewImg || avatar || url_img_default}/>
+                <Avatar alt='avatar' className='w-96 flex-1' bordered rounded size={"xl"} img={previewImg || avatar || url_img_default}/>
                 {linked_account === "google" ? 
-                <span className='text-red-600 text-sm'>Bạn không thể thay đổi ảnh khi đăng nhập bằng google, 
+                <span className='text-red-600 text-sm flex-1'>Bạn không thể thay đổi ảnh khi đăng nhập bằng google, 
                 ảnh đại diện của bạn sẽ tự động cập nhật khi bạn thay đổi trên tài khoản google của bạn</span>:
-                <div>
+                <div className='flex-1'>
                     <FileInput onChange={handleFileChange} accept="image/png, image/jpeg, image/jpg" helperText="Vui lòng chọn hình có định dạng đuôi là (.png, .jpeg, .jpg)"/>
                 </div>
                 }
