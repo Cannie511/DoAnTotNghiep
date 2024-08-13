@@ -1,8 +1,9 @@
-import Image, { StaticImageData } from 'next/image'
+import { url_img_default } from '@/images/image';
+import { Avatar } from 'flowbite-react';
 import React from 'react'
 
 interface Props{
-    avatarSrc:string|StaticImageData;
+    avatarSrc:string;
     email:string;
     display_name:string;
     onClick ?:(email:string)=>void;
@@ -15,11 +16,11 @@ export default function ResultComponent({avatarSrc, email, display_name, onClick
     >
         <div className="flex items-center space-x-3">
         <div className="shrink-0">
-            <Image
+            <Avatar
             alt="Neil image"
-            height="32"
-            src={avatarSrc}
-            width="32"
+            rounded
+            img={avatarSrc || url_img_default}
+            size={"sm"}
             className="rounded-full"
             />
         </div>

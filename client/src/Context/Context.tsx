@@ -136,40 +136,24 @@ export default function AppProvider({children}:{children: ReactNode}){
                 queryClient.invalidateQueries({queryKey:['message_noti']});
             });
             socketIo.on("addFriend_notification", async(friend)=>{
-                const noti:NotificationRequestType = {
-                    user_id: user_id,
-                    message: " đã gửi lời mời kết bạn ",
-                    send_by: friend?.id,
-                    type: "friend",
-                    status: 0,
-                }
-                await createNotification(noti)
-                .then(()=>{
-                    queryClient.invalidateQueries({queryKey:["friend_noti"]})
-                    toast({
-                        title: "Lời mời kết bạn",
-                        description:"Bạn có 1 lời mời kết bạn từ " + friend?.display_name
-                    });
+                toast({
+                    title:`Bạn có một lời mời kết bạn mới `
                 })
-                .catch((err)=>{
-                    toast({
-                        title: "Lỗi: " + err.message,
-                        variant:"destructive"
-                    });
-                })
-            })
+                queryClient.invalidateQueries({queryKey:["friend_noti"]});
+                queryClient.invalidateQueries({queryKey:["List user"]});
+            });
             socketIo.on("friend_res_noti",(friend)=>{
                 toast({
                     title:`Bạn và ${friend?.display_name} đã trở thành bạn bè`
                 })
                 queryClient.invalidateQueries({queryKey:["friend_noti"]});
-            })
+            });
             socketIo.on("resFriend_notification", (friend)=>{
                 toast({
                     title:`${friend?.display_name} đã đồng ý lời mời kết bạn`
                 })
                 queryClient.invalidateQueries({queryKey:["friend_request"]});
-            })
+            });
             
             socketIo.on("user-joinIn", (userJoin:any)=>{
                 if(pathname.includes("/onMeeting/")){
@@ -178,6 +162,11 @@ export default function AppProvider({children}:{children: ReactNode}){
                         title: userJoin?.display_name + " đã tham gia phòng họp"
                     })
                 }
+            })
+            socketIo.on("cancel_request",()=>{
+                queryClient.invalidateQueries({queryKey:["List user"]});
+                queryClient.invalidateQueries({queryKey:["friend_request"]});
+                queryClient.invalidateQueries({queryKey:["friend_noti"]});
             })
             socketIo.on("room-chat",(user_id, message)=>{
                 if(pathname.includes("/onMeeting/")){

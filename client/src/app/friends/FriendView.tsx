@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import SkeletonFriendComponent from './SkeletonFriendCoponent';
 import { Button } from 'flowbite-react';
 import { url_img_default } from '@/images/image';
 import CardFriend from './CardFriend';
+import { AppContext } from '@/Context/Context';
 interface Props{
     dataList: [];
     isLoading:boolean;
@@ -11,6 +12,7 @@ interface Props{
     typeView:string;
 }
 export default function FriendView({dataList,isLoading, header, btn_content, typeView}:Props) {
+    const {user_id} = useContext(AppContext)
     if(dataList && dataList.length !== 0)
   return (
     <>
@@ -25,7 +27,7 @@ export default function FriendView({dataList,isLoading, header, btn_content, typ
             }
             {!isLoading && dataList && dataList.map((item:any)=>{
                 return(
-                    <CardFriend typeView={typeView} key={item?.id} noti_id={item?.id} avatar={item?.avatar||url_img_default} id={item?.send_by||item?.id} display_name={item?.display_name}/>
+                    <CardFriend typeView={typeView} key={item?.id} noti_id={item?.id} avatar={item?.avatar||url_img_default} id={item?.send_by || item?.id} id_delete={item?.user_id} display_name={item?.display_name}/>
                 )
             })} 
         </div>

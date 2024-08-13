@@ -76,5 +76,22 @@ class NotificationController {
             return this.res.status(err.status).json({ message: err.message });
         }
     }
+
+    delete = async() =>{
+        try {
+            const { notification_id } = this.req.params;
+            if (!notification_id)
+              return this.res
+                .status(422)
+                .json({ message: "Các trường đều bắt buộc!" });
+            const service = new NotificationService();
+            const response = await service.delete(notification_id);
+            if (response)
+                return this.res.status(response.status).json(response.data);
+        } catch (error) {
+            const err = handleError(error);
+            return this.res.status(err.status).json({ message: err.message });
+        }
+    }
 }
 module.exports = NotificationController;

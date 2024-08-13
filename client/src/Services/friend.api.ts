@@ -17,8 +17,8 @@ export const getFriendNotInRoom = async(user_id:number, room_id: number)=>{
     return await http.get(`/api/friend/getNotInRoom/${user_id}/${room_id}`);
 }
 
-export const deleteFriend = async(user_id:number, friend_id: number)=>{
-    return await http.delete(`/api/friend/${user_id}/${friend_id}`);
+export const deleteFriend = async(user_id:number, friend_id: number, status:number)=>{
+    return await http.delete(`/api/friend/${user_id}/${friend_id}/${status}`);
 }
 
 export const getSuggestFriend = async(user_id:number, page:number)=>{

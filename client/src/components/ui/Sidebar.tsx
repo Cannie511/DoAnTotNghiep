@@ -35,9 +35,9 @@ export default function SideBar() {
           </NavLink>
           <NavLink href="/chat" className=" items-center sidebar-items flex rounded-lg p-3 text-lg font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
             <IoChatbubbleEllipses/> Trò chuyện 
-            {message_noti && 
+            {/* {message_noti && 
               <div className='w-5 h-5 flex items-center justify-center rounded-full bg-red-600 absolute mt-1 ml-40 text-xs text-white'>{String(message_noti)}</div>
-            }
+            } */}
           </NavLink>
           <NavLink href="/meeting" className="items-center sidebar-items flex rounded-lg p-3 text-lg font-bold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">
            <MdVideoCameraFront/> Phòng họp

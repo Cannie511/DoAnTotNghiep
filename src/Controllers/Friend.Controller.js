@@ -37,12 +37,12 @@ const addFriendController = async (req, res) => {
 //Xóa kết bạn
 const deleteFriendController = async (req, res) => {
   try {
-    const { user_id, friend_id } = req.params;
+    const { user_id, friend_id, status } = req.params;
     if (!user_id)
       return res.status(422).json({ message: "Không nhận được user_id" });
     if (!friend_id)
       return res.status(422).json({ message: "Không nhận được friend_id" });
-    const data = await deleteFriend(user_id, friend_id);
+    const data = await deleteFriend(user_id, friend_id, status);
     if (data) return res.status(data.status).json(data);
   } catch (error) {
     const err = handleError(error);

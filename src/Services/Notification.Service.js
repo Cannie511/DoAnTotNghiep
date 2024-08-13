@@ -21,7 +21,7 @@ class NotificationService {
         },
         raw: true,
       });
-      if(!findNoti){
+      if (!findNoti) {
         const data = await Model.Notification.create(
           {
             user_id: this.user_id,
@@ -35,7 +35,7 @@ class NotificationService {
         if (data) return handleResult(200, "Tạo thông báo thành công", data);
         else return handleResult(422, "Tạo thông báo thất bại");
       }
-      else return handleResult(422, "Thông báo đã tồn tại!");
+      return handleResult(422, "Thông báo đã tồn tại!");
     } catch (error) {
       return handleError(error);
     }
@@ -61,7 +61,7 @@ class NotificationService {
     }
   };
 
-  getAll = async()=>{
+  getAll = async () => {
     try {
       const data = await Model.Notification.findAll({
         include: [
@@ -69,29 +69,33 @@ class NotificationService {
             model: Model.User,
             as: "Sender",
             attributes: ["display_name", "avatar"],
-          }
+          },
         ],
-        attributes:[
-          "id","user_id", "message", "send_by", "status",
+        attributes: [
+          "id",
+          "user_id",
+          "message",
+          "send_by",
+          "status",
           [col("Sender.display_name"), "display_name"],
           [col("Sender.avatar"), "avatar"],
         ],
         where: {
           user_id: this.user_id,
           type: this.type,
-          status: this.status
+          status: this.status,
         },
         order: [["createdAt", "DESC"]],
         raw: true,
       });
-       if (data) return handleResult(200, "Lấy thông báo thành công", data);
-       else return handleResult(422, "Lấy thông báo thất bại");
+      if (data) return handleResult(200, "Lấy thông báo thành công", data);
+      else return handleResult(422, "Lấy thông báo thất bại");
     } catch (error) {
       return handleError(error);
     }
-  }
+  };
 
-  getRequest = async()=>{
+  getRequest = async () => {
     try {
       const data = await Model.Notification.findAll({
         include: [
@@ -118,14 +122,14 @@ class NotificationService {
         order: [["createdAt", "DESC"]],
         raw: true,
       });
-       if (data) return handleResult(200, "Lấy thông báo thành công", data);
-       else return handleResult(422, "Lấy thông báo thất bại");
+      if (data) return handleResult(200, "Lấy thông báo thành công", data);
+      else return handleResult(422, "Lấy thông báo thất bại");
     } catch (error) {
       return handleError(error);
     }
-  }
+  };
 
-  countAll = async()=>{
+  countAll = async () => {
     try {
       const data = await Model.Notification.count({
         where: {
@@ -141,6 +145,20 @@ class NotificationService {
     } catch (error) {
       return handleError(error);
     }
-  }
+  };
+
+  delete = async (id) => {
+    try {
+      const data = await Model.Notification.destroy({
+        where: {
+          id: id
+        },
+      });
+      if (+data === 1) return handleResult(200, "Xóa thông báo thành công");
+      return handleResult(422, "Xóa thông báo thất bại");
+    } catch (error) {
+      return handleError(error);
+    }
+  };
 }
 module.exports = NotificationService;

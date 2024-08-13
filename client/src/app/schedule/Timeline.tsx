@@ -1,5 +1,5 @@
 import { formatDateMessage, formatRoomKey } from "@/Utils/formatDate";
-import { TextInput, Timeline } from "flowbite-react";
+import { Card, TextInput, Timeline } from "flowbite-react";
 import {  HiCalendar } from "react-icons/hi";
 interface Props{
     schedule: []
@@ -11,20 +11,19 @@ export default function TimeLine({schedule}:Props) {
         <Timeline>
         {schedule && schedule.map((item:any)=>{
             return(
-                <Timeline.Item key={item["ID"]}>
-                    <Timeline.Point icon={HiCalendar} />
-                    <Timeline.Content>
-                    <Timeline.Time>{formatDateMessage(item.Time)} Hôm nay</Timeline.Time>
-                    <Timeline.Title>Phòng họp Freet</Timeline.Title>
-                    <Timeline.Body>
-                    <TextInput className="w-48" readOnly disabled color={"gray"} value={formatRoomKey(item["Room.Room_key"] || "")}/>
-                    </Timeline.Body>
-                    {/* <Button color="gray">
-                        Learn More
-                        <HiArrowNarrowRight className="ml-2 text-xl" />
-                    </Button> */}
-                    </Timeline.Content>
-                </Timeline.Item>
+                // <Timeline.Item key={item["ID"]}>
+                //     <Timeline.Point icon={HiCalendar} />
+                //     <Timeline.Content>
+                //     <Timeline.Time>{formatDateMessage(item.Time)} Hôm nay</Timeline.Time>
+                //     <Timeline.Body>
+                //     {/* <TextInput className="w-48" readOnly disabled color={"gray"} value={formatRoomKey(item["Room.Room_key"] || "")}/> */}
+                    
+                //     </Timeline.Body>
+                //     </Timeline.Content>
+                // </Timeline.Item>
+                <Card key={item["ID"]}>
+                    <div className="text-2xl font-bold">Phòng họp của tôi</div>
+                </Card>
             )
         })}
         {schedule && schedule.length===0 &&

@@ -6,7 +6,7 @@ const {
 const { getUsersByIdService } = require("./Services/User.Service");
 const Socket = require("./Services/Socket.Service");
 const { handleError } = require("./Utils/Http");
-const { addFriend, agreeAddFriend } = require("./Services/Friend.Service");
+const { addFriend, agreeAddFriend, deleteFriend } = require("./Services/Friend.Service");
 const NotificationService = require("./Services/Notification.Service");
 const UserJoin = require("./Services/User_Join.Service");
 const chalk = require("chalk");
@@ -164,6 +164,20 @@ function initializeSocket(server) {
               return;
             });
         }
+      });
+
+      socket.on("cancel_request", async(userId, friendId, status)=>{
+        console.log(userId, friendId, status);
+        await deleteFriend(userId, friendId, status)
+        .then(async()=>{
+          const received_user = await socketIO.searchOne(friendId);
+          if(received_user)
+          io.to(received_user?.data.socket_id).emit("cancel_request");
+          else return
+        })
+        .catch((err)=>{
+          console.log(err)
+        })
       });
 
       socket.on("invite_meeting", (listInvite) => {

@@ -54,9 +54,9 @@ const addFriend = async (user_id, friend_id) => {
     if (user_friend){
       return handleResult(201, "Bạn đã gửi lời mời rồi!");
     }
-      if (!userExists || !friendExists) {
-        return handleResult(400, "User or friend does not exist");
-      }
+    if (!userExists || !friendExists) {
+      return handleResult(400, "User or friend does not exist");
+    }
     const user = await Model.USER_FRIEND.bulkCreate(
       [
         {
@@ -83,12 +83,13 @@ const addFriend = async (user_id, friend_id) => {
 };
 
 // xóa bạn(done)
-const deleteFriend = async (user_id, friend_id) => {
+const deleteFriend = async (user_id, friend_id, status) => {
   try {
     const find = await Model.USER_FRIEND.findOne({
       where: {
         User_ID: user_id,
         Friend_ID: friend_id,
+        status: status
       },
       raw: true,
     });
@@ -102,13 +103,14 @@ const deleteFriend = async (user_id, friend_id) => {
           ],
         },
       });
-      if (data !== 1) {
+      console.log(data);
+      if (+data === 2) {
         return handleResult(200, "Delete friend successfully");
       } else {
         return handleResult(400, "Delete friend error");
       }
     } else {
-      return handleResult(404, "Friend not found");
+      return handleResult(422, "Friend not found");
     }
   } catch (error) {
     return handleError(error);

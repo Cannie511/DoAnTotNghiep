@@ -20,3 +20,7 @@ export const getNotification = async ({user_id, type}:NotificationRequestType)=>
 export const getFriendRequest = async ({send_by, type}:NotificationRequestType)=>{
     return await http.post<BasicResponse>(`/api/notification/getRequest`,{send_by, type, status});
 }
+
+export const deleteNotification = async (notification_id:number)=>{
+    return await http.post<BasicResponse>(`/api/notification/delete/${notification_id}`);
+}

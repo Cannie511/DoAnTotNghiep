@@ -30,7 +30,7 @@ export default function ConfirmDeleteFriend({openModal, setOpenModal, friend_id,
             });
             return;
         }
-        await deleteFriend(Number(user_id), friend_id)
+        await deleteFriend(Number(user_id), friend_id, 1)
         .then((data)=>{
             toast({
                 title:"Đã hủy kết bạn với " + display_name

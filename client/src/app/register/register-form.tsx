@@ -6,6 +6,7 @@ import ProfileStep from './ProfileStep';
 import PasswordStep from './PasswordStep';
 import { TbArrowBack } from "react-icons/tb";
 import OTPConfirmStep from './OTPConfirmStep';
+import Link from 'next/link';
 export default function RegisterForm() {
     const [process, setProcess] = useState<number>(25);
     useLayoutEffect(()=>{
@@ -43,6 +44,7 @@ export default function RegisterForm() {
                 {process === 50 && <EmailStep setStep={setProcess}/>}
                 {process === 75 && <OTPConfirmStep setStep={setProcess}/>}
                 {process === 100 && <PasswordStep />}
+                <Link className='text-indigo-500 text-center font-semibold hover:underline-offset-4 hover:underline transition-all' href={"/login"}>Quay lại đăng nhập</Link>
         </Card>
     </div>
     

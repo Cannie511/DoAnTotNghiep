@@ -234,6 +234,7 @@ const findUserService = async (value) => {
         "email",
         "display_name",
         "language",
+        "avatar",
         "premium",
         "linked_account",
       ],

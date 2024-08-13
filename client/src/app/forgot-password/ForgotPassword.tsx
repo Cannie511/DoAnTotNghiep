@@ -11,6 +11,7 @@ import { AppContext } from '@/Context/Context';
 import { SiAuthy } from "react-icons/si";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ForgotPassword() {
     const {toast} = useToast();
@@ -134,6 +135,7 @@ export default function ForgotPassword() {
                             <Label htmlFor="email1" value="Email đăng nhập: " />
                         </div>
                         <TextInput className='dark:text-black' 
+                        color={errorMessage ? "failure" : "gray"}
                         helperText={errorMessage}
                         value={searchValue}
                         onChange={(e)=>setSearchValue(e.target.value)}
@@ -146,7 +148,7 @@ export default function ForgotPassword() {
                 <div className='max-h-48 overflow-y-auto'>
                     {listResult.map((item:any, index:number)=>{
                         return(
-                            <ResultComponent onClick={handleStep} key={index} avatarSrc={avatar} email={item?.email} display_name={item?.display_name}/>
+                            <ResultComponent onClick={handleStep} key={index} avatarSrc={item?.avatar} email={item?.email} display_name={item?.display_name}/>
                         )
                     })}
                 </div>
@@ -162,11 +164,11 @@ export default function ForgotPassword() {
                         </div>
                         
                         <div className="my-3 block">
-                            <Label htmlFor="password1" value="Mật khẩu" />
+                            <Label htmlFor="password1" value="Mật khẩu mới" />
                         </div>
                         <TextInput value={password} onChange={(e)=>setPassword(e.target.value)} type="password"/>
                         <div className="my-3 block">
-                            <Label htmlFor="password2" value="Nhập lại mật khẩu" />
+                            <Label htmlFor="password2" value="Nhập lại mật khẩu mới" />
                         </div>
                         <TextInput value={retypePassword} color={validateRTP ? "failure":"gray"} onChange={(e)=>setRetypePassword(e.target.value)} type="password"
                             helperText={validateRTP ? 'Mật khẩu không trùng khớp':''}
@@ -204,6 +206,7 @@ export default function ForgotPassword() {
                 </Button> 
                 </form>
             }
+            <Link className='text-indigo-500 text-center font-semibold hover:underline-offset-4 hover:underline transition-all' href={"/login"}>Quay lại đăng nhập</Link>
     </Card>
   )
 }
